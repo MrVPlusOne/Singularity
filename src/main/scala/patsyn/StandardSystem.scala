@@ -80,10 +80,10 @@ object StandardSystem {
     })
 
     val access = EAbstractFunc("access", 1, {
-      case IS(e) => IS(EVect(e), EInt) -> e
+      case IS(e) => IS(EVect(e), EInt, e) -> e
     }, {
-      case IS(VectValue(vec), IntValue(v)) =>
-        if (vec.isEmpty) 0
+      case IS(VectValue(vec), IntValue(v), default) =>
+        if (vec.isEmpty) default
         else {
           val m = v % vec.length
           val i = if (m < 0) m + vec.length else m

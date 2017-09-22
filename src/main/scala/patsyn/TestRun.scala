@@ -94,21 +94,30 @@ object TestRun {
     )
   }
 
+  def makeConstMap(pairs: (EType, Random => EValue)*): Map[EType, IS[ExprGen[EConst]]] = {
+    pairs.map{ case (t, f) =>
+      t -> IS(ExprGen(t, r => EConst(t, f(r))))
+    }.toMap
+  }
 
   def main(args: Array[String]): Unit = {
     val example = quickSortExample
 
-    val intGen = ExprGen(EInt, r => EConst(EInt, r.nextInt(7)))
-    val intVecGen = ExprGen(EVect(EInt), _ => EConst(EVect(EInt), Vector()))
-    val constMap = Map[EType, IS[ExprGen[EConst]]](
-      EInt -> IS(intGen),
-      EVect(EInt) -> IS(intVecGen)
+    val constMap = makeConstMap(
+      EInt -> (r => r.nextInt(7)),
+      EVect(EInt) -> (_ => Vector()),
+      EVect(EVect(EInt)) -> (_ => Vector())
     )
 
     val functions = IntComponents.collection ++ VectComponents.collection
 
     val library = new GeneticOpLibrary(constMap, functions, example.seedTypes)
 
+    println("[Function map]")
+    library.functionMap.foreach{ case (t, comps) =>
+      println(s"$t -> ${comps.mkString("{",", ","}")}")
+    }
+    println("[End of Function map]")
 
     MamLink.runWithALinkOnMac{ link =>
 
@@ -160,7 +169,6 @@ object TestRun {
           print("Distribution: "); println(pop.frequencyRatioStat.take(12).map{
             case(s, f) => s"$s -> ${"%.3f".format(f)}"
           }.mkString(", "))
-          //          println(pop.showLinearExprs) //todo: print the whole population
         }
       }
     }

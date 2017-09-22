@@ -52,13 +52,17 @@ case class EConcreteFunc(name: String, argTypes: IS[EType], returnType: EType,
   def apply (args: Expr*): ENode = {
     ENode(this, args.toIndexedSeq)
   }
+
+  override def toString: String = {
+    s"$name: ${argTypes.mkString("(",",",")")} => $returnType"
+  }
 }
 
 case class EAbstractFunc(name: String, tyVarNum: Int,
                          typeInstantiation: (IS[EType]) => (IS[EType], EType),
                          eval: PartialFunction[IS[EValue], EValue]) extends EFunction {
 
-  def toConcrete(tyMap: IS[EType]): EConcreteFunc = {
+  def concretize(tyMap: IS[EType]): EConcreteFunc = {
     val (argTypes, returnType) = typeInstantiation(tyMap)
     EConcreteFunc(name, argTypes, returnType, eval)
   }
@@ -68,7 +72,7 @@ case class EAbstractFunc(name: String, tyVarNum: Int,
 object Expr {
   def evaluateWithCheck(expr: Expr, env: IndexedSeq[EValue]): EValue = {
     def withType(ty: EType)(value: EValue) ={
-      assert(value.hasType(ty))
+      assert(value.hasType(ty), s"$value should have type $ty")
       value
     }
     expr match {

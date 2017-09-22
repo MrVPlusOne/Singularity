@@ -31,7 +31,8 @@ object GeneticOpLibrary{
     }
 
     def rec(ty: EType, maxDepth: Int): Expr = {
-      if(maxDepth <= 0 || random.nextDouble()<terminalChance) return randomPick(terminalMap(ty)).gen(random)
+      if(maxDepth <= 0 || random.nextDouble()<terminalChance || !functionMap.contains(ty))
+        return randomPick(terminalMap(ty)).gen(random)
 
       val f = randomPick(functionMap(ty))
       val args = f.argTypes.map{aTy =>
@@ -75,32 +76,37 @@ object GeneticOpLibrary{
 class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[EFunction],
                        seedTypes: IS[EType]
                       ){
+  /** type set used to concretize abstract functions */
+  val typeUniverse: Set[EType] = constMap.keySet
 
-  val terminalTypes: Set[EType] = constMap.keySet
-
-  private def typeUniverseRequirement(sourceName: String, types: Set[EType]): Unit = {
+  private def argTypesInTheUniverse(sourceName: String, types: Set[EType]): Boolean = {
     types.foreach{t =>
-      if(!terminalTypes.contains(t)){
+      if(!typeUniverse.contains(t)){
         System.err.println(s"[Warning] $sourceName will not be used, because type $t is not within the type universe.")
-        return
+        return false
       }
     }
+    true
   }
 
   val functionMap: Map[EType, IndexedSeq[EConcreteFunc]] = functions.flatMap{
     case cf: EConcreteFunc =>
-      typeUniverseRequirement(cf.name, cf.argTypes.toSet)
-      IS(cf)
+      if(argTypesInTheUniverse(cf.name, cf.argTypes.toSet)) IS(cf)
+      else IS()
     case af: EAbstractFunc =>
-      for(
-        ts <- cartesianProduct(IS.fill(af.tyVarNum)(terminalTypes)).toIndexedSeq;
-        cf = af.toConcrete(ts) if cf.argTypes.toSet.subsetOf(terminalTypes)
+      val instantiations = for(
+        ts <- cartesianProduct(IS.fill(af.tyVarNum)(typeUniverse)).toIndexedSeq;
+        cf = af.concretize(ts) if cf.argTypes.toSet.subsetOf(typeUniverse)
       ) yield {
         cf
       }
+      if(instantiations.isEmpty){
+        System.err.println(s"[Warning] ${af.name} will not be used, because there is no valid concrete instantiations under the current type universe")
+      }
+      instantiations
   }.groupBy(_.returnType)
 
-  require(seedTypes.toSet.subsetOf(terminalTypes), "Some seed type is not within the type universe!")
+  require(seedTypes.toSet.subsetOf(typeUniverse), "Some seed type is not within the type universe!")
   val args: IndexedSeq[ExprGen[EArg]] = seedTypes.zipWithIndex.map{
     case (t, i) => ExprGen(t, _ =>EArg(i, t))
   }
