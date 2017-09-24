@@ -3,6 +3,7 @@ package patsyn
 import scala.util.Random
 import Evolution._
 
+
 object Evolution {
   trait Provider[T]{
     def provide(r: Random): T
@@ -79,7 +80,16 @@ class Evolution {
                       initOperator: GeneticOperator,
                       operators: IS[(GeneticOperator, Double)],
                       evaluation: Individual => IndividualEvaluation,
+                      threadNum: Int
                      ): Iterator[Population] = {
+    import scala.collection.parallel
+    import parallel._
+    def toPar[A](seq: Seq[A]): ParSeq[A] = {
+      val p = seq.par
+      p.tasksupport = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(threadNum))
+      p
+    }
+
     val operatorPCF: IS[(GeneticOperator, Double)] = {
       val normalizeFactor = operators.map(_._2).sum
       var acc = 0.0
@@ -90,21 +100,30 @@ class Evolution {
       }
     }
 
-    val random = new Random(randSeed)
+    val bigRandom = new Random(randSeed)
 
-    val initPop = Population((0 until populationSize).map{i =>
-      evaluation(initOperator.operate(random, IS()))
-    })
+    val initPop = {
+      val par = toPar(0 until populationSize)
+      Population(par.map{i =>
+        val random = new Random(randSeed +i)
+        evaluation(initOperator.operate(random, IS()))
+      }.toIndexedSeq)
+    }
 
     Iterator.iterate(initPop){pop =>
       def tournamentResult(): Individual = {
         val candidates = IS.fill(tournamentSize){
-          pop.evaluations(random.nextInt(populationSize))
+          pop.evaluations(bigRandom.nextInt(populationSize))
         }
         candidates.maxBy(ind => ind.fitness).ind
       }
 
-      val newInds = for(i <- 0 until populationSize) yield {
+      import collection.mutable
+      var buffer = mutable.HashMap[Individual, IndividualEvaluation]()
+
+      val seedBase = bigRandom.nextInt()
+      val newInds = for(i <- toPar(0 until populationSize)) yield {
+        val random = new Random(seedBase+i)
         val geneticOp = {
           val x = random.nextDouble()
 
@@ -116,9 +135,17 @@ class Evolution {
         val participates = IS.fill(geneticOp.arity){
           tournamentResult()
         }
-        evaluation(geneticOp.operate(random, participates))
+        val ind = geneticOp.operate(random, participates) // todo: only parallelize eval part
+        buffer.synchronized{
+          if(buffer.contains(ind)) buffer(ind)
+          else {
+            val eval = evaluation(ind)
+            buffer(ind) = eval
+            eval
+          }
+        }
       }
-      Population(newInds)
+      Population(newInds.toIndexedSeq)
     }
   }
 }

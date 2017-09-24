@@ -1,6 +1,5 @@
 package patsyn
 
-import patsyn.TestRun.failedIterFitness
 
 object Evaluation {
 
@@ -81,7 +80,7 @@ class ExtrapolateEvaluation(mamLink: MamLink, sizeOfInterest: Int, fitEndPoint: 
     val inputStream = Stream.iterate(seedValues)(ls => {
       val ls1 = iters.map { iter => Expr.evaluateWithCheck(iter, ls) }
       if (sizeF(ls1) <= sizeF(ls))
-        return (failedIterFitness, Stream())
+        return (nonsenseFitness, Stream())
       ls1
     })
 
@@ -98,7 +97,7 @@ class SimpleEvaluation(sizeOfInterest: Int, maxTrials: Int, nonsenseFitness: Dou
     val inputStream = Stream.iterate(seedValues)(ls => {
       val ls1 = iters.map { iter => Expr.evaluateWithCheck(iter, ls) }
       if (sizeF(ls1) <= sizeF(ls))
-        return (failedIterFitness, Stream())
+        return (nonsenseFitness, Stream())
       ls1
     })
 

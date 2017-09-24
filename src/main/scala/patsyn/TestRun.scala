@@ -1,13 +1,13 @@
 package patsyn
 
 import StandardSystem._
+import measure.{TimeMeasureExamples, TimeMeasurement, TimeTools}
 import patsyn.Evolution.IndividualEvaluation
 import patsyn.GeneticOpLibrary.ExprGen
 
 import scala.util.Random
 
 object TestRun {
-  val failedIterFitness = 0.0
 
   case class FuzzingExample(seedTypes: IS[EType], sizeF: IS[EValue] => Int, resourceUsage: IS[EValue] => Double)
 
@@ -94,6 +94,63 @@ object TestRun {
     )
   }
 
+  def vectIntToString(vec: VectValue): String = {
+    String.valueOf(vectIntToCharArray(vec))
+  }
+
+  def vectIntToCharArray(vec: VectValue): List[Char] = {
+    vec.value.map { i =>
+      (i.asInstanceOf[IntValue].value % 256).toChar
+    }.toList
+  }
+
+  def phpHashTableExample(timeout: TimeMeasurement.DoubleAsMillis): FuzzingExample = {
+    val example = TimeMeasureExamples.phpHashExampleNoFile
+    FuzzingExample(
+      seedTypes = IS(EVect(EVect(EInt))),
+      sizeF = {
+        case IS(VectValue(strings)) =>
+          strings.map(s => s.asInstanceOf[VectValue].value.length).sum
+        case _ => notPossible()
+      },
+      resourceUsage = {
+        case IS(VectValue(vec)) =>
+          val strings = vec.map(v => vectIntToString(v.asInstanceOf[VectValue]))
+          example.measure(strings, timeout)
+      }
+    )
+  }
+
+  def phpHashCollision: FuzzingExample = {
+    FuzzingExample(
+      seedTypes = IS(EVect(EVect(EInt))),
+      sizeF = {
+        case IS(VectValue(strings)) =>
+          strings.map(s => s.asInstanceOf[VectValue].value.length).sum
+        case _ => notPossible()
+      },
+      resourceUsage = {
+        case IS(VectValue(vec)) =>
+          val hashes = vec.map(v => {
+            vectIntToCharArray(v.asInstanceOf[VectValue])
+          }).toSet.toIndexedSeq.map(hashFunc)
+
+          hashes.groupBy(identity).values.map{
+            elems => elems.length - 1
+          }.sum
+      }
+    )
+  }
+
+  def hashFunc(ls: Seq[Char]) = {
+    val cs = ls.toArray
+    var hash = 5381
+    for(i <- cs.indices){
+      hash = ((hash << 5) + hash) + cs(i)
+    }
+    hash
+  }
+
   def makeConstMap(pairs: (EType, Random => EValue)*): Map[EType, IS[ExprGen[EConst]]] = {
     pairs.map{ case (t, f) =>
       t -> IS(ExprGen(t, r => EConst(t, f(r))))
@@ -101,10 +158,10 @@ object TestRun {
   }
 
   def main(args: Array[String]): Unit = {
-    val example = quickSortExample
+    val example = phpHashCollision
 
     val constMap = makeConstMap(
-      EInt -> (r => r.nextInt(7)),
+      EInt -> (r => r.nextInt(12)),
       EVect(EInt) -> (_ => Vector()),
       EVect(EVect(EInt)) -> (_ => Vector())
     )
@@ -119,56 +176,62 @@ object TestRun {
     }
     println("[End of Function map]")
 
-    MamLink.runWithALinkOnMac{ link =>
+    MamLink.runWithALinkOnMac { link =>
 
       val eval: (IS[Expr], IS[Expr]) => ((Double, Double), Stream[IS[EValue]]) = (seeds, iters) => {
-        val seedSizeFringe = 12
-        val programSizeFringe = 20
+        val seedSizeFringe = 15
+        val programSizeFringe = 30
         val penaltyFactor = seeds.map(s => Evaluation.gaussianSquared(seedSizeFringe)(s.astSize)).product *
           iters.map(iter => Evaluation.gaussianSquared(programSizeFringe)(iter.astSize)).product
 
-        val (v, stream) = new SimpleEvaluation(sizeOfInterest = 400, maxTrials = 3).evaluateAPattern(
+        val (v, stream) = new SimpleEvaluation(sizeOfInterest = 1000, maxTrials = 3, nonsenseFitness = -1.0).evaluateAPattern(
           example.resourceUsage, example.sizeF
         )(seeds, iters)
 
-        ((v * penaltyFactor,v), stream)
+        ((v * penaltyFactor, v), stream)
       }
 
+      for (seed <- 2 to 5) {
 
-      val evolution = new Evolution()
-      val generations = evolution.evolveAFunction(
-        populationSize = 1000, tournamentSize = 8,
-        randSeed = 1,
-        initOperator = library.initOp(maxDepth = 3),
-        operators = IS(
-          library.simpleCrossOp(0.2) -> 0.6,
-          library.simpleMutateOp(newTreeMaxDepth = 3, 0.2) -> 0.3,
-          library.copyOp -> 0.1
-        ),
-        evaluation = ind => {
-          val (fitness, performance) = eval(ind.seed, ind.iter)._1
-          IndividualEvaluation(ind, fitness, performance)
-        }
-      )
+        val evolution = new Evolution()
+        val generations = evolution.evolveAFunction(
+          populationSize = 1000, tournamentSize = 5,
+          randSeed = seed,
+          initOperator = library.initOp(maxDepth = 3),
+          operators = IS(
+            library.simpleCrossOp(0.2) -> 0.6,
+            library.simpleMutateOp(newTreeMaxDepth = 3, 0.2) -> 0.3,
+            library.copyOp -> 0.05
+          ),
+          evaluation = ind => {
+            val (fitness, performance) = eval(ind.seed, ind.iter)._1
+            IndividualEvaluation(ind, fitness, performance)
+          },
+          threadNum = 8 //todo
+        )
 
-      FileLogger.runWithAFileLogger("testResult.txt") { logger =>
-        import logger._
+        FileLogger.runWithAFileLogger(s"testResult[$seed].txt") { logger =>
+          import logger._
 
-        generations.take(30).zipWithIndex.foreach { case (pop, i) =>
-          println("------------")
-          println(s"Generation ${i + 1}")
-          val best = pop.bestSoFar
-          println(s"Best Individual: ${best.showAsLinearExpr}")
-          link.logInteraction = true
-          val firstFiveInputs = eval(best.ind.seed, best.ind.iter)._2.take(5).map(
-            _.mkString("< ", " | ", " >")).mkString(", ")
-          link.logInteraction = false
-          println(s"Best Individual Pattern: $firstFiveInputs, ...")
-          println(s"Average Size: ${pop.averageSize}")
-          println(s"Average Fitness: ${pop.averageFitness}")
-          print("Distribution: "); println(pop.frequencyRatioStat.take(12).map{
-            case(s, f) => s"$s -> ${"%.3f".format(f)}"
-          }.mkString(", "))
+          val startTime = System.nanoTime()
+          generations.take(150).zipWithIndex.foreach { case (pop, i) =>
+            println("------------")
+            print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
+            println(s"Generation ${i + 1}")
+            val best = pop.bestSoFar
+            println(s"Best Individual: ${best.showAsLinearExpr}")
+            link.logInteraction = true
+            val firstFiveInputs = eval(best.ind.seed, best.ind.iter)._2.take(5).map(
+              _.mkString("< ", " | ", " >")).mkString(", ")
+            link.logInteraction = false
+            println(s"Best Individual Pattern: $firstFiveInputs, ...")
+            println(s"Average Size: ${pop.averageSize}")
+            println(s"Average Fitness: ${pop.averageFitness}")
+            print("Distribution: ");
+            println(pop.frequencyRatioStat.take(12).map {
+              case (s, f) => s"$s -> ${"%.3f".format(f)}"
+            }.mkString(", "))
+          }
         }
       }
     }

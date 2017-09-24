@@ -76,6 +76,8 @@ object GeneticOpLibrary{
 class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[EFunction],
                        seedTypes: IS[EType]
                       ){
+
+  require(constMap.forall{case (_, gens) => gens.nonEmpty}, "For each type in constMap, there should be at least one ExprGen.")
   /** type set used to concretize abstract functions */
   val typeUniverse: Set[EType] = constMap.keySet
 

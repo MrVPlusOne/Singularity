@@ -7,6 +7,7 @@ class FileLogger(fileName: String, printToConsole: Boolean, writer: FileWriter) 
   def println(obj: Any): Unit ={
     val s = obj.toString
     writer.write(s)
+    writer.write("\n")
     if(printToConsole){
       System.out.println(s)
     }
@@ -20,6 +21,7 @@ object FileLogger{
     try{
       f(logger)
     }finally {
+      writer.flush()
       writer.close()
     }
   }
