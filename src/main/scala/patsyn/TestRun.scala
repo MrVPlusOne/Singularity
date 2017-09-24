@@ -1,5 +1,6 @@
 package patsyn
 
+
 import StandardSystem._
 import measure.{TimeMeasureExamples, TimeMeasurement, TimeTools}
 import patsyn.Evolution.IndividualEvaluation
@@ -151,9 +152,9 @@ object TestRun {
     hash
   }
 
-  def makeConstMap(pairs: (EType, Random => EValue)*): Map[EType, IS[ExprGen[EConst]]] = {
-    pairs.map{ case (t, f) =>
-      t -> IS(ExprGen(t, r => EConst(t, f(r))))
+  def makeConstMap(pairs: (EType, IS[Random => EValue])*): Map[EType, IS[ExprGen[EConst]]] = {
+    pairs.map{ case (t, fs) =>
+      t -> fs.map(f =>ExprGen(t, r => EConst(t, f(r))))
     }.toMap
   }
 
@@ -161,9 +162,9 @@ object TestRun {
     val example = phpHashCollision
 
     val constMap = makeConstMap(
-      EInt -> (r => r.nextInt(12)),
-      EVect(EInt) -> (_ => Vector()),
-      EVect(EVect(EInt)) -> (_ => Vector())
+      EInt -> IS(r => r.nextInt(12), _ => 33),
+      EVect(EInt) -> IS(_ => Vector()),
+      EVect(EVect(EInt)) -> IS(_ => Vector())
     )
 
     val functions = IntComponents.collection ++ VectComponents.collection
@@ -192,7 +193,6 @@ object TestRun {
       }
 
       for (seed <- 2 to 5) {
-
         val evolution = new Evolution()
         val generations = evolution.evolveAFunction(
           populationSize = 1000, tournamentSize = 5,
@@ -207,10 +207,15 @@ object TestRun {
             val (fitness, performance) = eval(ind.seed, ind.iter)._1
             IndividualEvaluation(ind, fitness, performance)
           },
-          threadNum = 8 //todo
+          threadNum = 8
         )
 
-        FileLogger.runWithAFileLogger(s"testResult[$seed].txt") { logger =>
+        import java.util.Calendar
+        import java.io._
+
+        val dateTime = Calendar.getInstance().getTime
+        new File("results/"+dateTime.toString).mkdir()
+        FileLogger.runWithAFileLogger(s"results/$dateTime/testResult-with33[$seed].txt") { logger =>
           import logger._
 
           val startTime = System.nanoTime()
@@ -225,9 +230,10 @@ object TestRun {
               _.mkString("< ", " | ", " >")).mkString(", ")
             link.logInteraction = false
             println(s"Best Individual Pattern: $firstFiveInputs, ...")
+            println(s"Diversity: ${pop.fitnessMap.keySet.size}")
             println(s"Average Size: ${pop.averageSize}")
             println(s"Average Fitness: ${pop.averageFitness}")
-            print("Distribution: ");
+            print("Distribution: ")
             println(pop.frequencyRatioStat.take(12).map {
               case (s, f) => s"$s -> ${"%.3f".format(f)}"
             }.mkString(", "))

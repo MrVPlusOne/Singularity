@@ -24,7 +24,7 @@ object Evolution {
     }
   }
 
-  case class Population(evaluations: IS[IndividualEvaluation]){
+  case class Population(evaluations: IS[IndividualEvaluation], fitnessMap: Map[Individual, IndividualEvaluation]){
     def showLinearExprs: String = evaluations.map {_.showAsLinearExpr}.mkString("{",",","}")
 
     def averageSize: Double = evaluations.map{ eval =>
@@ -100,52 +100,46 @@ class Evolution {
       }
     }
 
-    val bigRandom = new Random(randSeed)
+    val random = new Random(randSeed) // used through multiple generations
 
     val initPop = {
-      val par = toPar(0 until populationSize)
-      Population(par.map{i =>
-        val random = new Random(randSeed +i)
-        evaluation(initOperator.operate(random, IS()))
-      }.toIndexedSeq)
+      val individuals = (0 until populationSize).map(_ => initOperator.operate(random, IS()))
+      val fitnessMap = toPar(individuals.distinct).map(ind => ind -> evaluation(ind)).toIndexedSeq.toMap
+
+      Population(individuals.map(fitnessMap.apply), fitnessMap)
     }
 
-    Iterator.iterate(initPop){pop =>
+
+    Iterator.iterate(initPop){ pop =>
       def tournamentResult(): Individual = {
         val candidates = IS.fill(tournamentSize){
-          pop.evaluations(bigRandom.nextInt(populationSize))
+          pop.evaluations(random.nextInt(populationSize))
         }
         candidates.maxBy(ind => ind.fitness).ind
       }
 
-      import collection.mutable
-      var buffer = mutable.HashMap[Individual, IndividualEvaluation]()
-
-      val seedBase = bigRandom.nextInt()
-      val newInds = for(i <- toPar(0 until populationSize)) yield {
-        val random = new Random(seedBase+i)
+      val newInds = for (i <- 0 until populationSize) yield {
         val geneticOp = {
           val x = random.nextDouble()
 
-          operatorPCF.find{
+          operatorPCF.find {
             case (op, pAcc) => x < pAcc
           }.getOrElse(operatorPCF.last)._1
         }
 
-        val participates = IS.fill(geneticOp.arity){
+        val participates = IS.fill(geneticOp.arity) {
           tournamentResult()
         }
-        val ind = geneticOp.operate(random, participates) // todo: only parallelize eval part
-        buffer.synchronized{
-          if(buffer.contains(ind)) buffer(ind)
-          else {
-            val eval = evaluation(ind)
-            buffer(ind) = eval
-            eval
-          }
-        }
+        geneticOp.operate(random, participates)
       }
-      Population(newInds.toIndexedSeq)
+
+      val newFitnessMap = toPar(newInds.distinct).map{ind =>
+        ind -> pop.fitnessMap.getOrElse(ind, default = evaluation(ind))
+      }.toIndexedSeq.toMap
+
+      val newEvals = newInds.map(newFitnessMap.apply)
+
+      Population(newEvals, newFitnessMap)
     }
   }
 }
