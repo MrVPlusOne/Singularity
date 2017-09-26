@@ -3,7 +3,7 @@ package patsyn
 
 import StandardSystem._
 import measure.{TimeMeasureExamples, TimeMeasurement, TimeTools}
-import patsyn.Evolution.IndividualEvaluation
+import patsyn.Evolution.{IndividualEvaluation, Population}
 import patsyn.GeneticOpLibrary.ExprGen
 
 import scala.util.Random
@@ -158,7 +158,7 @@ object TestRun {
     }.toMap
   }
 
-  def main(args: Array[String]): Unit = {
+  def runExample(generationMonitor: Population => Unit): Unit = {
     val example = phpHashCollision
 
     val constMap = makeConstMap(
@@ -223,6 +223,7 @@ object TestRun {
 
         val startTime = System.nanoTime()
         generations.take(100).zipWithIndex.foreach { case (pop, i) =>
+          generationMonitor(pop)
           println("------------")
           print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
           println(s"Generation ${i + 1}")
@@ -243,5 +244,36 @@ object TestRun {
         }
       }
     }
+  }
+
+  def makeXY(ys: IS[Double]): IS[(Double, Double)] = {
+    ys.indices.map{ i => i.toDouble -> ys(i)}
+  }
+
+  def main(args: Array[String]): Unit = {
+    import javax.swing._
+    import gui._
+
+    val frame = new JFrame("GP Monitor") {
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+      setVisible(true)
+    }
+
+
+    var populations = IS[Population]()
+    runExample(generationMonitor = pop => {
+      populations :+= pop
+
+      val avFitLine = populations.map(_.averageFitness)
+      val bestFitness = populations.map(_.bestSoFar.evaluation.fitness)
+      val bestPerformance = populations.map(_.bestSoFar.evaluation.performance)
+
+      val chart = ListPlot.plot(
+        "best performance" -> makeXY(bestPerformance),
+        "best fitness" -> makeXY(bestFitness),
+        "average fitness" -> makeXY(avFitLine))("Performance Curve", "Generations", "Evaluation")
+      frame.setContentPane(new MonitorPanel(chart, 10, (600, 450)))
+      frame.pack()
+    })
   }
 }
