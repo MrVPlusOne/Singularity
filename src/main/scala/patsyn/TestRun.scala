@@ -210,7 +210,7 @@ object TestRun {
           ),
           evaluation = ind => {
             val (fitness, performance) = eval(ind.seed, ind.iter)._1
-            IndividualEvaluation(ind, fitness, performance)
+            IndividualEvaluation(fitness, performance)
           },
           threadNum = 8,
           randSeed = seed

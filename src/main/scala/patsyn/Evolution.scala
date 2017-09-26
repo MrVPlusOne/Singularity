@@ -18,41 +18,49 @@ object Evolution {
     }
   }
 
-  case class IndividualEvaluation(ind: Individual, fitness: Double, performance: Double){
+  case class IndividualEvaluation(fitness: Double, performance: Double){
     def showAsLinearExpr: String = {
-      s"(fitness: ${f"$fitness%.1f"}, performance: ${f"$performance%.1f"}) -> ${ind.showAsLinearExpr}"
+      s"(fitness: ${f"$fitness%.1f"}, performance: ${f"$performance%.1f"})"
     }
   }
 
-  case class Population(evaluations: IS[IndividualEvaluation], fitnessMap: Map[Individual, IndividualEvaluation]){
-    def showLinearExprs: String = evaluations.map {_.showAsLinearExpr}.mkString("{",",","}")
+  case class IndividualHistory(parents: IS[Int], birthOp: GeneticOperator, historyLength: Int)
 
-    def averageSize: Double = evaluations.map{ eval =>
+  case class IndividualData(ind: Individual, history: IndividualHistory, evaluation: IndividualEvaluation){
+    def showAsLinearExpr: String = {
+      s"${evaluation.showAsLinearExpr} -> { ${ind.showAsLinearExpr}, historyLen: ${history.historyLength} }"
+    }
+  }
+
+  case class Population(individuals: IS[IndividualData], fitnessMap: Map[Individual, IndividualEvaluation]){
+    def showLinearExprs: String = individuals.map {_.showAsLinearExpr}.mkString("{",",","}")
+
+    def averageSize: Double = individuals.map{ eval =>
       val seed = eval.ind.seed
       val iter = eval.ind.iter
       (seed++iter).map(_.astSize).sum.toDouble
-    }.sum/evaluations.size
+    }.sum/individuals.size
 
-    def averageFitness: Double = {
-      evaluations.map(_.fitness).sum/evaluations.size
+    lazy val averageFitness: Double = {
+      individuals.map(_.evaluation.fitness).sum/individuals.size
     }
 
-    def fitnessStdDiv: Double = {
+    lazy val fitnessStdDiv: Double = {
       val aveFit = averageFitness
       math.sqrt{
-        evaluations.map(e => SimpleMath.square(e.fitness - aveFit)).sum / evaluations.length
+        individuals.map(e => SimpleMath.square(e.evaluation.fitness - aveFit)).sum / individuals.length
       }
     }
 
-    def averagePerformance: Double = {
-      evaluations.map(_.performance).sum/evaluations.size
+    lazy val averagePerformance: Double = {
+      individuals.map(_.evaluation.performance).sum/individuals.size
     }
 
     def frequencyStat: IS[(String, Int)] = {
       import collection.mutable
       val map = mutable.HashMap[String, Int]()
       for(
-        eval <- evaluations;
+        eval <- individuals;
         ind = eval.ind;
         expr <- ind.iter;
         (_, e) <- Expr.subExprs(expr)
@@ -74,8 +82,8 @@ object Evolution {
       }
     }
 
-    def bestSoFar: IndividualEvaluation = {
-      evaluations.maxBy(_.fitness)
+    def bestSoFar: IndividualData = {
+      individuals.maxBy(_.evaluation.fitness)
     }
   }
 
@@ -116,21 +124,26 @@ class Evolution {
       val individuals = (0 until populationSize).map(_ => initOperator.operate(random, IS()))
       val fitnessMap = toPar(individuals.distinct).map(ind => ind -> evaluation(ind)).toIndexedSeq.toMap
 
-      Population(individuals.map(fitnessMap.apply), fitnessMap)
+      Population(individuals.map{ind =>
+        val eval = fitnessMap(ind)
+        IndividualData(ind, IndividualHistory(IS(), initOperator, historyLength = 0), eval)
+      }, fitnessMap)
     }
 
 
     Iterator.iterate(initPop){ pop =>
-      def tournamentResult(position: Int): Individual = {
+      def tournamentResult(position: Int): (IndividualData, Int) = {
         val candidates = IS.fill(tournamentSize){
           val offset = random.nextInt(neighbourSize*2+1)-neighbourSize
           val idx = SimpleMath.wrapInRange(offset + position, populationSize)
-          pop.evaluations(idx)
+          pop.individuals(idx) -> idx
         }
-        candidates.maxBy(ind => ind.fitness).ind
+        candidates.maxBy{ case (data, _) =>
+          data.evaluation.fitness
+        }
       }
 
-      val newInds = for (i <- 0 until populationSize) yield {
+      val newIndsAndHistory = for (i <- 0 until populationSize) yield {
         val geneticOp = {
           val x = random.nextDouble()
 
@@ -142,16 +155,24 @@ class Evolution {
         val participates = IS.fill(geneticOp.arity) {
           tournamentResult(i)
         }
-        geneticOp.operate(random, participates)
+        val newInd = geneticOp.operate(random, participates.map(_._1.ind))
+        val historyLen = if(participates.isEmpty) 0 else participates.map(_._1.history.historyLength).max + 1
+        val newHistory = IndividualHistory(participates.map(_._2), geneticOp, historyLen)
+        newInd -> newHistory
       }
 
+      val newInds = newIndsAndHistory.map(_._1)
       val newFitnessMap = toPar(newInds.distinct).map{ind =>
         ind -> pop.fitnessMap.getOrElse(ind, default = evaluation(ind))
       }.toIndexedSeq.toMap
 
-      val newEvals = newInds.map(newFitnessMap.apply)
+      val newData = newIndsAndHistory.indices.map{i =>
+        val (ind, history) = newIndsAndHistory(i)
+        val eval = newFitnessMap(ind)
+        IndividualData(ind, history, eval)
+      }
 
-      Population(newEvals, newFitnessMap)
+      Population(newData, newFitnessMap)
     }
   }
 }
