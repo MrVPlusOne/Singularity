@@ -9,8 +9,8 @@ object Evolution {
     def provide(r: Random): T
   }
 
-
   case class Individual(seed: IS[Expr], iter: IS[Expr]){
+    //todo: add new size measurement with penalty on repeated exprs
 
     def showAsLinearExpr: String = {
       s"{seed: ${seed.map(Expr.linearShow).mkString("< ", " | ", " >" )} ; " +
@@ -35,6 +35,13 @@ object Evolution {
 
     def averageFitness: Double = {
       evaluations.map(_.fitness).sum/evaluations.size
+    }
+
+    def fitnessStdDiv: Double = {
+      val aveFit = averageFitness
+      math.sqrt{
+        evaluations.map(e => SimpleMath.square(e.fitness - aveFit)).sum / evaluations.length
+      }
     }
 
     def averagePerformance: Double = {
@@ -76,12 +83,15 @@ object Evolution {
 
 class Evolution {
 
-  def evolveAFunction(populationSize: Int, tournamentSize: Int, randSeed: Int,
+  def evolveAFunction(populationSize: Int, tournamentSize: Int, neighbourSize: Int,
                       initOperator: GeneticOperator,
                       operators: IS[(GeneticOperator, Double)],
                       evaluation: Individual => IndividualEvaluation,
-                      threadNum: Int
+                      threadNum: Int,
+                      randSeed: Int
                      ): Iterator[Population] = {
+    require(neighbourSize*2+1 <= populationSize, "Neighbour size too large.")
+
     import scala.collection.parallel
     import parallel._
     def toPar[A](seq: Seq[A]): ParSeq[A] = {
@@ -111,9 +121,11 @@ class Evolution {
 
 
     Iterator.iterate(initPop){ pop =>
-      def tournamentResult(): Individual = {
+      def tournamentResult(position: Int): Individual = {
         val candidates = IS.fill(tournamentSize){
-          pop.evaluations(random.nextInt(populationSize))
+          val offset = random.nextInt(neighbourSize*2+1)-neighbourSize
+          val idx = SimpleMath.wrapInRange(offset + position, populationSize)
+          pop.evaluations(idx)
         }
         candidates.maxBy(ind => ind.fitness).ind
       }
@@ -128,7 +140,7 @@ class Evolution {
         }
 
         val participates = IS.fill(geneticOp.arity) {
-          tournamentResult()
+          tournamentResult(i)
         }
         geneticOp.operate(random, participates)
       }

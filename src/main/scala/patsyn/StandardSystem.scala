@@ -85,8 +85,7 @@ object StandardSystem {
       case IS(VectValue(vec), IntValue(v), default) =>
         if (vec.isEmpty) default
         else {
-          val m = v % vec.length
-          val i = if (m < 0) m + vec.length else m
+          val i = SimpleMath.wrapInRange(v, vec.length)
           vec(i)
         }
     })

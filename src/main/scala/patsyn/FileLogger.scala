@@ -8,8 +8,17 @@ class FileLogger(fileName: String, printToConsole: Boolean, writer: FileWriter) 
     val s = obj.toString
     writer.write(s)
     writer.write("\n")
+    writer.flush()
     if(printToConsole){
       System.out.println(s)
+    }
+  }
+
+  def print(obj: Any): Unit ={
+    val s = obj.toString
+    writer.write(s)
+    if(printToConsole){
+      System.out.print(s)
     }
   }
 }
