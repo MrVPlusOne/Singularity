@@ -231,6 +231,7 @@ object TestRun {
           val firstFiveInputs = eval(best.ind.seed, best.ind.iter)._2.take(5).map(
             _.mkString("< ", " | ", " >")).mkString(", ")
           println(s"Best Individual Pattern: $firstFiveInputs, ...")
+          println(s"Best Individual created by: ${best.history.birthOp.name}, HistoryLen: ${best.history.historyLength}")
           println(s"Diversity: ${pop.fitnessMap.keySet.size}")
           println(s"Average Size: ${pop.averageSize}")
           println(s"Average Fitness: ${pop.averageFitness}")

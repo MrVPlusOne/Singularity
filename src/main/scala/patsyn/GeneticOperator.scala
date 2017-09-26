@@ -10,6 +10,8 @@ trait GeneticOperator{
   def arity: Int
 
   def operate(random: Random, participates: IS[Individual]): Individual
+
+  def name: String
 }
 
 object GeneticOpLibrary{
@@ -125,6 +127,8 @@ class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[
   }
 
   def initOp(maxDepth: Int): GeneticOperator = new GeneticOperator {
+    def name = s"Init"
+
     override def arity: Int = 0
 
     override def operate(random: Random, participates: IS[Individual]): Individual = {
@@ -135,6 +139,8 @@ class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[
   }
 
   def copyOp: GeneticOperator = new GeneticOperator {
+    def name = "Copy"
+
     override def arity: Int = 1
 
     override def operate(random: Random, participates: IS[Individual]): Individual = {
@@ -145,6 +151,8 @@ class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[
 
   def simpleCrossOp(crossSeedProb: Double): GeneticOperator = new GeneticOperator {
     require(crossSeedProb<=1.0 & crossSeedProb>=0.0)
+
+    def name = "Crossover"
 
     override def arity: Int = 2
 
@@ -166,6 +174,8 @@ class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[
 
   def simpleMutateOp(newTreeMaxDepth: Int, mutateSeedProb: Double): GeneticOperator = new GeneticOperator {
     require(mutateSeedProb<=1.0 & mutateSeedProb>=0.0)
+
+    def name = "Mutate"
 
     override def arity: Int = 1
 

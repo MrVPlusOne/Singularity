@@ -28,7 +28,7 @@ object Evolution {
 
   case class IndividualData(ind: Individual, history: IndividualHistory, evaluation: IndividualEvaluation){
     def showAsLinearExpr: String = {
-      s"${evaluation.showAsLinearExpr} -> { ${ind.showAsLinearExpr}, historyLen: ${history.historyLength} }"
+      s"${evaluation.showAsLinearExpr} -> ${ind.showAsLinearExpr}"
     }
   }
 
