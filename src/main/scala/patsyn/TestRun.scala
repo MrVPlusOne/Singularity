@@ -172,77 +172,73 @@ object TestRun {
     val library = new GeneticOpLibrary(constMap, functions, example.seedTypes)
 
     println("[Function map]")
-    library.functionMap.foreach{ case (t, comps) =>
-      println(s"$t -> ${comps.mkString("{",", ","}")}")
+    library.functionMap.foreach { case (t, comps) =>
+      println(s"$t -> ${comps.mkString("{", ", ", "}")}")
     }
     println("[End of Function map]")
 
-    MamLink.runWithALinkOnMac { link =>
 
-      val eval: (IS[Expr], IS[Expr]) => ((Double, Double), Stream[IS[EValue]]) = (seeds, iters) => {
-        val seedSizeFringe = 15
-        val programSizeFringe = 30
-        val penaltyFactor = seeds.map(s => Evaluation.gaussianSquared(seedSizeFringe)(s.astSize)).product *
-          iters.map(iter => Evaluation.gaussianSquared(programSizeFringe)(iter.astSize)).product
+    val eval: (IS[Expr], IS[Expr]) => ((Double, Double), Stream[IS[EValue]]) = (seeds, iters) => {
+      val seedSizeFringe = 15
+      val programSizeFringe = 30
+      val penaltyFactor = seeds.map(s => Evaluation.gaussianSquared(seedSizeFringe)(s.astSize)).product *
+        iters.map(iter => Evaluation.gaussianSquared(programSizeFringe)(iter.astSize)).product
 
-        val (v, stream) = new SimpleEvaluation(sizeOfInterest = 600, maxTrials = 3, nonsenseFitness = -1.0).evaluateAPattern(
-          example.resourceUsage, example.sizeF
-        )(seeds, iters)
+      val (v, stream) = new SimpleEvaluation(sizeOfInterest = 600, maxTrials = 3, nonsenseFitness = -1.0).evaluateAPattern(
+        example.resourceUsage, example.sizeF
+      )(seeds, iters)
 
-        ((v * penaltyFactor, v), stream)
-      }
+      ((v * penaltyFactor, v), stream)
+    }
 
 
-      import java.util.Calendar
-      import java.io._
-      val dateTime = Calendar.getInstance().getTime
-      new File("results/"+dateTime.toString).mkdir()
+    import java.util.Calendar
+    import java.io._
+    val dateTime = Calendar.getInstance().getTime
+    new File("results/" + dateTime.toString).mkdir()
 
-      for (seed <- 2 to 5) {
-        val evolution = new Evolution()
-        val generations = evolution.evolveAFunction(
-          populationSize = 10000, tournamentSize = 7, neighbourSize = 3000,
-          initOperator = library.initOp(maxDepth = 3),
-          operators = IS(
-            library.simpleCrossOp(0.2) -> 0.6,
-            library.simpleMutateOp(newTreeMaxDepth = 3, 0.2) -> 0.3,
-            library.copyOp -> 0.1
-          ),
-          evaluation = ind => {
-            val (fitness, performance) = eval(ind.seed, ind.iter)._1
-            IndividualEvaluation(fitness, performance)
-          },
-          threadNum = 8,
-          randSeed = seed
-        )
+    for (seed <- 2 to 5) {
+      val evolution = new Evolution()
+      val generations = evolution.evolveAFunction(
+        populationSize = 10000, tournamentSize = 7, neighbourSize = 3000,
+        initOperator = library.initOp(maxDepth = 3),
+        operators = IS(
+          library.simpleCrossOp(0.2) -> 0.6,
+          library.simpleMutateOp(newTreeMaxDepth = 3, 0.2) -> 0.3,
+          library.copyOp -> 0.1
+        ),
+        evaluation = ind => {
+          val (fitness, performance) = eval(ind.seed, ind.iter)._1
+          IndividualEvaluation(fitness, performance)
+        },
+        threadNum = 8,
+        randSeed = seed
+      )
 
-        FileLogger.runWithAFileLogger(s"results/$dateTime/testResult[$seed].txt") { logger =>
-          import logger._
+      FileLogger.runWithAFileLogger(s"results/$dateTime/testResult[$seed].txt") { logger =>
+        import logger._
 
-          val parameterInfo = ""
-          println(parameterInfo)
+        val parameterInfo = ""
+        println(parameterInfo)
 
-          val startTime = System.nanoTime()
-          generations.take(100).zipWithIndex.foreach { case (pop, i) =>
-            println("------------")
-            print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
-            println(s"Generation ${i + 1}")
-            val best = pop.bestSoFar
-            println(s"Best Individual: ${best.showAsLinearExpr}")
-            link.logInteraction = true
-            val firstFiveInputs = eval(best.ind.seed, best.ind.iter)._2.take(5).map(
-              _.mkString("< ", " | ", " >")).mkString(", ")
-            link.logInteraction = false
-            println(s"Best Individual Pattern: $firstFiveInputs, ...")
-            println(s"Diversity: ${pop.fitnessMap.keySet.size}")
-            println(s"Average Size: ${pop.averageSize}")
-            println(s"Average Fitness: ${pop.averageFitness}")
-            println(s"Fitness Variation: ${pop.fitnessStdDiv}")
-            print("Distribution: ")
-            println(pop.frequencyRatioStat.take(12).map {
-              case (s, f) => s"$s -> ${"%.3f".format(f)}"
-            }.mkString(", "))
-          }
+        val startTime = System.nanoTime()
+        generations.take(100).zipWithIndex.foreach { case (pop, i) =>
+          println("------------")
+          print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
+          println(s"Generation ${i + 1}")
+          val best = pop.bestSoFar
+          println(s"Best Individual: ${best.showAsLinearExpr}")
+          val firstFiveInputs = eval(best.ind.seed, best.ind.iter)._2.take(5).map(
+            _.mkString("< ", " | ", " >")).mkString(", ")
+          println(s"Best Individual Pattern: $firstFiveInputs, ...")
+          println(s"Diversity: ${pop.fitnessMap.keySet.size}")
+          println(s"Average Size: ${pop.averageSize}")
+          println(s"Average Fitness: ${pop.averageFitness}")
+          println(s"Fitness Variation: ${pop.fitnessStdDiv}")
+          print("Distribution: ")
+          println(pop.frequencyRatioStat.take(12).map {
+            case (s, f) => s"$s -> ${"%.3f".format(f)}"
+          }.mkString(", "))
         }
       }
     }
