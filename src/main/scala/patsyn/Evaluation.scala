@@ -75,16 +75,12 @@ class ExtrapolateEvaluation(mamLink: MamLink, sizeOfInterest: Int, fitEndPoint: 
 
   def evaluateAPattern(resourceUsage: IS[EValue] => Double, sizeF: IS[EValue] => Int)
                       (seeds: IS[Expr], iters: IS[Expr]): (Double, Stream[IS[EValue]]) = {
-    import patsyn.StandardSystem.IntValue
 
-    var index = 0
     val seedValues = seeds.map(seed => Expr.evaluateWithCheck(seed, IS()))
     val inputStream = Stream.iterate(seedValues)(ls => {
-      val lsWithIdx = IntValue(index) +: ls
-      val ls1 = iters.map { iter => Expr.evaluateWithCheck(iter, lsWithIdx) }
+      val ls1 = iters.map { iter => Expr.evaluateWithCheck(iter, ls) }
       if (sizeF(ls1) <= sizeF(ls))
         return (nonsenseFitness, Stream())
-      index += 1
       ls1
     })
 
@@ -97,16 +93,11 @@ class ExtrapolateEvaluation(mamLink: MamLink, sizeOfInterest: Int, fitEndPoint: 
 class SimpleEvaluation(sizeOfInterest: Int, maxTrials: Int, nonsenseFitness: Double = 0.0) extends Evaluation {
   def evaluateAPattern(resourceUsage: (IS[EValue]) => Double, sizeF: (IS[EValue]) => Int)
                       (seeds: IS[Expr], iters: IS[Expr]): (Double, Stream[IS[EValue]]) = {
-    import patsyn.StandardSystem.IntValue
-
-    var index = 0
     val seedValues = seeds.map(seed => Expr.evaluateWithCheck(seed, IS()))
     val inputStream = Stream.iterate(seedValues)(ls => {
-      val lsWithIdx = IntValue(index) +: ls
-      val ls1 = iters.map { iter => Expr.evaluateWithCheck(iter, lsWithIdx) }
+      val ls1 = iters.map { iter => Expr.evaluateWithCheck(iter, ls) }
       if (sizeF(ls1) <= sizeF(ls))
         return (nonsenseFitness, Stream())
-      index += 1
       ls1
     })
 

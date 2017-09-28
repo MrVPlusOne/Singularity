@@ -1,8 +1,7 @@
 package patsyn
 
-import Evolution.Individual
+import Evolution.{Individual}
 import GeneticOpLibrary._
-import patsyn.StandardSystem.EInt
 
 import scala.util.Random
 
@@ -84,7 +83,7 @@ class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[
   /** type set used to concretize abstract functions */
   val typeUniverse: Set[EType] = constMap.keySet
 
-  private def argTypesAreInUniverse(sourceName: String, types: Set[EType]): Boolean = {
+  private def argTypesInTheUniverse(sourceName: String, types: Set[EType]): Boolean = {
     types.foreach{t =>
       if(!typeUniverse.contains(t)){
         System.err.println(s"[Warning] $sourceName will not be used, because type $t is not within the type universe.")
@@ -96,7 +95,7 @@ class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[
 
   val functionMap: Map[EType, IndexedSeq[EConcreteFunc]] = functions.flatMap{
     case cf: EConcreteFunc =>
-      if(argTypesAreInUniverse(cf.name, cf.argTypes.toSet)) IS(cf)
+      if(argTypesInTheUniverse(cf.name, cf.argTypes.toSet)) IS(cf)
       else IS()
     case af: EAbstractFunc =>
       val instantiations = for(
@@ -112,8 +111,8 @@ class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[
   }.groupBy(_.returnType)
 
   require(seedTypes.toSet.subsetOf(typeUniverse), "Some seed type is not within the type universe!")
-  val args: IndexedSeq[ExprGen[EArg]] = ExprGen(EInt, _ => EArg(0, EInt)) +: seedTypes.zipWithIndex.map{
-    case (t, i) => ExprGen(t, _ =>EArg(i+1, t))
+  val args: IndexedSeq[ExprGen[EArg]] = seedTypes.zipWithIndex.map{
+    case (t, i) => ExprGen(t, _ =>EArg(i, t))
   }
 
   val terminalMap: Map[EType, IS[ExprGen[ETerminal]]] = {
