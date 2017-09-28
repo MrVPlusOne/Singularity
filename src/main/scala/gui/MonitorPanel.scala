@@ -2,7 +2,7 @@ package gui
 
 import java.awt.geom.Rectangle2D
 import java.awt.{Dimension, Graphics, Graphics2D}
-import java.text.{DecimalFormat, NumberFormat}
+import java.text.{DecimalFormat, FieldPosition, NumberFormat, ParsePosition}
 import javax.swing._
 
 import org.jfree.chart.axis.NumberAxis
@@ -52,8 +52,16 @@ object ListPlot {
     val chart = ChartFactory.createXYLineChart(plotName, xLabel, yLabel, dataSet,
       orientation, true, true, false
     )
-    val numAxis = chart.getXYPlot.getRangeAxis().asInstanceOf[NumberAxis]
-    numAxis.setNumberFormatOverride(new DecimalFormat("0.###E0"))
+    val rangeAxis = chart.getXYPlot.getRangeAxis().asInstanceOf[NumberAxis]
+    rangeAxis.setNumberFormatOverride(new NumberFormat {
+      def format(number: Double, toAppendTo: StringBuffer, pos: FieldPosition): StringBuffer = {
+        toAppendTo.append("%.3g".format(number))
+        toAppendTo
+      }
+      def format(number: Long, toAppendTo: StringBuffer, pos: FieldPosition): StringBuffer = throw new Exception()
+      def parse(source: String, parsePosition: ParsePosition): Number = throw new Exception()
+    })
+
     chart
   }
 }
