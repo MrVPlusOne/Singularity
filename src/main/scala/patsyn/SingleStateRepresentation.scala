@@ -9,7 +9,8 @@ case class SingleStateInd(seed: IS[Expr], iter: IS[Expr]){
   }
 }
 
-object SingleStateRepresentation extends EvolutionRepresentation[SingleStateInd]{
+case class SingleStateRepresentation(seedSizeTolerance: Int, iterSizeTolerance: Int,
+                                     evaluation: PerformanceEvaluation) extends EvolutionRepresentation[SingleStateInd]{
 
   def showIndividual(ind: SingleStateInd): String = ind.showAsLinearExpr
 
@@ -20,4 +21,22 @@ object SingleStateRepresentation extends EvolutionRepresentation[SingleStateInd]
   def individualExprs(ind: SingleStateInd): Seq[Expr] = {
     (ind.seed ++ ind.iter).flatMap(e => Expr.subExprs(e).values)
   }
+
+  def individualToPattern(ind: SingleStateInd): Stream[IS[EValue]] = {
+    val seeds = ind.seed
+    val iters = ind.iter
+    val seedValues = seeds.map(seed => Expr.evaluateWithCheck(seed, IS()))
+    val s = Stream.iterate(seedValues)(ls => {
+      iters.map { iter => Expr.evaluateWithCheck(iter, ls) }
+    })
+    s
+  }
+
+  def sizePenaltyFactor(ind: SingleStateInd): Double = {
+    val seeds = ind.seed
+    val iters = ind.iter
+    seeds.map(s => PerformanceEvaluation.gaussianSquared(seedSizeTolerance)(s.astSize)).product *
+      iters.map(iter => PerformanceEvaluation.gaussianSquared(iterSizeTolerance)(iter.astSize)).product
+  }
+
 }

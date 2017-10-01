@@ -175,19 +175,6 @@ object TestRun {
     println("[End of Function map]")
 
 
-    val eval: (IS[Expr], IS[Expr]) => ((Double, Double), Stream[IS[EValue]]) = (seeds, iters) => {
-      val seedSizeFringe = 15
-      val programSizeFringe = 30
-      val penaltyFactor = seeds.map(s => Evaluation.gaussianSquared(seedSizeFringe)(s.astSize)).product *
-        iters.map(iter => Evaluation.gaussianSquared(programSizeFringe)(iter.astSize)).product
-
-      val (v, stream) = new SimpleEvaluation(sizeOfInterest = 600, maxTrials = 3, nonsenseFitness = -1.0).evaluateAPattern(
-        example.resourceUsage, example.sizeF
-      )(seeds, iters)
-
-      ((v * penaltyFactor, v), stream)
-    }
-
 
     import java.util.Calendar
     import java.io._
@@ -195,7 +182,11 @@ object TestRun {
     new File("results/" + dateTime.toString).mkdir()
 
     for (seed <- 2 to 5) {
-      val representation = SingleStateRepresentation
+      val representation = SingleStateRepresentation(seedSizeTolerance = 20, iterSizeTolerance = 30,
+        evaluation = new SimplePerformanceEvaluation(
+          sizeOfInterest = 600, maxTrials = 3, nonsenseFitness = -1.0,
+          resourceUsage = example.resourceUsage, sizeF = example.sizeF
+        ))
       val optimizer = EvolutionaryOptimizer(representation)
       val generations = optimizer.optimize(
         populationSize = 10000, tournamentSize = 7, neighbourSize = 4000,
@@ -206,8 +197,7 @@ object TestRun {
           library.copyOp -> 0.1
         ),
         evaluation = ind => {
-          val (fitness, performance) = eval(ind.seed, ind.iter)._1
-          IndividualEvaluation(fitness, performance)
+          representation.fitnessEvaluation(ind)._1
         },
         threadNum = 8,
         randSeed = seed
@@ -229,7 +219,7 @@ object TestRun {
           print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
           println(s"Generation ${i+1}")
           println(s"Best Individual: ${representation.showIndData(best)}")
-          val firstFiveInputs = eval(best.ind.seed, best.ind.iter)._2.take(5).map(
+          val firstFiveInputs = representation.fitnessEvaluation(best.ind)._2.take(5).map(
             _.mkString("< ", " | ", " >")).mkString(", ")
           println(s"Best Individual Pattern: $firstFiveInputs, ...")
           println(s"Best Individual created by: ${best.history.birthOp.name}, HistoryLen: ${best.history.historyLength}")

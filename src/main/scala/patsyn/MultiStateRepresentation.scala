@@ -1,5 +1,7 @@
 package patsyn
 
+import patsyn.EvolutionRepresentation.IndividualEvaluation
+
 
 case class MultiStateInd(seeds: IS[Expr], iters: IS[Expr], outputs: IS[Expr]){
   def totalAstSize: Int = {
@@ -35,4 +37,10 @@ class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType])
   def individualExprs(ind: MultiStateInd): Seq[Expr] = {
     ind.allSubExprs
   }
+
+  def individualToPattern(ind: MultiStateInd) = ???
+
+  def sizePenaltyFactor(ind: MultiStateInd) = ???
+
+  def evaluation = ???
 }

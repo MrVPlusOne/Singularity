@@ -9,6 +9,19 @@ trait EvolutionRepresentation[Individual] {
   def representationSize(ind: Individual): Double
   def individualExprs(ind: Individual): Seq[Expr]
 
+  def individualToPattern(ind: Individual): Stream[IS[EValue]]
+
+  def sizePenaltyFactor(ind: Individual): Double
+
+  def evaluation: PerformanceEvaluation
+
+  def fitnessEvaluation(ind: Individual): (IndividualEvaluation, Stream[IS[EValue]]) = {
+    val inputStream = individualToPattern(ind)
+    val performance = evaluation.evaluateAPattern(inputStream)
+    val fitness = sizePenaltyFactor(ind) * performance
+    IndividualEvaluation(fitness, performance) -> inputStream
+  }
+
   def showIndData(data: IndividualData[Individual]): String = {
     s"${data.evaluation.showAsLinearExpr} -> ${showIndividual(data.ind)}"
   }
