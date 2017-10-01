@@ -120,6 +120,7 @@ case class GPEnvironment(constMap: Map[EType, IS[ExprGen[EConst]]], functions: I
 
 case class SingleStateGOpLibrary(environment: GPEnvironment)  {
   type Individual = SingleStateInd
+  type GOp = GeneticOperator[Individual]
 
   import environment._
 
@@ -127,7 +128,7 @@ case class SingleStateGOpLibrary(environment: GPEnvironment)  {
     SingleStateInd(seed, iter)
   }
 
-  def initOp(maxDepth: Int) = new GeneticOperator[SingleStateInd] {
+  def initOp(maxDepth: Int): GOp = new GOp {
     def name = s"Init"
 
     override def arity: Int = 0
@@ -139,7 +140,7 @@ case class SingleStateGOpLibrary(environment: GPEnvironment)  {
     }
   }
 
-  def copyOp = new GeneticOperator[SingleStateInd] {
+  def copyOp: GOp = new GOp {
     def name = "Copy"
 
     override def arity: Int = 1
@@ -150,7 +151,7 @@ case class SingleStateGOpLibrary(environment: GPEnvironment)  {
     }
   }
 
-  def simpleCrossOp(crossSeedProb: Double) = new GeneticOperator[SingleStateInd] {
+  def simpleCrossOp(crossSeedProb: Double): GOp = new GOp {
     require(crossSeedProb<=1.0 & crossSeedProb>=0.0)
 
     def name = "Crossover"
@@ -173,7 +174,7 @@ case class SingleStateGOpLibrary(environment: GPEnvironment)  {
     }
   }
 
-  def simpleMutateOp(newTreeMaxDepth: Int, mutateSeedProb: Double) = new GeneticOperator[SingleStateInd] {
+  def simpleMutateOp(newTreeMaxDepth: Int, mutateSeedProb: Double): GOp = new GOp {
     require(mutateSeedProb<=1.0 & mutateSeedProb>=0.0)
 
     def name = "Mutate"

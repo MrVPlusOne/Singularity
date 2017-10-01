@@ -12,8 +12,8 @@ case class MultiStateInd(seeds: IS[Expr], iters: IS[Expr], outputs: IS[Expr]){
 }
 
 
-class MultiStateOptimizer(stateTypes: IS[EType], outputTypes: IS[EType])
-  extends EvolutionaryOptimizer[MultiStateInd] {
+class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType])
+  extends EvolutionRepresentation[MultiStateInd] {
 
   def showIndividual(ind: MultiStateInd): String = {
     (stateTypes.indices.map{ i =>

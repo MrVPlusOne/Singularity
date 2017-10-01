@@ -9,7 +9,7 @@ case class SingleStateInd(seed: IS[Expr], iter: IS[Expr]){
   }
 }
 
-class SingleStateOptimizer() extends EvolutionaryOptimizer[SingleStateInd]{
+object SingleStateRepresentation extends EvolutionRepresentation[SingleStateInd]{
 
   def showIndividual(ind: SingleStateInd): String = ind.showAsLinearExpr
 

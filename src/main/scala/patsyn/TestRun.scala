@@ -3,7 +3,7 @@ package patsyn
 
 import StandardSystem._
 import measure.{TimeMeasureExamples, TimeMeasurement, TimeTools}
-import patsyn.EvolutionaryOptimizer.IndividualEvaluation
+import patsyn.EvolutionRepresentation.IndividualEvaluation
 import patsyn.GeneticOperator.ExprGen
 
 import scala.util.Random
@@ -195,8 +195,9 @@ object TestRun {
     new File("results/" + dateTime.toString).mkdir()
 
     for (seed <- 2 to 5) {
-      val evolution = new SingleStateOptimizer()
-      val generations = evolution.optimize(
+      val representation = SingleStateRepresentation
+      val optimizer = EvolutionaryOptimizer(representation)
+      val generations = optimizer.optimize(
         populationSize = 10000, tournamentSize = 7, neighbourSize = 4000,
         initOperator = library.initOp(maxDepth = 3),
         operators = IS(
@@ -227,17 +228,17 @@ object TestRun {
           println("------------")
           print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
           println(s"Generation ${i+1}")
-          println(s"Best Individual: ${best.showAsLinearExpr}")
+          println(s"Best Individual: ${representation.showIndData(best)}")
           val firstFiveInputs = eval(best.ind.seed, best.ind.iter)._2.take(5).map(
             _.mkString("< ", " | ", " >")).mkString(", ")
           println(s"Best Individual Pattern: $firstFiveInputs, ...")
           println(s"Best Individual created by: ${best.history.birthOp.name}, HistoryLen: ${best.history.historyLength}")
           println(s"Diversity: ${pop.fitnessMap.keySet.size}")
-          println(s"Average Size: ${pop.averageSize}")
+          println(s"Average Size: ${representation.populationAverageSize(pop)}")
           println(s"Average Fitness: ${pop.averageFitness}")
           println(s"Fitness Variation: ${pop.fitnessStdDiv}")
           print("Distribution: ")
-          println(pop.frequencyRatioStat.take(12).map {
+          println(representation.frequencyRatioStat(pop.individuals.map(_.ind)).take(12).map {
             case (s, f) => s"$s -> ${"%.3f".format(f)}"
           }.mkString(", "))
         }
