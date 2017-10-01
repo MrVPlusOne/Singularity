@@ -10,7 +10,7 @@ import scala.util.Random
 
 object TestRun {
 
-  case class FuzzingExample(seedTypes: IS[EType],
+  case class FuzzingExample(outputTypes: IS[EType],
                             sizeF: PartialFunction[IS[EValue], Int],
                             resourceUsage: PartialFunction[IS[EValue], Double])
 
@@ -22,7 +22,7 @@ object TestRun {
 
   def insertionSortExample: FuzzingExample = {
     FuzzingExample(
-      seedTypes = IS(EVect(EInt)),
+      outputTypes = IS(EVect(EInt)),
       sizeF = {
         case IS(VectValue(v)) =>
           v.length
@@ -43,7 +43,7 @@ object TestRun {
     }
 
     FuzzingExample(
-      seedTypes = IS(EVect(EInt)),
+      outputTypes = IS(EVect(EInt)),
       sizeF = {
         case IS(VectValue(v)) =>
           v.length
@@ -59,7 +59,7 @@ object TestRun {
 
   def randomQuickSortExample(seed: Int): FuzzingExample = {
     FuzzingExample(
-      seedTypes = IS(EVect(EInt)),
+      outputTypes = IS(EVect(EInt)),
       sizeF = {
         case IS(VectValue(v)) =>
           v.length
@@ -76,7 +76,7 @@ object TestRun {
 
   def listSearchExample: FuzzingExample = {
     FuzzingExample(
-      seedTypes = IS(EVect(EInt), EInt),
+      outputTypes = IS(EVect(EInt), EInt),
       sizeF = {
         case IS(VectValue(v), IntValue(_)) => v.length
       },
@@ -102,7 +102,7 @@ object TestRun {
   def phpHashTableExample(timeout: TimeMeasurement.DoubleAsMillis): FuzzingExample = {
     val example = TimeMeasureExamples.phpHashExampleNoFile
     FuzzingExample(
-      seedTypes = IS(EVect(EVect(EInt))),
+      outputTypes = IS(EVect(EVect(EInt))),
       sizeF = {
         case IS(VectValue(strings)) =>
           strings.map(s => s.asInstanceOf[VectValue].value.length).sum
@@ -118,7 +118,7 @@ object TestRun {
 
   def phpHashCollision: FuzzingExample = {
     FuzzingExample(
-      seedTypes = IS(EVect(EVect(EInt))),
+      outputTypes = IS(EVect(EVect(EInt))),
       sizeF = {
         case IS(VectValue(strings)) =>
           strings.map(s => s.asInstanceOf[VectValue].value.length).sum
@@ -165,8 +165,10 @@ object TestRun {
 
     val functions = IntComponents.collection ++ VectComponents.collection
 
-    val gpEnv = GPEnvironment(constMap, functions, example.seedTypes)
-    val library = SingleStateGOpLibrary(gpEnv)
+    val stateTypes = constMap.keys.toIndexedSeq
+    val gpEnv = GPEnvironment(constMap, functions, stateTypes)
+    val library = MultiStateGOpLibrary(gpEnv, example.outputTypes)
+//    val library = SingleStateGOpLibrary(gpEnv)
 
     println("[Function map]")
     gpEnv.functionMap.foreach { case (t, comps) =>
@@ -182,20 +184,30 @@ object TestRun {
     new File("results/" + dateTime.toString).mkdir()
 
     for (seed <- 2 to 5) {
-      val representation = SingleStateRepresentation(seedSizeTolerance = 20, iterSizeTolerance = 30,
-        evaluation = new SimplePerformanceEvaluation(
-          sizeOfInterest = 600, maxTrials = 3, nonsenseFitness = -1.0,
-          resourceUsage = example.resourceUsage, sizeF = example.sizeF
-        ))
+      val evaluation = new SimplePerformanceEvaluation(
+        sizeOfInterest = 600, maxTrials = 3, nonsenseFitness = -1.0,
+        resourceUsage = example.resourceUsage, sizeF = example.sizeF
+      )
+//      val representation = SingleStateRepresentation(seedSizeTolerance = 20, iterSizeTolerance = 30,
+//        evaluation = evaluation)
+      val representation = MultiStateRepresentation(totalSizeTolerance = 60,
+   stateTypes = stateTypes, outputTypes = example.outputTypes, evaluation = evaluation)
       val optimizer = EvolutionaryOptimizer(representation)
+//      val operators = IS(
+//        library.simpleCrossOp(0.2) -> 0.5,
+//        library.simpleMutateOp(newTreeMaxDepth = 3, 0.2) -> 0.4,
+//        library.copyOp -> 0.1
+//      )
+      val operators = IS(
+//        library.simpleCrossOp(0.2) -> 0.5,
+        library.simpleMutateOp(newTreeMaxDepth = 3) -> 0.9,
+        library.copyOp -> 0.1
+      )
+
       val generations = optimizer.optimize(
-        populationSize = 10000, tournamentSize = 7, neighbourSize = 4000,
+        populationSize = 100, tournamentSize = 7, neighbourSize = 40,
         initOperator = library.initOp(maxDepth = 3),
-        operators = IS(
-          library.simpleCrossOp(0.2) -> 0.5,
-          library.simpleMutateOp(newTreeMaxDepth = 3, 0.2) -> 0.4,
-          library.copyOp -> 0.1
-        ),
+        operators = operators,
         evaluation = ind => {
           representation.fitnessEvaluation(ind)._1
         },

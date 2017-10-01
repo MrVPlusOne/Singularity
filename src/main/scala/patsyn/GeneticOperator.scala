@@ -45,19 +45,6 @@ object GeneticOperator{
     rec(ty, maxDepth)
   }
 
-  def replaceSubExpr(parent: Expr, child: Expr, replacePoint: Expr.Coordinate): Expr = {
-    def rec(parent: Expr, point: Expr.Coordinate): Expr = {
-      if(point.isEmpty) child
-      else parent match {
-        case ENode(f, args) =>
-          val newArgs = args.updated(point.head, rec(args(point.head), point.tail))
-          ENode(f, newArgs)
-        case _ => throw new Exception("Invalid coordinate")
-      }
-    }
-    rec(parent, replacePoint)
-  }
-
 
   def simpleCrossOver(random: Random, parent: Expr, child: Expr): Expr = {
     val parentSubsTypeMapWithCoord = Expr.subExprs(parent).groupBy(_._2.returnType)
@@ -70,11 +57,11 @@ object GeneticOperator{
 
     val possiblePoints = parentSubsTypeMapWithCoord(newChild.returnType).toIndexedSeq
     val (parentPoint, _) = possiblePoints(random.nextInt(possiblePoints.size))
-    replaceSubExpr(parent, newChild, parentPoint)
+    Expr.replaceSubExpr(parent, newChild, parentPoint)
   }
 }
 
-case class GPEnvironment(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[EFunction], inputTypes: IS[EType]) {
+case class GPEnvironment(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[EFunction], stateTypes: IS[EType]) {
   require(constMap.forall{case (_, gens) => gens.nonEmpty}, "For each type in constMap, there should be at least one ExprGen.")
   /** type set used to concretize abstract functions */
   val typeUniverse: Set[EType] = constMap.keySet
@@ -106,8 +93,8 @@ case class GPEnvironment(constMap: Map[EType, IS[ExprGen[EConst]]], functions: I
       instantiations
   }.groupBy(_.returnType)
 
-  require(inputTypes.toSet.subsetOf(typeUniverse), "Some input type is not within the type universe!")
-  val args: IndexedSeq[ExprGen[EArg]] = inputTypes.zipWithIndex.map{
+  require(stateTypes.toSet.subsetOf(typeUniverse), "Some input type is not within the type universe!")
+  val args: IndexedSeq[ExprGen[EArg]] = stateTypes.zipWithIndex.map{
     case (t, i) => ExprGen(t, _ =>EArg(i, t))
   }
 
@@ -134,8 +121,8 @@ case class SingleStateGOpLibrary(environment: GPEnvironment)  {
     override def arity: Int = 0
 
     override def operate(random: Random, participates: IS[Individual]): Individual = {
-      val seed = inputTypes.map(t => genExpr(t, maxDepth, constMap, functionMap, random))
-      val iter = inputTypes.map(t => genExpr(t, maxDepth, terminalMap, functionMap, random))
+      val seed = stateTypes.map(t => genExpr(t, maxDepth, constMap, functionMap, random))
+      val iter = stateTypes.map(t => genExpr(t, maxDepth, terminalMap, functionMap, random))
       createIndividual(seed, iter)
     }
   }
@@ -194,11 +181,74 @@ case class SingleStateGOpLibrary(environment: GPEnvironment)  {
       val ty = mutationPoint._2.returnType
       val subExpr = genExpr(ty, newTreeMaxDepth, if(mutateSeed) constMap else terminalMap, functionMap, random)
 
-      val newExpr = replaceSubExpr(toMutate(crossIdx), subExpr, mutationPoint._1)
+      val newExpr = Expr.replaceSubExpr(toMutate(crossIdx), subExpr, mutationPoint._1)
       if(mutateSeed)
         createIndividual(parent.seed.updated(crossIdx,newExpr), parent.iter)
       else
         createIndividual(parent.seed, parent.iter.updated(crossIdx,newExpr))
+    }
+  }
+}
+
+case class MultiStateGOpLibrary(environment: GPEnvironment, outputTypes: IS[EType])  {
+  type Individual = MultiStateInd
+  type GOp = GeneticOperator[Individual]
+
+  import environment._
+
+
+  def initOp(maxDepth: Int): GOp = new GOp {
+    def name = "Init"
+
+    override def arity: Int = 0
+
+    override def operate(random: Random, participates: IS[Individual]): Individual = {
+      val seeds = stateTypes.map(t => genExpr(t, maxDepth, constMap, functionMap, random))
+      val iters = stateTypes.map(t => genExpr(t, maxDepth, terminalMap, functionMap, random))
+      val outputs = outputTypes.map(t => genExpr(t, maxDepth, terminalMap, functionMap, random))
+      MultiStateInd(seeds ++ iters ++ outputs, stateTypes.length)
+    }
+  }
+
+  def copyOp: GOp = new GOp {
+    def name = "Copy"
+
+    override def arity: Int = 1
+
+    override def operate(random: Random, participates: IS[Individual]): Individual = {
+      participates.head
+    }
+  }
+
+  def simpleCrossOp(crossSeedProb: Double): GOp = new GOp {
+    require(crossSeedProb<=1.0 & crossSeedProb>=0.0)
+
+    def name = "Crossover"
+
+    override def arity: Int = 2
+
+    override def operate(random: Random, participates: IS[Individual]): Individual = {
+      ???
+    }
+  }
+
+  def simpleMutateOp(newTreeMaxDepth: Int): GOp = new GOp {
+
+    def name = "Mutate"
+
+    override def arity: Int = 1
+
+    override def operate(random: Random, participates: IS[Individual]): Individual = {
+      val IndexedSeq(parent) = participates
+
+      val allSubs = parent.allSubExprs
+
+      val (c, e) = SimpleMath.randomSelect(random)(allSubs)
+
+      val mapToUse = if(parent.isSeed(c._1)) constMap else terminalMap
+
+      val newSubTree = genExpr(e.returnType, newTreeMaxDepth, mapToUse, functionMap, random)
+      parent.update(c, newSubTree)
     }
   }
 }

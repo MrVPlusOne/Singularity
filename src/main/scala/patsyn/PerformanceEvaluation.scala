@@ -2,10 +2,6 @@ package patsyn
 
 
 object PerformanceEvaluation {
-
-  def gaussianSquared(halfPoint: Double)(x: Double): Double = {
-    math.pow(2,-math.pow(x/halfPoint,4))
-  }
 }
 
 trait PerformanceEvaluation {

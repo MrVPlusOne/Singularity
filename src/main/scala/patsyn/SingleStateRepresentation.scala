@@ -35,8 +35,8 @@ case class SingleStateRepresentation(seedSizeTolerance: Int, iterSizeTolerance: 
   def sizePenaltyFactor(ind: SingleStateInd): Double = {
     val seeds = ind.seed
     val iters = ind.iter
-    seeds.map(s => PerformanceEvaluation.gaussianSquared(seedSizeTolerance)(s.astSize)).product *
-      iters.map(iter => PerformanceEvaluation.gaussianSquared(iterSizeTolerance)(iter.astSize)).product
+    seeds.map(s => SimpleMath.gaussianForthOrder(seedSizeTolerance)(s.astSize)).product *
+      iters.map(iter => SimpleMath.gaussianForthOrder(iterSizeTolerance)(iter.astSize)).product
   }
 
 }
