@@ -1,34 +1,32 @@
 package patsyn
 
+
+import patsyn.EvolutionaryOptimizer.IndividualEvaluation
+
 import scala.util.Random
-import Evolution._
 
-
-object Evolution {
-  trait Provider[T]{
-    def provide(r: Random): T
-  }
-
-  case class Individual(seed: IS[Expr], iter: IS[Expr]){
-    //todo: add new size measurement with penalty on repeated exprs
-
-    def showAsLinearExpr: String = {
-      s"{seed: ${seed.map(Expr.linearShow).mkString("< ", " | ", " >" )} ; " +
-        s"iter: ${iter.map(Expr.linearShow).mkString("< ", " | ", " >" )}}"
-    }
-  }
-
+object EvolutionaryOptimizer{
   case class IndividualEvaluation(fitness: Double, performance: Double){
     def showAsLinearExpr: String = {
       s"(fitness: ${f"$fitness%.1f"}, performance: ${f"$performance%.1f"})"
     }
   }
 
-  case class IndividualHistory(parents: IS[Int], birthOp: GeneticOperator, historyLength: Int)
+
+}
+
+trait EvolutionaryOptimizer[Individual] {
+  type GOp = GeneticOperator[Individual]
+
+  def showIndividual(ind: Individual): String
+  def representationSize(ind: Individual): Double
+  def individualExprs(ind: Individual): Seq[Expr]
+
+  case class IndividualHistory(parents: IS[Int], birthOp: GOp, historyLength: Int)
 
   case class IndividualData(ind: Individual, history: IndividualHistory, evaluation: IndividualEvaluation){
     def showAsLinearExpr: String = {
-      s"${evaluation.showAsLinearExpr} -> ${ind.showAsLinearExpr}"
+      s"${evaluation.showAsLinearExpr} -> ${showIndividual(ind)}"
     }
   }
 
@@ -36,9 +34,7 @@ object Evolution {
     def showLinearExprs: String = individuals.map {_.showAsLinearExpr}.mkString("{",",","}")
 
     def averageSize: Double = individuals.map{ eval =>
-      val seed = eval.ind.seed
-      val iter = eval.ind.iter
-      (seed++iter).map(_.astSize).sum.toDouble
+      representationSize(eval.ind)
     }.sum/individuals.size
 
     lazy val averageFitness: Double = {
@@ -62,7 +58,7 @@ object Evolution {
       for(
         eval <- individuals;
         ind = eval.ind;
-        expr <- ind.iter;
+        expr <- individualExprs(ind);
         (_, e) <- Expr.subExprs(expr)
       ){
         val s = e match {
@@ -87,16 +83,12 @@ object Evolution {
     }
   }
 
-}
-
-class Evolution {
-
-  def evolveAFunction(populationSize: Int, tournamentSize: Int, neighbourSize: Int,
-                      initOperator: GeneticOperator,
-                      operators: IS[(GeneticOperator, Double)],
-                      evaluation: Individual => IndividualEvaluation,
-                      threadNum: Int,
-                      randSeed: Int
+  def optimize(populationSize: Int, tournamentSize: Int, neighbourSize: Int,
+               initOperator: GOp,
+               operators: IS[(GOp, Double)],
+               evaluation: Individual => IndividualEvaluation,
+               threadNum: Int,
+               randSeed: Int
                      ): Iterator[Population] = {
     require(neighbourSize*2+1 <= populationSize, "Neighbour size too large.")
 
@@ -108,7 +100,7 @@ class Evolution {
       p
     }
 
-    val operatorPCF: IS[(GeneticOperator, Double)] = {
+    val operatorPCF: IS[(GOp, Double)] = {
       val normalizeFactor = operators.map(_._2).sum
       var acc = 0.0
       operators.map{
@@ -175,4 +167,5 @@ class Evolution {
       Population(newData, newFitnessMap)
     }
   }
+
 }

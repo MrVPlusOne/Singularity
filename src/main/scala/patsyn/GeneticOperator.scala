@@ -1,19 +1,18 @@
 package patsyn
 
-import Evolution.{Individual}
-import GeneticOpLibrary._
+import GeneticOperator._
 
 import scala.util.Random
 
-trait GeneticOperator{
+trait GeneticOperator[T]{
   def arity: Int
 
-  def operate(random: Random, participates: IS[Individual]): Individual
+  def operate(random: Random, participates: IS[T]): T
 
   def name: String
 }
 
-object GeneticOpLibrary{
+object GeneticOperator{
 
   def cartesianProduct[A](listOfSets: IndexedSeq[Iterable[A]]): Iterator[IndexedSeq[A]] = {
     if(listOfSets.isEmpty) return Iterator(IndexedSeq())
@@ -75,10 +74,7 @@ object GeneticOpLibrary{
   }
 }
 
-class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[EFunction],
-                       seedTypes: IS[EType]
-                      ){
-
+case class GPEnvironment(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[EFunction], inputTypes: IS[EType]) {
   require(constMap.forall{case (_, gens) => gens.nonEmpty}, "For each type in constMap, there should be at least one ExprGen.")
   /** type set used to concretize abstract functions */
   val typeUniverse: Set[EType] = constMap.keySet
@@ -110,8 +106,8 @@ class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[
       instantiations
   }.groupBy(_.returnType)
 
-  require(seedTypes.toSet.subsetOf(typeUniverse), "Some seed type is not within the type universe!")
-  val args: IndexedSeq[ExprGen[EArg]] = seedTypes.zipWithIndex.map{
+  require(inputTypes.toSet.subsetOf(typeUniverse), "Some input type is not within the type universe!")
+  val args: IndexedSeq[ExprGen[EArg]] = inputTypes.zipWithIndex.map{
     case (t, i) => ExprGen(t, _ =>EArg(i, t))
   }
 
@@ -120,24 +116,30 @@ class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[
       map.updated(gen.returnType, gen +: map(gen.returnType))
     }}
   }
+}
+
+case class SingleStateGOpLibrary(environment: GPEnvironment)  {
+  type Individual = SingleStateInd
+
+  import environment._
 
   def createIndividual(seed: IS[Expr], iter: IS[Expr]): Individual = {
-    Individual(seed, iter)
+    SingleStateInd(seed, iter)
   }
 
-  def initOp(maxDepth: Int): GeneticOperator = new GeneticOperator {
+  def initOp(maxDepth: Int) = new GeneticOperator[SingleStateInd] {
     def name = s"Init"
 
     override def arity: Int = 0
 
     override def operate(random: Random, participates: IS[Individual]): Individual = {
-      val seed = seedTypes.map(t => genExpr(t, maxDepth, constMap, functionMap, random))
-      val iter = seedTypes.map(t => genExpr(t, maxDepth, terminalMap, functionMap, random))
+      val seed = inputTypes.map(t => genExpr(t, maxDepth, constMap, functionMap, random))
+      val iter = inputTypes.map(t => genExpr(t, maxDepth, terminalMap, functionMap, random))
       createIndividual(seed, iter)
     }
   }
 
-  def copyOp: GeneticOperator = new GeneticOperator {
+  def copyOp = new GeneticOperator[SingleStateInd] {
     def name = "Copy"
 
     override def arity: Int = 1
@@ -148,7 +150,7 @@ class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[
     }
   }
 
-  def simpleCrossOp(crossSeedProb: Double): GeneticOperator = new GeneticOperator {
+  def simpleCrossOp(crossSeedProb: Double) = new GeneticOperator[SingleStateInd] {
     require(crossSeedProb<=1.0 & crossSeedProb>=0.0)
 
     def name = "Crossover"
@@ -171,7 +173,7 @@ class GeneticOpLibrary(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[
     }
   }
 
-  def simpleMutateOp(newTreeMaxDepth: Int, mutateSeedProb: Double): GeneticOperator = new GeneticOperator {
+  def simpleMutateOp(newTreeMaxDepth: Int, mutateSeedProb: Double) = new GeneticOperator[SingleStateInd] {
     require(mutateSeedProb<=1.0 & mutateSeedProb>=0.0)
 
     def name = "Mutate"

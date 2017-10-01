@@ -3,8 +3,8 @@ package patsyn
 
 import StandardSystem._
 import measure.{TimeMeasureExamples, TimeMeasurement, TimeTools}
-import patsyn.Evolution.{IndividualEvaluation, Population}
-import patsyn.GeneticOpLibrary.ExprGen
+import patsyn.EvolutionaryOptimizer.IndividualEvaluation
+import patsyn.GeneticOperator.ExprGen
 
 import scala.util.Random
 
@@ -152,7 +152,9 @@ object TestRun {
     }.toMap
   }
 
-  def runExample(generationMonitor: Population => Unit): Unit = {
+  case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
+
+  def runExample(monitorCallback: MonitoringData => Unit): Unit = {
     val example = phpHashCollision
 
     val constMap = makeConstMap(
@@ -163,10 +165,11 @@ object TestRun {
 
     val functions = IntComponents.collection ++ VectComponents.collection
 
-    val library = new GeneticOpLibrary(constMap, functions, example.seedTypes)
+    val gpEnv = GPEnvironment(constMap, functions, example.seedTypes)
+    val library = SingleStateGOpLibrary(gpEnv)
 
     println("[Function map]")
-    library.functionMap.foreach { case (t, comps) =>
+    gpEnv.functionMap.foreach { case (t, comps) =>
       println(s"$t -> ${comps.mkString("{", ", ", "}")}")
     }
     println("[End of Function map]")
@@ -192,8 +195,8 @@ object TestRun {
     new File("results/" + dateTime.toString).mkdir()
 
     for (seed <- 2 to 5) {
-      val evolution = new Evolution()
-      val generations = evolution.evolveAFunction(
+      val evolution = new SingleStateOptimizer()
+      val generations = evolution.optimize(
         populationSize = 10000, tournamentSize = 7, neighbourSize = 4000,
         initOperator = library.initOp(maxDepth = 3),
         operators = IS(
@@ -217,11 +220,13 @@ object TestRun {
 
         val startTime = System.nanoTime()
         generations.take(100).zipWithIndex.foreach { case (pop, i) =>
-          generationMonitor(pop)
+          val best = pop.bestSoFar
+          val data = MonitoringData(pop.averageFitness, best.evaluation.fitness, best.evaluation.performance)
+          monitorCallback(data)
+
           println("------------")
           print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
           println(s"Generation ${i+1}")
-          val best = pop.bestSoFar
           println(s"Best Individual: ${best.showAsLinearExpr}")
           val firstFiveInputs = eval(best.ind.seed, best.ind.iter)._2.take(5).map(
             _.mkString("< ", " | ", " >")).mkString(", ")
@@ -254,13 +259,14 @@ object TestRun {
     }
 
 
-    var populations = IS[Population]()
-    runExample(generationMonitor = pop => {
-      populations :+= pop
+    var dataCollected = IS[MonitoringData]()
+    runExample(monitorCallback = d => {
+      dataCollected :+= d
 
-      val avFitLine = populations.map(_.averageFitness)
-      val bestFitness = populations.map(_.bestSoFar.evaluation.fitness)
-      val bestPerformance = populations.map(_.bestSoFar.evaluation.performance)
+
+      val avFitLine = dataCollected.map(_.averageFitness)
+      val bestFitness = dataCollected.map(_.bestFitness)
+      val bestPerformance = dataCollected.map(_.bestPerformance)
 
       val chart = ListPlot.plot(
         "best performance" -> makeXY(bestPerformance),
