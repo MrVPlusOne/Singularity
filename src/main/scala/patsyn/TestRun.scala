@@ -10,7 +10,9 @@ import scala.util.Random
 
 object TestRun {
 
-  case class FuzzingExample(seedTypes: IS[EType], sizeF: IS[EValue] => Int, resourceUsage: IS[EValue] => Double)
+  case class FuzzingExample(seedTypes: IS[EType],
+                            sizeF: PartialFunction[IS[EValue], Int],
+                            resourceUsage: PartialFunction[IS[EValue], Double])
 
   def notPossible[T](): T = throw new Exception("Not possible!")
 
@@ -24,14 +26,12 @@ object TestRun {
       sizeF = {
         case IS(VectValue(v)) =>
           v.length
-        case _ => notPossible()
       },
       resourceUsage = {
         case IS(VectValue(v)) =>
           val c = new Counter()
           Examples.insertionSort(c)(toIntVect(v))
           c.read()
-        case _ => notPossible()
       }
     )
   }
@@ -47,14 +47,12 @@ object TestRun {
       sizeF = {
         case IS(VectValue(v)) =>
           v.length
-        case _ => notPossible()
       },
       resourceUsage = {
         case IS(VectValue(vec)) =>
           val c = new Counter()
           Examples.quickSort(c, choosePivot)(toIntVect(vec))
           c.read()
-        case _ => notPossible()
       }
     )
   }
@@ -65,7 +63,6 @@ object TestRun {
       sizeF = {
         case IS(VectValue(v)) =>
           v.length
-        case _ => notPossible()
       },
       resourceUsage = {
         case IS(VectValue(vec)) =>
@@ -73,7 +70,6 @@ object TestRun {
           val c = new Counter()
           Examples.quickSort(c, xs => xs(random.nextInt(xs.length)))(toIntVect(vec))
           c.read()
-        case _ => notPossible()
       }
     )
   }
@@ -83,14 +79,12 @@ object TestRun {
       seedTypes = IS(EVect(EInt), EInt),
       sizeF = {
         case IS(VectValue(v), IntValue(_)) => v.length
-        case _ => notPossible()
       },
       resourceUsage = {
         case IS(VectValue(vec), IntValue(idx)) =>
           val c = new Counter()
           Examples.listSearchAndCopy(c)(toIntVect(vec), idx)
           c.read()
-        case _ => notPossible()
       }
     )
   }
@@ -200,11 +194,11 @@ object TestRun {
     for (seed <- 2 to 5) {
       val evolution = new Evolution()
       val generations = evolution.evolveAFunction(
-        populationSize = 10000, tournamentSize = 7, neighbourSize = 3000,
+        populationSize = 10000, tournamentSize = 7, neighbourSize = 4000,
         initOperator = library.initOp(maxDepth = 3),
         operators = IS(
-          library.simpleCrossOp(0.2) -> 0.6,
-          library.simpleMutateOp(newTreeMaxDepth = 3, 0.2) -> 0.3,
+          library.simpleCrossOp(0.2) -> 0.5,
+          library.simpleMutateOp(newTreeMaxDepth = 3, 0.2) -> 0.4,
           library.copyOp -> 0.1
         ),
         evaluation = ind => {
@@ -226,7 +220,7 @@ object TestRun {
           generationMonitor(pop)
           println("------------")
           print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
-          println(s"Generation ${i + 1}")
+          println(s"Generation ${i+1}")
           val best = pop.bestSoFar
           println(s"Best Individual: ${best.showAsLinearExpr}")
           val firstFiveInputs = eval(best.ind.seed, best.ind.iter)._2.take(5).map(
@@ -247,7 +241,7 @@ object TestRun {
   }
 
   def makeXY(ys: IS[Double]): IS[(Double, Double)] = {
-    ys.indices.map{ i => i.toDouble -> ys(i)}
+    ys.indices.map{ i => (i+1).toDouble -> ys(i)}
   }
 
   def main(args: Array[String]): Unit = {
