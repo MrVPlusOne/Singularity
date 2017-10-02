@@ -3,7 +3,6 @@ package patsyn
 
 import StandardSystem._
 import measure.{TimeMeasureExamples, TimeMeasurement, TimeTools}
-import patsyn.EvolutionRepresentation.IndividualEvaluation
 import patsyn.GeneticOperator.ExprGen
 
 import scala.util.Random
@@ -161,15 +160,13 @@ object TestRun {
       EInt -> IS(r => r.nextInt(12)),
       EVect(EInt) -> IS(_ => Vector()),
       EVect(EVect(EInt)) -> IS(_ => Vector())
-//      EBool -> IS(_ => true, _ => false)
     )
 
-    val functions = IntComponents.collection ++ VectComponents.collection// ++ BoolComponents.collection
+    val functions = IntComponents.collection ++ VectComponents.collection
 
     val stateTypes = constMap.keys.toIndexedSeq
     val gpEnv = GPEnvironment(constMap, functions, stateTypes)
     val library = MultiStateGOpLibrary(gpEnv, example.outputTypes)
-//    val library = SingleStateGOpLibrary(gpEnv)
 
     println("[Function map]")
     gpEnv.functionMap.foreach { case (t, comps) =>
@@ -179,26 +176,21 @@ object TestRun {
 
 
 
-    import java.util.Calendar
-    import java.io._
-    val dateTime = Calendar.getInstance().getTime
-    new File("results/" + dateTime.toString).mkdir()
+
+    val recordDirPath = {
+      import java.util.Calendar
+      val dateTime = Calendar.getInstance().getTime
+      s"results/$dateTime"
+    }
 
     for (seed <- 2 to 5) {
       val evaluation = new SimplePerformanceEvaluation(
         sizeOfInterest = 600, maxTrials = 3, nonsenseFitness = -1.0,
         resourceUsage = example.resourceUsage, sizeF = example.sizeF, maxMemoryUsage = 600*10
       )
-//      val representation = SingleStateRepresentation(seedSizeTolerance = 20, iterSizeTolerance = 30,
-//        evaluation = evaluation)
       val representation = MultiStateRepresentation(totalSizeTolerance = 60, singleSizeTolerance = 30,
    stateTypes = stateTypes, outputTypes = example.outputTypes, evaluation = evaluation)
       val optimizer = EvolutionaryOptimizer(representation)
-//      val operators = IS(
-//        library.simpleCrossOp(0.2) -> 0.5,
-//        library.simpleMutateOp(newTreeMaxDepth = 3, 0.2) -> 0.4,
-//        library.copyOp -> 0.1
-//      )
       val operators = IS(
         library.simpleCrossOp -> 0.4,
         library.simpleMutateOp(newTreeMaxDepth = 3) -> 0.5,
@@ -216,7 +208,7 @@ object TestRun {
         randSeed = seed
       )
 
-      FileLogger.runWithAFileLogger(s"results/$dateTime/testResult[$seed].txt") { logger =>
+      FileLogger.runWithAFileLogger(s"$recordDirPath/testResult[seed=$seed].txt") { logger =>
         import logger._
 
         val parameterInfo = ""
@@ -231,7 +223,6 @@ object TestRun {
           println("------------")
           print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
           println(s"Generation ${i+1}")
-//          println(s"Best Individual: ${representation.showIndData(best)}")
           println(s"Best Result: ${best.evaluation.showAsLinearExpr}, Created by ${best.history.birthOp.name}")
           representation.printIndividualMultiLine(println)(best.ind)
           val firstSevenInputs = representation.fitnessEvaluation(best.ind)._2.take(7).map(

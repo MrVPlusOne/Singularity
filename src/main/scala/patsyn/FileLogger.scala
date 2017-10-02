@@ -1,6 +1,6 @@
 package patsyn
 
-import java.io.FileWriter
+import java.io.{File, FileWriter}
 
 class FileLogger(fileName: String, printToConsole: Boolean, writer: FileWriter) {
 
@@ -25,6 +25,7 @@ class FileLogger(fileName: String, printToConsole: Boolean, writer: FileWriter) 
 
 object FileLogger{
   def runWithAFileLogger[T](fileName: String, printToConsole: Boolean = true)(f: FileLogger => T): T = {
+    mkDirsAlongPath(fileName.split("/").init.mkString("/"))
     val writer = new FileWriter(fileName)
     val logger = new FileLogger(fileName, printToConsole, writer)
     try{
@@ -32,6 +33,17 @@ object FileLogger{
     }finally {
       writer.flush()
       writer.close()
+    }
+  }
+
+  def mkDirsAlongPath(path: String): Unit = {
+    val parts = path.split("/").filterNot(_.isEmpty)
+    require(parts.length>=1, s"invalid path format: '$path'")
+    parts.tail.scanLeft(parts.head){ case (p0, part) => p0 + "/" + part }.foreach{ p =>
+      val f = new File(p)
+      if(!f.exists()){
+        f.mkdir()
+      }
     }
   }
 }

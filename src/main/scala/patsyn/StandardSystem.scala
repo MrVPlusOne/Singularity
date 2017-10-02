@@ -1,11 +1,15 @@
 package patsyn
 
+import scala.language.implicitConversions
+
 object StandardSystem {
 
   // Type declarations
   case object EInt extends EType
 
   case class EVect(elemT: EType) extends EType
+
+  case object EBool extends EType
 
   // Value declarations
   case class IntValue(value: Int) extends EValue {
@@ -27,11 +31,19 @@ object StandardSystem {
     def size: Long = value.map(_.size).sum + 1
   }
 
+  case class BoolValue(value: Boolean) extends EValue{
+    def hasType(ty: EType): Boolean = ty == EBool
+
+    def size: Long = 1
+  }
+
   implicit def intValue(v: Int): IntValue = IntValue(v)
 
   implicit def vectValue[E](v: Vector[EValue]): VectValue = {
     VectValue(v)
   }
+
+  implicit def boolValue(b: Boolean): BoolValue = BoolValue(b)
 
   object IntComponents{
     val inc =  EConcreteFunc("inc", IS(EInt), EInt, {
@@ -113,6 +125,38 @@ object StandardSystem {
     })
 
     val collection: IndexedSeq[EFunction] = IS(append, prepend, access, concat, length)
+  }
+
+  object BoolComponents {
+    val not = EConcreteFunc("not", IS(EBool), EBool, {
+      case IS(BoolValue(b)) => !b
+    })
+
+    val and = EConcreteFunc("and", IS(EBool, EBool), EBool, {
+      case IS(BoolValue(b1), BoolValue(b2)) => b1 && b2
+    })
+
+    val or = EConcreteFunc("or", IS(EBool, EBool), EBool, {
+      case IS(BoolValue(b1), BoolValue(b2)) => b1 || b2
+    })
+
+    val lessThan = EConcreteFunc("lessThan", IS(EInt, EInt), EBool, {
+      case IS(IntValue(i1), IntValue(i2)) => i1 < i2
+    })
+
+    val equal = EAbstractFunc("equal", 1, {
+      case IS(e) => IS(e, e) -> EBool
+    }, {
+      case IS(v1, v2) => v1 == v2
+    })
+
+    val ifElse = EAbstractFunc("ifElse", 1, {
+      case IS(e) => IS(EBool, e, e) -> e
+    }, {
+      case IS(BoolValue(b), v1, v2) => if (b) v1 else v2
+    })
+
+    val collection: IndexedSeq[EFunction] = IS(not, and, or, lessThan, equal, ifElse)
   }
 
 }
