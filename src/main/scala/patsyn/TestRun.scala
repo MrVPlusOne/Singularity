@@ -11,11 +11,8 @@ import scala.util.Random
 object TestRun {
 
   case class FuzzingExample(outputTypes: IS[EType],
-                            resourceUsage: PartialFunction[IS[EValue], Double],
-                            sizeF: PartialFunction[IS[EValue], Int] = {
-                              case vs => vs.map(_.size).sum.toInt
-                            }
-                           )
+                            sizeF: PartialFunction[IS[EValue], Int],
+                            resourceUsage: PartialFunction[IS[EValue], Double])
 
   def notPossible[T](): T = throw new Exception("Not possible!")
 
@@ -26,6 +23,10 @@ object TestRun {
   def insertionSortExample: FuzzingExample = {
     FuzzingExample(
       outputTypes = IS(EVect(EInt)),
+      sizeF = {
+        case IS(VectValue(v)) =>
+          v.length
+      },
       resourceUsage = {
         case IS(VectValue(v)) =>
           val c = new Counter()
@@ -43,6 +44,10 @@ object TestRun {
 
     FuzzingExample(
       outputTypes = IS(EVect(EInt)),
+      sizeF = {
+        case IS(VectValue(v)) =>
+          v.length
+      },
       resourceUsage = {
         case IS(VectValue(vec)) =>
           val c = new Counter()
@@ -55,6 +60,10 @@ object TestRun {
   def randomQuickSortExample(seed: Int): FuzzingExample = {
     FuzzingExample(
       outputTypes = IS(EVect(EInt)),
+      sizeF = {
+        case IS(VectValue(v)) =>
+          v.length
+      },
       resourceUsage = {
         case IS(VectValue(vec)) =>
           val random = new Random(seed)
@@ -68,6 +77,9 @@ object TestRun {
   def listSearchExample: FuzzingExample = {
     FuzzingExample(
       outputTypes = IS(EVect(EInt), EInt),
+      sizeF = {
+        case IS(VectValue(v), IntValue(_)) => v.length
+      },
       resourceUsage = {
         case IS(VectValue(vec), IntValue(idx)) =>
           val c = new Counter()
@@ -91,6 +103,11 @@ object TestRun {
     val example = TimeMeasureExamples.phpHashExampleNoFile
     FuzzingExample(
       outputTypes = IS(EVect(EVect(EInt))),
+      sizeF = {
+        case IS(VectValue(strings)) =>
+          strings.map(s => s.asInstanceOf[VectValue].value.length).sum
+        case _ => notPossible()
+      },
       resourceUsage = {
         case IS(VectValue(vec)) =>
           val strings = vec.map(v => vectIntToString(v.asInstanceOf[VectValue]))
@@ -102,6 +119,11 @@ object TestRun {
   def phpHashCollision: FuzzingExample = {
     FuzzingExample(
       outputTypes = IS(EVect(EVect(EInt))),
+      sizeF = {
+        case IS(VectValue(strings)) =>
+          strings.map(s => s.asInstanceOf[VectValue].value.length).sum
+        case _ => notPossible()
+      },
       resourceUsage = {
         case IS(VectValue(vec)) =>
           val hashes = vec.map(v => {
@@ -115,7 +137,7 @@ object TestRun {
     )
   }
 
-  def hashFunc(ls: Seq[Char]): Int = {
+  def hashFunc(ls: Seq[Char]) = {
     val cs = ls.toArray
     var hash = 5381
     for(i <- cs.indices){
@@ -139,9 +161,10 @@ object TestRun {
       EInt -> IS(r => r.nextInt(12)),
       EVect(EInt) -> IS(_ => Vector()),
       EVect(EVect(EInt)) -> IS(_ => Vector())
+//      EBool -> IS(_ => true, _ => false)
     )
 
-    val functions = IntComponents.collection ++ VectComponents.collection
+    val functions = IntComponents.collection ++ VectComponents.collection// ++ BoolComponents.collection
 
     val stateTypes = constMap.keys.toIndexedSeq
     val gpEnv = GPEnvironment(constMap, functions, stateTypes)
