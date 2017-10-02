@@ -1,5 +1,7 @@
 package patsyn
 
+import patsyn.EvolutionRepresentation.MemoryUsage
+
 case class SingleStateInd(seed: IS[Expr], iter: IS[Expr]){
   //todo: add new size measurement with penalty on repeated exprs
 
@@ -22,14 +24,17 @@ case class SingleStateRepresentation(seedSizeTolerance: Int, iterSizeTolerance: 
     (ind.seed ++ ind.iter).flatMap(e => Expr.subExprs(e).values)
   }
 
-  def individualToPattern(ind: SingleStateInd): Stream[IS[EValue]] = {
+  def individualToPattern(ind: SingleStateInd): Stream[(MemoryUsage, IS[EValue])] = {
     val seeds = ind.seed
     val iters = ind.iter
     val seedValues = seeds.map(seed => Expr.evaluateWithCheck(seed, IS()))
     val s = Stream.iterate(seedValues)(ls => {
       iters.map { iter => Expr.evaluateWithCheck(iter, ls) }
     })
-    s
+
+    s.map(ys => {
+      MemoryUsage(ys.map(_.size).sum) -> ys
+    })
   }
 
   def sizePenaltyFactor(ind: SingleStateInd): Double = {

@@ -12,6 +12,8 @@ object StandardSystem {
     def hasType(ty: EType): Boolean = ty == EInt
 
     override def toString: String = value.toString
+
+    def size: Long = 1
   }
 
   case class VectValue(value: Vector[EValue]) extends EValue{
@@ -21,6 +23,8 @@ object StandardSystem {
     }
 
     override def toString: String = value.mkString("[",",","]")
+
+    def size: Long = value.map(_.size).sum + 1
   }
 
   implicit def intValue(v: Int): IntValue = IntValue(v)

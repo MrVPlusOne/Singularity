@@ -9,7 +9,7 @@ trait EvolutionRepresentation[Individual] {
   def representationSize(ind: Individual): Double
   def individualExprs(ind: Individual): Seq[Expr]
 
-  def individualToPattern(ind: Individual): Stream[IS[EValue]]
+  def individualToPattern(ind: Individual): Stream[(MemoryUsage, IS[EValue])]
 
   def sizePenaltyFactor(ind: Individual): Double
 
@@ -19,7 +19,7 @@ trait EvolutionRepresentation[Individual] {
     val inputStream = individualToPattern(ind)
     val performance = evaluation.evaluateAPattern(inputStream)
     val fitness = sizePenaltyFactor(ind) * performance
-    IndividualEvaluation(fitness, performance) -> inputStream
+    IndividualEvaluation(fitness, performance) -> inputStream.map(_._2)
   }
 
   def showIndData(data: IndividualData[Individual]): String = {
@@ -95,6 +95,7 @@ object EvolutionRepresentation{
     }
   }
 
+  case class MemoryUsage(amount: Long)
 }
 
 

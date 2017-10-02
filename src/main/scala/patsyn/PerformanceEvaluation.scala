@@ -1,5 +1,7 @@
 package patsyn
 
+import patsyn.EvolutionRepresentation.MemoryUsage
+
 
 object PerformanceEvaluation {
 }
@@ -9,7 +11,7 @@ trait PerformanceEvaluation {
   def sizeF: IS[EValue] => Int
   def nonsenseFitness: Double
 
-  def evaluateAPattern(inputStream: Stream[IS[EValue]]): Double
+  def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): Double
 }
 
 object ExtrapolatePerformanceEvaluation{
@@ -61,33 +63,34 @@ class ExtrapolatePerformanceEvaluation(mamLink: MamLink, sizeOfInterest: Int, fi
   }
 
 
-  def evaluateAPattern(inputStream: Stream[IS[EValue]]): Double = {
-    var lastSize = Int.MinValue
-    val xs = inputStream.map{ input =>
-      val inputSize = sizeF(input)
-      if(inputSize <= lastSize)
-        return nonsenseFitness
-      lastSize = inputSize
-      input
-    }
-    this.evaluate[IS[EValue]](xs, sizeF, resourceUsage).value
+  def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): Double = {
+//    var lastSize = Int.MinValue
+//    val xs = inputStream.map{ input =>
+//      val inputSize = sizeF(input)
+//      if(inputSize <= lastSize)
+//        return nonsenseFitness
+//      lastSize = inputSize
+//      input
+//    }
+//    this.evaluate[IS[EValue]](xs, sizeF, resourceUsage).value
+    ???
   }
 
 }
 
-class SimplePerformanceEvaluation(sizeOfInterest: Int, maxTrials: Int, val resourceUsage: (IS[EValue]) => Double, val sizeF: (IS[EValue]) => Int, val nonsenseFitness: Double = 0.0) extends PerformanceEvaluation {
+class SimplePerformanceEvaluation(sizeOfInterest: Int, maxTrials: Int, val resourceUsage: (IS[EValue]) => Double, val sizeF: (IS[EValue]) => Int, maxMemoryUsage: Long, val nonsenseFitness: Double = 0.0) extends PerformanceEvaluation {
 
 
-  def evaluateAPattern(inputStream: Stream[IS[EValue]]): Double = {
+  def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): Double = {
     var lastSize = Int.MinValue
-    val pointsToTry = inputStream.takeWhile{input =>
+    val pointsToTry = inputStream.takeWhile{case (usage, input) =>
       val inputSize = sizeF(input)
       if(inputSize <= lastSize)
         return nonsenseFitness
       lastSize = inputSize
-      sizeF(input) <= sizeOfInterest
+      sizeF(input) <= sizeOfInterest && usage.amount <= maxMemoryUsage
     }.takeRight(maxTrials)
-    pointsToTry.map(resourceUsage).max
+    pointsToTry.map(_._2).map(resourceUsage).max
   }
 }
 

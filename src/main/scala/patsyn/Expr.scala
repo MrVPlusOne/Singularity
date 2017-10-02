@@ -71,12 +71,13 @@ case class EAbstractFunc(name: String, tyVarNum: Int,
 
 object Expr {
   def evaluateWithCheck(expr: Expr, env: IndexedSeq[EValue]): EValue = {
+//    println(s"$expr \\||/ $env")
     def withType(ty: EType)(value: EValue) ={
       assert(value.hasType(ty), s"$value should have type $ty")
       value
     }
     expr match {
-      case arg: EArg => withType(expr.returnType)(env(arg.id))
+      case arg: EArg => withType(expr.returnType){ env(arg.id) }
       case EConst(_, value) => value
       case ENode(f, args) => withType(f.returnType){
         f.eval(args.map(a => evaluateWithCheck(a, env)))
@@ -114,6 +115,19 @@ object Expr {
       }
     }
     rec(IS(), expr)
+  }
+
+  def replaceSubExpr(parent: Expr, child: Expr, replacePoint: Expr.Coordinate): Expr = {
+    def rec(parent: Expr, point: Expr.Coordinate): Expr = {
+      if(point.isEmpty) child
+      else parent match {
+        case ENode(f, args) =>
+          val newArgs = args.updated(point.head, rec(args(point.head), point.tail))
+          ENode(f, newArgs)
+        case _ => throw new Exception("Invalid coordinate")
+      }
+    }
+    rec(parent, replacePoint)
   }
 
 }

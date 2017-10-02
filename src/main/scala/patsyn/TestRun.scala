@@ -186,7 +186,7 @@ object TestRun {
     for (seed <- 2 to 5) {
       val evaluation = new SimplePerformanceEvaluation(
         sizeOfInterest = 600, maxTrials = 3, nonsenseFitness = -1.0,
-        resourceUsage = example.resourceUsage, sizeF = example.sizeF
+        resourceUsage = example.resourceUsage, sizeF = example.sizeF, maxMemoryUsage = 600*10
       )
 //      val representation = SingleStateRepresentation(seedSizeTolerance = 20, iterSizeTolerance = 30,
 //        evaluation = evaluation)
@@ -205,7 +205,7 @@ object TestRun {
       )
 
       val generations = optimizer.optimize(
-        populationSize = 100, tournamentSize = 7, neighbourSize = 40,
+        populationSize = 500, tournamentSize = 7, neighbourSize = 245,
         initOperator = library.initOp(maxDepth = 3),
         operators = operators,
         evaluation = ind => {
@@ -222,7 +222,7 @@ object TestRun {
         println(parameterInfo)
 
         val startTime = System.nanoTime()
-        generations.take(100).zipWithIndex.foreach { case (pop, i) =>
+        generations.take(500).zipWithIndex.foreach { case (pop, i) =>
           val best = pop.bestSoFar
           val data = MonitoringData(pop.averageFitness, best.evaluation.fitness, best.evaluation.performance)
           monitorCallback(data)
@@ -230,10 +230,12 @@ object TestRun {
           println("------------")
           print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
           println(s"Generation ${i+1}")
-          println(s"Best Individual: ${representation.showIndData(best)}")
-          val firstFiveInputs = representation.fitnessEvaluation(best.ind)._2.take(5).map(
+//          println(s"Best Individual: ${representation.showIndData(best)}")
+          println(s"Best Result: ${best.evaluation.showAsLinearExpr}")
+          representation.printIndividualMultiLine(println)(best.ind)
+          val firstSevenInputs = representation.fitnessEvaluation(best.ind)._2.take(7).map(
             _.mkString("< ", " | ", " >")).mkString(", ")
-          println(s"Best Individual Pattern: $firstFiveInputs, ...")
+          println(s"Best Individual Pattern: $firstSevenInputs, ...")
           println(s"Best Individual created by: ${best.history.birthOp.name}, HistoryLen: ${best.history.historyLength}")
           println(s"Diversity: ${pop.fitnessMap.keySet.size}")
           println(s"Average Size: ${representation.populationAverageSize(pop)}")
