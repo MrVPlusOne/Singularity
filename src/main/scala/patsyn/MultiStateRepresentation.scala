@@ -35,7 +35,8 @@ case class MultiStateInd(exprs: IS[Expr], nStates: Int){
 
 
 case class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType],
-                                    totalSizeTolerance: Double, evaluation: PerformanceEvaluation)
+                                    totalSizeTolerance: Double, singleSizeTolerance: Double,
+                                    evaluation: PerformanceEvaluation)
   extends EvolutionRepresentation[MultiStateInd] {
 
   def showIndividual(ind: MultiStateInd): String = {
@@ -57,7 +58,7 @@ case class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType
       val out = ind.outputs(i)
       println(s"[O$i: $t] -> $out")
     }
-    println("^^^")
+    println("*")
     stateTypes.indices.foreach { i =>
       val t = stateTypes(i)
       val s = ind.seeds(i)
@@ -88,7 +89,8 @@ case class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType
   }
 
   def sizePenaltyFactor(ind: MultiStateInd): Double = {
-    val totalSize = (ind.seeds ++ ind.iters ++ ind.outputs).map(_.astSize).sum
-    SimpleMath.gaussianForthOrder(totalSizeTolerance)(totalSize)
+    import SimpleMath.gaussianForthOrder
+    ind.exprs.map(e => gaussianForthOrder(singleSizeTolerance)(e.astSize)).product *
+      gaussianForthOrder(totalSizeTolerance)(ind.totalAstSize)
   }
 }

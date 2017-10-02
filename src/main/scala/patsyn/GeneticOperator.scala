@@ -220,15 +220,28 @@ case class MultiStateGOpLibrary(environment: GPEnvironment, outputTypes: IS[ETyp
     }
   }
 
-  def simpleCrossOp(crossSeedProb: Double): GOp = new GOp {
-    require(crossSeedProb<=1.0 & crossSeedProb>=0.0)
+  def simpleCrossOp: GOp = new GOp {
 
     def name = "Crossover"
 
     override def arity: Int = 2
 
     override def operate(random: Random, participates: IS[Individual]): Individual = {
-      ???
+      val IndexedSeq(p1,p2) = participates
+      val (subs1, subs2) = (p1.allSubExprs, p2.allSubExprs)
+      val allSubs = subs1 ++ subs2
+      val crossPoint = random.nextInt(allSubs.length)
+
+      val (c, e1) = allSubs(crossPoint)
+      val parentSelected = if(crossPoint < subs1.length) p1 else p2
+      val seedSelected = parentSelected.isSeed(c._1)
+
+      val t = e1.returnType
+      val candidates = allSubs.collect{
+        case (_, e) if e.returnType == t && (!seedSelected || e.isConst) => e
+      }
+      val newSubTree = SimpleMath.randomSelect(random)(candidates)
+      parentSelected.update(c, newSubTree)
     }
   }
 

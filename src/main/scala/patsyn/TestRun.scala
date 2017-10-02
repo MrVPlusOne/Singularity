@@ -128,7 +128,7 @@ object TestRun {
         case IS(VectValue(vec)) =>
           val hashes = vec.map(v => {
             vectIntToCharArray(v.asInstanceOf[VectValue])
-          }).toSet.toIndexedSeq.map(hashFunc)
+          }).distinct.map(hashFunc)
 
           hashes.groupBy(identity).values.map{
             elems => elems.length - 1
@@ -190,7 +190,7 @@ object TestRun {
       )
 //      val representation = SingleStateRepresentation(seedSizeTolerance = 20, iterSizeTolerance = 30,
 //        evaluation = evaluation)
-      val representation = MultiStateRepresentation(totalSizeTolerance = 60,
+      val representation = MultiStateRepresentation(totalSizeTolerance = 60, singleSizeTolerance = 30,
    stateTypes = stateTypes, outputTypes = example.outputTypes, evaluation = evaluation)
       val optimizer = EvolutionaryOptimizer(representation)
 //      val operators = IS(
@@ -199,8 +199,8 @@ object TestRun {
 //        library.copyOp -> 0.1
 //      )
       val operators = IS(
-//        library.simpleCrossOp(0.2) -> 0.5,
-        library.simpleMutateOp(newTreeMaxDepth = 3) -> 0.9,
+        library.simpleCrossOp -> 0.4,
+        library.simpleMutateOp(newTreeMaxDepth = 3) -> 0.5,
         library.copyOp -> 0.1
       )
 
@@ -222,7 +222,7 @@ object TestRun {
         println(parameterInfo)
 
         val startTime = System.nanoTime()
-        generations.take(500).zipWithIndex.foreach { case (pop, i) =>
+        generations.take(250).zipWithIndex.foreach { case (pop, i) =>
           val best = pop.bestSoFar
           val data = MonitoringData(pop.averageFitness, best.evaluation.fitness, best.evaluation.performance)
           monitorCallback(data)
@@ -231,18 +231,17 @@ object TestRun {
           print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
           println(s"Generation ${i+1}")
 //          println(s"Best Individual: ${representation.showIndData(best)}")
-          println(s"Best Result: ${best.evaluation.showAsLinearExpr}")
+          println(s"Best Result: ${best.evaluation.showAsLinearExpr}, Created by ${best.history.birthOp.name}")
           representation.printIndividualMultiLine(println)(best.ind)
           val firstSevenInputs = representation.fitnessEvaluation(best.ind)._2.take(7).map(
             _.mkString("< ", " | ", " >")).mkString(", ")
           println(s"Best Individual Pattern: $firstSevenInputs, ...")
-          println(s"Best Individual created by: ${best.history.birthOp.name}, HistoryLen: ${best.history.historyLength}")
           println(s"Diversity: ${pop.fitnessMap.keySet.size}")
           println(s"Average Size: ${representation.populationAverageSize(pop)}")
           println(s"Average Fitness: ${pop.averageFitness}")
           println(s"Fitness Variation: ${pop.fitnessStdDiv}")
           print("Distribution: ")
-          println(representation.frequencyRatioStat(pop.individuals.map(_.ind)).take(12).map {
+          println(representation.frequencyRatioStat(pop.individuals.map(_.ind)).take(10).map {
             case (s, f) => s"$s -> ${"%.3f".format(f)}"
           }.mkString(", "))
         }

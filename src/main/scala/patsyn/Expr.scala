@@ -9,6 +9,8 @@ sealed trait Expr {
   override def toString: String = Expr.linearShow(this)
 
   def astSize: Int
+
+  def isConst: Boolean
 }
 
 sealed trait ETerminal extends Expr {
@@ -18,14 +20,19 @@ sealed trait ETerminal extends Expr {
 }
 
 case class EArg(id: Int, returnType: EType) extends ETerminal{
+  def isConst: Boolean = false
 }
 
 case class EConst(returnType: EType, value: EValue) extends ETerminal{
   require(value hasType returnType)
+
+  def isConst: Boolean = true
 }
 
 case class ENode(f: EConcreteFunc, args: IS[Expr]) extends Expr {
   val astSize: Int = args.map(_.astSize).sum + 1
+
+  val isConst: Boolean = args.forall(_.isConst)
 
   f.argTypes.zip(args).foreach{
     case (t, expr) =>
