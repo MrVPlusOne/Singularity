@@ -9,140 +9,31 @@ import scala.util.Random
 
 object TestRun {
 
-  case class FuzzingExample(outputTypes: IS[EType],
-                            sizeF: PartialFunction[IS[EValue], Int],
-                            resourceUsage: PartialFunction[IS[EValue], Double])
+  def main(args: Array[String]): Unit = {
+    import javax.swing._
+    import gui._
 
-  def notPossible[T](): T = throw new Exception("Not possible!")
-
-  def toIntVect(v: Vector[EValue]): Vector[Int] = {
-      v.asInstanceOf[Vector[IntValue]].map(_.value)
-  }
-
-  def insertionSortExample: FuzzingExample = {
-    FuzzingExample(
-      outputTypes = IS(EVect(EInt)),
-      sizeF = {
-        case IS(VectValue(v)) =>
-          v.length
-      },
-      resourceUsage = {
-        case IS(VectValue(v)) =>
-          val c = new Counter()
-          Examples.insertionSort(c)(toIntVect(v))
-          c.read()
-      }
-    )
-  }
-
-  def quickSortExample: FuzzingExample = {
-    def choosePivot(xs: IS[Int]): Int = {
-      xs(xs.length/2) // choose middle
-//      xs(xs.length/3) // 1/3
+    val frame = new JFrame("GP Monitor") {
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+      setVisible(true)
     }
 
-    FuzzingExample(
-      outputTypes = IS(EVect(EInt)),
-      sizeF = {
-        case IS(VectValue(v)) =>
-          v.length
-      },
-      resourceUsage = {
-        case IS(VectValue(vec)) =>
-          val c = new Counter()
-          Examples.quickSort(c, choosePivot)(toIntVect(vec))
-          c.read()
-      }
-    )
-  }
+    var dataCollected = IS[MonitoringData]()
+    runExample(FuzzingExample.phpHashCollision,
+      monitorCallback = d => {
+        dataCollected :+= d
 
-  def randomQuickSortExample(seed: Int): FuzzingExample = {
-    FuzzingExample(
-      outputTypes = IS(EVect(EInt)),
-      sizeF = {
-        case IS(VectValue(v)) =>
-          v.length
-      },
-      resourceUsage = {
-        case IS(VectValue(vec)) =>
-          val random = new Random(seed)
-          val c = new Counter()
-          Examples.quickSort(c, xs => xs(random.nextInt(xs.length)))(toIntVect(vec))
-          c.read()
-      }
-    )
-  }
+        val avFitLine = dataCollected.map(_.averageFitness)
+        val bestFitness = dataCollected.map(_.bestFitness)
+        val bestPerformance = dataCollected.map(_.bestPerformance)
 
-  def listSearchExample: FuzzingExample = {
-    FuzzingExample(
-      outputTypes = IS(EVect(EInt), EInt),
-      sizeF = {
-        case IS(VectValue(v), IntValue(_)) => v.length
-      },
-      resourceUsage = {
-        case IS(VectValue(vec), IntValue(idx)) =>
-          val c = new Counter()
-          Examples.listSearchAndCopy(c)(toIntVect(vec), idx)
-          c.read()
-      }
-    )
-  }
-
-  def vectIntToString(vec: VectValue): String = {
-    String.valueOf(vectIntToCharArray(vec))
-  }
-
-  def vectIntToCharArray(vec: VectValue): List[Char] = {
-    vec.value.map { i =>
-      (i.asInstanceOf[IntValue].value % 256).toChar
-    }.toList
-  }
-
-  def phpHashTableExample(timeout: TimeMeasurement.DoubleAsMillis): FuzzingExample = {
-    val example = TimeMeasureExamples.phpHashExampleNoFile
-    FuzzingExample(
-      outputTypes = IS(EVect(EVect(EInt))),
-      sizeF = {
-        case IS(VectValue(strings)) =>
-          strings.map(s => s.asInstanceOf[VectValue].value.length).sum
-        case _ => notPossible()
-      },
-      resourceUsage = {
-        case IS(VectValue(vec)) =>
-          val strings = vec.map(v => vectIntToString(v.asInstanceOf[VectValue]))
-          example.measure(strings, timeout)
-      }
-    )
-  }
-
-  def phpHashCollision: FuzzingExample = {
-    FuzzingExample(
-      outputTypes = IS(EVect(EVect(EInt))),
-      sizeF = {
-        case IS(VectValue(strings)) =>
-          strings.map(s => s.asInstanceOf[VectValue].value.length).sum
-        case _ => notPossible()
-      },
-      resourceUsage = {
-        case IS(VectValue(vec)) =>
-          val hashes = vec.map(v => {
-            vectIntToCharArray(v.asInstanceOf[VectValue])
-          }).distinct.map(hashFunc)
-
-          hashes.groupBy(identity).values.map{
-            elems => elems.length - 1
-          }.sum
-      }
-    )
-  }
-
-  def hashFunc(ls: Seq[Char]) = {
-    val cs = ls.toArray
-    var hash = 5381
-    for(i <- cs.indices){
-      hash = ((hash << 5) + hash) + cs(i)
-    }
-    hash
+        val chart = ListPlot.plot(
+          "best performance" -> makeXY(bestPerformance),
+          "best fitness" -> makeXY(bestFitness),
+          "average fitness" -> makeXY(avFitLine))("Performance Curve", "Generations", "Evaluation")
+        frame.setContentPane(new MonitorPanel(chart, 10, (600, 450)))
+        frame.pack()
+      })
   }
 
   def makeConstMap(pairs: (EType, IS[Random => EValue])*): Map[EType, IS[ExprGen[EConst]]] = {
@@ -153,9 +44,11 @@ object TestRun {
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
 
-  def runExample(monitorCallback: MonitoringData => Unit): Unit = {
-    val example = phpHashCollision
+  def makeXY(ys: IS[Double]): IS[(Double, Double)] = {
+    ys.indices.map{ i => (i+1).toDouble -> ys(i)}
+  }
 
+  def runExample(example: FuzzingExample, monitorCallback: MonitoringData => Unit): Unit = {
     val constMap = makeConstMap(
       EInt -> IS(r => r.nextInt(12)),
       EVect(EInt) -> IS(_ => Vector()),
@@ -174,9 +67,6 @@ object TestRun {
     }
     println("[End of Function map]")
 
-
-
-
     val recordDirPath = {
       import java.util.Calendar
       val dateTime = Calendar.getInstance().getTime
@@ -189,7 +79,7 @@ object TestRun {
         resourceUsage = example.resourceUsage, sizeF = example.sizeF, maxMemoryUsage = 600*10
       )
       val representation = MultiStateRepresentation(totalSizeTolerance = 60, singleSizeTolerance = 30,
-   stateTypes = stateTypes, outputTypes = example.outputTypes, evaluation = evaluation)
+        stateTypes = stateTypes, outputTypes = example.outputTypes, evaluation = evaluation)
       val optimizer = EvolutionaryOptimizer(representation)
       val operators = IS(
         library.simpleCrossOp -> 0.4,
@@ -241,35 +131,4 @@ object TestRun {
     }
   }
 
-  def makeXY(ys: IS[Double]): IS[(Double, Double)] = {
-    ys.indices.map{ i => (i+1).toDouble -> ys(i)}
-  }
-
-  def main(args: Array[String]): Unit = {
-    import javax.swing._
-    import gui._
-
-    val frame = new JFrame("GP Monitor") {
-      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-      setVisible(true)
-    }
-
-
-    var dataCollected = IS[MonitoringData]()
-    runExample(monitorCallback = d => {
-      dataCollected :+= d
-
-
-      val avFitLine = dataCollected.map(_.averageFitness)
-      val bestFitness = dataCollected.map(_.bestFitness)
-      val bestPerformance = dataCollected.map(_.bestPerformance)
-
-      val chart = ListPlot.plot(
-        "best performance" -> makeXY(bestPerformance),
-        "best fitness" -> makeXY(bestFitness),
-        "average fitness" -> makeXY(avFitLine))("Performance Curve", "Generations", "Evaluation")
-      frame.setContentPane(new MonitorPanel(chart, 10, (600, 450)))
-      frame.pack()
-    })
-  }
 }
