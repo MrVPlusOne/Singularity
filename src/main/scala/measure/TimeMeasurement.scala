@@ -4,7 +4,7 @@ package measure
 import java.io.ByteArrayInputStream
 
 import measure.TimeMeasurement.DoubleAsMillis
-import patsyn.FileLogger
+import patsyn.{FileInteraction, FileLogger}
 
 object TimeMeasurement{
   type DoubleAsMillis = Double
@@ -45,7 +45,7 @@ object TimeMeasureExamples {
     }
     new TimeMeasurement[Seq[String]](input => {
 
-      FileLogger.runWithAFileLogger(tempFileName, printToConsole = false) { logger =>
+      FileInteraction.runWithAFileLogger(tempFileName, printToConsole = false) { logger =>
         val table = input.map(s => "\"" + s + "\": null").mkString("{", ",", "}")
         logger.println(table)
       }

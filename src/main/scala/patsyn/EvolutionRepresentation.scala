@@ -69,9 +69,9 @@ object EvolutionRepresentation{
     }
   }
 
-  case class IndividualHistory[T](parents: IS[Int], birthOp: GeneticOperator[T], historyLength: Int)
+  case class IndividualHistory(parents: IS[Int], birthOp: String, historyLength: Int)
 
-  case class IndividualData[T](ind: T, history: IndividualHistory[T], evaluation: IndividualEvaluation)
+  case class IndividualData[T](ind: T, history: IndividualHistory, evaluation: IndividualEvaluation)
 
   case class Population[T](individuals: IS[IndividualData[T]], fitnessMap: Map[T, IndividualEvaluation]){
 
@@ -90,7 +90,7 @@ object EvolutionRepresentation{
       individuals.map(_.evaluation.performance).sum/individuals.size
     }
 
-    def bestSoFar: IndividualData[T] = {
+    def bestIndividual: IndividualData[T] = {
       individuals.maxBy(_.evaluation.fitness)
     }
   }

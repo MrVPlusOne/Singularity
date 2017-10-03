@@ -1,6 +1,9 @@
 package patsyn
 
-import java.io.{File, FileWriter}
+import java.io._
+
+import patsyn.EvolutionRepresentation.IndividualData
+import patsyn.StandardSystem.EInt
 
 class FileLogger(fileName: String, printToConsole: Boolean, writer: FileWriter) {
 
@@ -23,7 +26,7 @@ class FileLogger(fileName: String, printToConsole: Boolean, writer: FileWriter) 
   }
 }
 
-object FileLogger{
+object FileInteraction{
   def runWithAFileLogger[T](fileName: String, printToConsole: Boolean = true)(f: FileLogger => T): T = {
     mkDirsAlongPath(fileName.split("/").init.mkString("/"))
     val writer = new FileWriter(fileName)
@@ -45,6 +48,35 @@ object FileLogger{
         f.mkdir()
       }
     }
+  }
+
+  def saveObjectToFile(path: String)(obj: Serializable): Unit = {
+    val oos = new ObjectOutputStream(new FileOutputStream(path))
+    try{
+      oos.writeObject(obj)
+    } finally {
+      oos.close()
+    }
+  }
+
+  def readObjectFromFile[T](path: String): T = {
+    val ois = new ObjectInputStream(new FileInputStream(path))
+    try{
+      val obj = ois.readObject.asInstanceOf[T]
+      obj
+    } finally {
+      ois.close()
+    }
+  }
+
+  def main(args: Array[String]): Unit = {
+    val objFile = "results/Tue Oct 03 17:15:54 CDT 2017/bestIndividual[seed=2].serialized"
+
+    val pattern = "abc".r
+    pattern.regex
+
+    val arg = readObjectFromFile[IndividualData[MultiStateInd]](objFile)
+    println(arg.ind)
   }
 }
 

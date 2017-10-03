@@ -42,7 +42,7 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
 
       Population(individuals.map{ind =>
         val eval = fitnessMap(ind)
-        IndividualData(ind, IndividualHistory(IS(), initOperator, historyLength = 0), eval)
+        IndividualData(ind, IndividualHistory(IS(), initOperator.name, historyLength = 0), eval)
       }, fitnessMap)
     }
 
@@ -73,7 +73,7 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
         }
         val newInd = geneticOp.operate(random, participates.map(_._1.ind))
         val historyLen = if(participates.isEmpty) 0 else participates.map(_._1.history.historyLength).max + 1
-        val newHistory = IndividualHistory(participates.map(_._2), geneticOp, historyLen)
+        val newHistory = IndividualHistory(participates.map(_._2), geneticOp.name, historyLen)
         newInd -> newHistory
       }
 

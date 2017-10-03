@@ -19,16 +19,19 @@ sealed trait ETerminal extends Expr {
   override def astSize: Int = 1
 }
 
+@SerialVersionUID(0L)
 case class EArg(id: Int, returnType: EType) extends ETerminal{
   def isConst: Boolean = false
 }
 
+@SerialVersionUID(0L)
 case class EConst(returnType: EType, value: EValue) extends ETerminal{
   require(value hasType returnType)
 
   def isConst: Boolean = true
 }
 
+@SerialVersionUID(0L)
 case class ENode(f: EConcreteFunc, args: IS[Expr]) extends Expr {
   val astSize: Int = args.map(_.astSize).sum + 1
 
@@ -54,6 +57,7 @@ case class ENode(f: EConcreteFunc, args: IS[Expr]) extends Expr {
 
 sealed trait EFunction
 
+@SerialVersionUID(0L)
 case class EConcreteFunc(name: String, argTypes: IS[EType], returnType: EType,
                          eval: PartialFunction[IS[EValue], EValue]) extends EFunction {
   def apply (args: Expr*): ENode = {
@@ -65,6 +69,7 @@ case class EConcreteFunc(name: String, argTypes: IS[EType], returnType: EType,
   }
 }
 
+@SerialVersionUID(0L)
 case class EAbstractFunc(name: String, tyVarNum: Int,
                          typeInstantiation: (IS[EType]) => (IS[EType], EType),
                          eval: PartialFunction[IS[EValue], EValue]) extends EFunction {

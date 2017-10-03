@@ -2,7 +2,8 @@ package patsyn
 
 
 import StandardSystem._
-import measure.{TimeMeasureExamples, TimeMeasurement, TimeTools}
+import measure.TimeTools
+import patsyn.EvolutionRepresentation.IndividualData
 import patsyn.GeneticOperator.ExprGen
 
 import scala.util.Random
@@ -98,22 +99,24 @@ object TestRun {
         randSeed = seed
       )
 
-      FileLogger.runWithAFileLogger(s"$recordDirPath/testResult[seed=$seed].txt") { logger =>
+      FileInteraction.runWithAFileLogger(s"$recordDirPath/testResult[seed=$seed].txt") { logger =>
         import logger._
 
         val parameterInfo = ""
         println(parameterInfo)
 
         val startTime = System.nanoTime()
-        generations.take(250).zipWithIndex.foreach { case (pop, i) =>
-          val best = pop.bestSoFar
+
+        var bestSoFar: Option[IndividualData[MultiStateInd]] = None
+        generations.take(10).zipWithIndex.foreach { case (pop, i) =>
+          val best = pop.bestIndividual
           val data = MonitoringData(pop.averageFitness, best.evaluation.fitness, best.evaluation.performance)
           monitorCallback(data)
 
           println("------------")
           print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
-          println(s"Generation ${i+1}")
-          println(s"Best Result: ${best.evaluation.showAsLinearExpr}, Created by ${best.history.birthOp.name}")
+          println(s"Generation ${i + 1}")
+          println(s"Best Result: ${best.evaluation.showAsLinearExpr}, Created by ${best.history.birthOp}")
           representation.printIndividualMultiLine(println)(best.ind)
           val firstSevenInputs = representation.fitnessEvaluation(best.ind)._2.take(7).map(
             _.mkString("< ", " | ", " >")).mkString(", ")
@@ -123,10 +126,16 @@ object TestRun {
           println(s"Average Fitness: ${pop.averageFitness}")
           println(s"Fitness Variation: ${pop.fitnessStdDiv}")
           print("Distribution: ")
-          println(representation.frequencyRatioStat(pop.individuals.map(_.ind)).take(10).map {
-            case (s, f) => s"$s -> ${"%.3f".format(f)}"
-          }.mkString(", "))
+          println {
+            representation.frequencyRatioStat(pop.individuals.map(_.ind)).take(10).map {
+              case (s, f) => s"$s -> ${"%.3f".format(f)}"
+            }.mkString(", ")
+          }
+          bestSoFar = Some(best)
         }
+
+        val data = bestSoFar.get
+        FileInteraction.saveObjectToFile(s"$recordDirPath/bestIndividual[seed=$seed].serialized")(data)
       }
     }
   }

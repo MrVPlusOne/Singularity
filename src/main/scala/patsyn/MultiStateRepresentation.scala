@@ -7,6 +7,7 @@ object MultiStateInd {
   type GlobalCoord = (Int, Expr.Coordinate)
 }
 
+@SerialVersionUID(0L)
 case class MultiStateInd(exprs: IS[Expr], nStates: Int){
   val seeds: IS[Expr] = exprs.take(nStates)
   val iters: IS[Expr] = (nStates until 2*nStates).map(i => exprs(i))
