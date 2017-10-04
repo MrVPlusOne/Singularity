@@ -9,7 +9,11 @@ class Counter{
 
   private var counter = 0L
 
-  def count(n: Int = 1): Unit = {
+  def count(): Unit = {
+    counter += 1
+  }
+
+  def count(n: Int): Unit = {
     counter += n
   }
 

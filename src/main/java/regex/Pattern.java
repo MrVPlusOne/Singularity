@@ -9,6 +9,8 @@ package regex;
  *
  */
 
+import patsyn.Counter;
+
 import java.text.Normalizer;
 import java.util.Locale;
 import java.util.Iterator;
@@ -342,14 +344,14 @@ public final class Pattern
      *
      * @return  A new matcher for this pattern
      */
-    public Matcher matcher(CharSequence input) {
+    public Matcher matcher(Counter counter, CharSequence input) {
         if (!compiled) {
             synchronized(this) {
                 if (!compiled)
                     compile();
             }
         }
-        Matcher m = new Matcher(this, input);
+        Matcher m = new Matcher(counter, this, input);
         return m;
     }
 
@@ -388,9 +390,9 @@ public final class Pattern
      * @throws  PatternSyntaxException
      *          If the expression's syntax is invalid
      */
-    public static boolean matches(String regex, CharSequence input) {
+    public static boolean matches(Counter counter, String regex, CharSequence input) {
         Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(input);
+        Matcher m = p.matcher(counter, input);
         return m.matches();
     }
 
@@ -458,11 +460,11 @@ public final class Pattern
      * @return  The array of strings computed by splitting the input
      *          around matches of this pattern
      */
-    public String[] split(CharSequence input, int limit) {
+    public String[] split(Counter counter, CharSequence input, int limit) {
         int index = 0;
         boolean matchLimited = limit > 0;
         ArrayList<String> matchList = new ArrayList<>();
-        Matcher m = matcher(input);
+        Matcher m = matcher(counter, input);
 
         // Add segments before each match found
         while(m.find()) {
@@ -528,8 +530,8 @@ public final class Pattern
      * @return  The array of strings computed by splitting the input
      *          around matches of this pattern
      */
-    public String[] split(CharSequence input) {
-        return split(input, 0);
+    public String[] split(Counter counter, CharSequence input) {
+        return split(counter, input, 0);
     }
 
     /**
@@ -2659,10 +2661,16 @@ public final class Pattern
         Node() {
             next = Pattern.accept;
         }
+
+        final boolean match(Counter counter, Matcher matcher, int i, CharSequence seq){
+            counter.count();
+            return matchImpl(counter, matcher, i, seq);
+        }
+
         /**
          * This method implements the classic accept node.
          */
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq){
             matcher.last = i;
             matcher.groups[0] = matcher.first;
             matcher.groups[1] = matcher.last;
@@ -2686,7 +2694,7 @@ public final class Pattern
          * the addition of a check to see if the match occurred
          * using all of the input.
          */
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             if (matcher.acceptMode == Matcher.ENDANCHOR && i != matcher.to)
                 return false;
             matcher.last = i;
@@ -2710,14 +2718,14 @@ public final class Pattern
             next.study(info);
             minLength = info.minLength;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             if (i > matcher.to - minLength) {
                 matcher.hitEnd = true;
                 return false;
             }
             int guard = matcher.to - minLength;
             for (; i <= guard; i++) {
-                if (next.match(matcher, i, seq)) {
+                if (next.match(counter, matcher, i, seq)) {
                     matcher.first = i;
                     matcher.groups[0] = matcher.first;
                     matcher.groups[1] = matcher.last;
@@ -2742,15 +2750,15 @@ public final class Pattern
         StartS(Node node) {
             super(node);
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             if (i > matcher.to - minLength) {
                 matcher.hitEnd = true;
                 return false;
             }
             int guard = matcher.to - minLength;
             while (i <= guard) {
-                //if ((ret = next.match(matcher, i, seq)) || i == guard)
-                if (next.match(matcher, i, seq)) {
+                //if ((ret = next.match(counter, matcher, i, seq)) || i == guard)
+                if (next.match(counter, matcher, i, seq)) {
                     matcher.first = i;
                     matcher.groups[0] = matcher.first;
                     matcher.groups[1] = matcher.last;
@@ -2778,10 +2786,10 @@ public final class Pattern
      * multiline mode.
      */
     static final class Begin extends Node {
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int fromIndex = (matcher.anchoringBounds) ?
                     matcher.from : 0;
-            if (i == fromIndex && next.match(matcher, i, seq)) {
+            if (i == fromIndex && next.match(counter, matcher, i, seq)) {
                 matcher.first = i;
                 matcher.groups[0] = i;
                 matcher.groups[1] = matcher.last;
@@ -2797,12 +2805,12 @@ public final class Pattern
      * should not match at the last newline before the end as $ will.
      */
     static final class End extends Node {
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int endIndex = (matcher.anchoringBounds) ?
                     matcher.to : matcher.getTextLength();
             if (i == endIndex) {
                 matcher.hitEnd = true;
-                return next.match(matcher, i, seq);
+                return next.match(counter, matcher, i, seq);
             }
             return false;
         }
@@ -2813,7 +2821,7 @@ public final class Pattern
      * object to match for the multiline ^.
      */
     static final class Caret extends Node {
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int startIndex = matcher.from;
             int endIndex = matcher.to;
             if (!matcher.anchoringBounds) {
@@ -2836,7 +2844,7 @@ public final class Pattern
                 if (ch == '\r' && seq.charAt(i) == '\n')
                     return false;
             }
-            return next.match(matcher, i, seq);
+            return next.match(counter, matcher, i, seq);
         }
     }
 
@@ -2844,7 +2852,7 @@ public final class Pattern
      * Node to anchor at the beginning of a line when in unixdot mode.
      */
     static final class UnixCaret extends Node {
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int startIndex = matcher.from;
             int endIndex = matcher.to;
             if (!matcher.anchoringBounds) {
@@ -2862,7 +2870,7 @@ public final class Pattern
                     return false;
                 }
             }
-            return next.match(matcher, i, seq);
+            return next.match(counter, matcher, i, seq);
         }
     }
 
@@ -2871,10 +2879,10 @@ public final class Pattern
      * This is used for the \G construct.
      */
     static final class LastMatch extends Node {
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             if (i != matcher.oldLast)
                 return false;
-            return next.match(matcher, i, seq);
+            return next.match(counter, matcher, i, seq);
         }
     }
 
@@ -2896,7 +2904,7 @@ public final class Pattern
         Dollar(boolean mul) {
             multiline = mul;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int endIndex = (matcher.anchoringBounds) ?
                     matcher.to : matcher.getTextLength();
             if (!multiline) {
@@ -2926,11 +2934,11 @@ public final class Pattern
                     if (i > 0 && seq.charAt(i-1) == '\r')
                         return false;
                     if (multiline)
-                        return next.match(matcher, i, seq);
+                        return next.match(counter, matcher, i, seq);
                 } else if (ch == '\r' || ch == '\u0085' ||
                         (ch|1) == '\u2029') {
                     if (multiline)
-                        return next.match(matcher, i, seq);
+                        return next.match(counter, matcher, i, seq);
                 } else { // No line terminator, no match
                     return false;
                 }
@@ -2940,7 +2948,7 @@ public final class Pattern
             // If a $ matches because of end of input, then more input
             // could cause it to fail!
             matcher.requireEnd = true;
-            return next.match(matcher, i, seq);
+            return next.match(counter, matcher, i, seq);
         }
         boolean study(TreeInfo info) {
             next.study(info);
@@ -2957,7 +2965,7 @@ public final class Pattern
         UnixDollar(boolean mul) {
             multiline = mul;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int endIndex = (matcher.anchoringBounds) ?
                     matcher.to : matcher.getTextLength();
             if (i < endIndex) {
@@ -2970,7 +2978,7 @@ public final class Pattern
                     // If multiline return next.match without setting
                     // matcher.hitEnd
                     if (multiline)
-                        return next.match(matcher, i, seq);
+                        return next.match(counter, matcher, i, seq);
                 } else {
                     return false;
                 }
@@ -2981,7 +2989,7 @@ public final class Pattern
             // If a $ matches because of end of input, then more input
             // could cause it to fail!
             matcher.requireEnd = true;
-            return next.match(matcher, i, seq);
+            return next.match(counter, matcher, i, seq);
         }
         boolean study(TreeInfo info) {
             next.study(info);
@@ -2993,18 +3001,18 @@ public final class Pattern
      * Node class that matches a Unicode line ending '\R'
      */
     static final class LineEnding extends Node {
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             // (u+000Du+000A|[u+000Au+000Bu+000Cu+000Du+0085u+2028u+2029])
             if (i < matcher.to) {
                 int ch = seq.charAt(i);
                 if (ch == 0x0A || ch == 0x0B || ch == 0x0C ||
                         ch == 0x85 || ch == 0x2028 || ch == 0x2029)
-                    return next.match(matcher, i + 1, seq);
+                    return next.match(counter, matcher, i + 1, seq);
                 if (ch == 0x0D) {
                     i++;
                     if (i < matcher.to && seq.charAt(i) == 0x0A)
                         i++;
-                    return next.match(matcher, i, seq);
+                    return next.match(counter, matcher, i, seq);
                 }
             } else {
                 matcher.hitEnd = true;
@@ -3029,11 +3037,11 @@ public final class Pattern
                 boolean isSatisfiedBy(int ch) {
                     return ! CharProperty.this.isSatisfiedBy(ch);}};
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             if (i < matcher.to) {
                 int ch = Character.codePointAt(seq, i);
                 return isSatisfiedBy(ch)
-                        && next.match(matcher, i+Character.charCount(ch), seq);
+                        && next.match(counter, matcher, i+Character.charCount(ch), seq);
             } else {
                 matcher.hitEnd = true;
                 return false;
@@ -3051,10 +3059,10 @@ public final class Pattern
      * properties never satisfied by Supplementary characters.
      */
     private static abstract class BmpCharProperty extends CharProperty {
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             if (i < matcher.to) {
                 return isSatisfiedBy(seq.charAt(i))
-                        && next.match(matcher, i+1, seq);
+                        && next.match(counter, matcher, i+1, seq);
             } else {
                 matcher.hitEnd = true;
                 return false;
@@ -3197,7 +3205,7 @@ public final class Pattern
     /**
      * Base class for all Slice nodes
      */
-    static class SliceNode extends Node {
+    static abstract class SliceNode extends Node {
         int[] buffer;
         SliceNode(int[] buf) {
             buffer = buf;
@@ -3217,7 +3225,7 @@ public final class Pattern
         Slice(int[] buf) {
             super(buf);
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int[] buf = buffer;
             int len = buf.length;
             for (int j=0; j<len; j++) {
@@ -3228,7 +3236,7 @@ public final class Pattern
                 if (buf[j] != seq.charAt(i+j))
                     return false;
             }
-            return next.match(matcher, i+len, seq);
+            return next.match(counter, matcher, i+len, seq);
         }
     }
 
@@ -3240,7 +3248,7 @@ public final class Pattern
         SliceI(int[] buf) {
             super(buf);
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int[] buf = buffer;
             int len = buf.length;
             for (int j=0; j<len; j++) {
@@ -3253,7 +3261,7 @@ public final class Pattern
                         buf[j] != ASCII.toLower(c))
                     return false;
             }
-            return next.match(matcher, i+len, seq);
+            return next.match(counter, matcher, i+len, seq);
         }
     }
 
@@ -3265,7 +3273,7 @@ public final class Pattern
         SliceU(int[] buf) {
             super(buf);
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int[] buf = buffer;
             int len = buf.length;
             for (int j=0; j<len; j++) {
@@ -3278,7 +3286,7 @@ public final class Pattern
                         buf[j] != Character.toLowerCase(Character.toUpperCase(c)))
                     return false;
             }
-            return next.match(matcher, i+len, seq);
+            return next.match(counter, matcher, i+len, seq);
         }
     }
 
@@ -3290,7 +3298,7 @@ public final class Pattern
         SliceS(int[] buf) {
             super(buf);
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int[] buf = buffer;
             int x = i;
             for (int j = 0; j < buf.length; j++) {
@@ -3307,7 +3315,7 @@ public final class Pattern
                     return false;
                 }
             }
-            return next.match(matcher, x, seq);
+            return next.match(counter, matcher, x, seq);
         }
     }
 
@@ -3322,7 +3330,7 @@ public final class Pattern
         int toLower(int c) {
             return ASCII.toLower(c);
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int[] buf = buffer;
             int x = i;
             for (int j = 0; j < buf.length; j++) {
@@ -3339,7 +3347,7 @@ public final class Pattern
                     return false;
                 }
             }
-            return next.match(matcher, x, seq);
+            return next.match(counter, matcher, x, seq);
         }
     }
 
@@ -3434,19 +3442,19 @@ public final class Pattern
             this.atom = node;
             this.type = type;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             switch (type) {
                 case GREEDY:
-                    return (atom.match(matcher, i, seq) && next.match(matcher, matcher.last, seq))
-                            || next.match(matcher, i, seq);
+                    return (atom.match(counter, matcher, i, seq) && next.match(counter, matcher, matcher.last, seq))
+                            || next.match(counter, matcher, i, seq);
                 case LAZY:
-                    return next.match(matcher, i, seq)
-                            || (atom.match(matcher, i, seq) && next.match(matcher, matcher.last, seq));
+                    return next.match(counter, matcher, i, seq)
+                            || (atom.match(counter, matcher, i, seq) && next.match(counter, matcher, matcher.last, seq));
                 case POSSESSIVE:
-                    if (atom.match(matcher, i, seq)) i = matcher.last;
-                    return next.match(matcher, i, seq);
+                    if (atom.match(counter, matcher, i, seq)) i = matcher.last;
+                    return next.match(counter, matcher, i, seq);
                 default:
-                    return atom.match(matcher, i, seq) && next.match(matcher, matcher.last, seq);
+                    return atom.match(counter, matcher, i, seq) && next.match(counter, matcher, matcher.last, seq);
             }
         }
         boolean study(TreeInfo info) {
@@ -3480,33 +3488,33 @@ public final class Pattern
             this.cmin = cmin;
             this.cmax = cmax;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int j;
             for (j = 0; j < cmin; j++) {
-                if (atom.match(matcher, i, seq)) {
+                if (atom.match(counter, matcher, i, seq)) {
                     i = matcher.last;
                     continue;
                 }
                 return false;
             }
             if (type == GREEDY)
-                return match0(matcher, i, j, seq);
+                return match0(counter, matcher, i, j, seq);
             else if (type == LAZY)
-                return match1(matcher, i, j, seq);
+                return match1(counter, matcher, i, j, seq);
             else
-                return match2(matcher, i, j, seq);
+                return match2(counter, matcher, i, j, seq);
         }
         // Greedy match.
         // i is the index to start matching at
         // j is the number of atoms that have matched
-        boolean match0(Matcher matcher, int i, int j, CharSequence seq) {
+        boolean match0(Counter counter, Matcher matcher, int i, int j, CharSequence seq) {
             if (j >= cmax) {
                 // We have matched the maximum... continue with the rest of
                 // the regular expression
-                return next.match(matcher, i, seq);
+                return next.match(counter, matcher, i, seq);
             }
             int backLimit = j;
-            while (atom.match(matcher, i, seq)) {
+            while (atom.match(counter, matcher, i, seq)) {
                 // k is the length of this match
                 int k = matcher.last - i;
                 if (k == 0) // Zero length match
@@ -3516,10 +3524,10 @@ public final class Pattern
                 j++;
                 // We are greedy so match as many as we can
                 while (j < cmax) {
-                    if (!atom.match(matcher, i, seq))
+                    if (!atom.match(counter, matcher, i, seq))
                         break;
                     if (i + k != matcher.last) {
-                        if (match0(matcher, matcher.last, j+1, seq))
+                        if (match0(counter, matcher, matcher.last, j+1, seq))
                             return true;
                         break;
                     }
@@ -3528,28 +3536,28 @@ public final class Pattern
                 }
                 // Handle backing off if match fails
                 while (j >= backLimit) {
-                    if (next.match(matcher, i, seq))
+                    if (next.match(counter, matcher, i, seq))
                         return true;
                     i -= k;
                     j--;
                 }
                 return false;
             }
-            return next.match(matcher, i, seq);
+            return next.match(counter, matcher, i, seq);
         }
         // Reluctant match. At this point, the minimum has been satisfied.
         // i is the index to start matching at
         // j is the number of atoms that have matched
-        boolean match1(Matcher matcher, int i, int j, CharSequence seq) {
+        boolean match1(Counter counter, Matcher matcher, int i, int j, CharSequence seq) {
             for (;;) {
                 // Try finishing match without consuming any more
-                if (next.match(matcher, i, seq))
+                if (next.match(counter, matcher, i, seq))
                     return true;
                 // At the maximum, no match found
                 if (j >= cmax)
                     return false;
                 // Okay, must try one more atom
-                if (!atom.match(matcher, i, seq))
+                if (!atom.match(counter, matcher, i, seq))
                     return false;
                 // If we haven't moved forward then must break out
                 if (i == matcher.last)
@@ -3559,15 +3567,15 @@ public final class Pattern
                 j++;
             }
         }
-        boolean match2(Matcher matcher, int i, int j, CharSequence seq) {
+        boolean match2(Counter counter, Matcher matcher, int i, int j, CharSequence seq) {
             for (; j < cmax; j++) {
-                if (!atom.match(matcher, i, seq))
+                if (!atom.match(counter, matcher, i, seq))
                     break;
                 if (i == matcher.last)
                     break;
                 i = matcher.last;
             }
-            return next.match(matcher, i, seq);
+            return next.match(counter, matcher, i, seq);
         }
         boolean study(TreeInfo info) {
             // Save original info
@@ -3630,7 +3638,7 @@ public final class Pattern
             this.groupIndex = group;
             this.capture = capture;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int[] groups = matcher.groups;
             int[] locals = matcher.locals;
             int save0 = locals[localIndex];
@@ -3648,7 +3656,7 @@ public final class Pattern
 
             boolean ret = true;
             for (int j = 0; j < cmin; j++) {
-                if (atom.match(matcher, i, seq)) {
+                if (atom.match(counter, matcher, i, seq)) {
                     if (capture) {
                         groups[groupIndex] = i;
                         groups[groupIndex+1] = matcher.last;
@@ -3661,11 +3669,11 @@ public final class Pattern
             }
             if (ret) {
                 if (type == GREEDY) {
-                    ret = match0(matcher, i, cmin, seq);
+                    ret = match0(counter, matcher, i, cmin, seq);
                 } else if (type == LAZY) {
-                    ret = match1(matcher, i, cmin, seq);
+                    ret = match1(counter, matcher, i, cmin, seq);
                 } else {
-                    ret = match2(matcher, i, cmin, seq);
+                    ret = match2(counter, matcher, i, cmin, seq);
                 }
             }
             if (!ret) {
@@ -3678,7 +3686,7 @@ public final class Pattern
             return ret;
         }
         // Aggressive group match
-        boolean match0(Matcher matcher, int i, int j, CharSequence seq) {
+        boolean match0(Counter counter, Matcher matcher, int i, int j, CharSequence seq) {
             // don't back off passing the starting "j"
             int min = j;
             int[] groups = matcher.groups;
@@ -3691,7 +3699,7 @@ public final class Pattern
             for (;;) {
                 if (j >= cmax)
                     break;
-                if (!atom.match(matcher, i, seq))
+                if (!atom.match(counter, matcher, i, seq))
                     break;
                 int k = matcher.last - i;
                 if (k <= 0) {
@@ -3710,16 +3718,16 @@ public final class Pattern
                     i = i + k;
                     if (++j >= cmax)
                         break;
-                    if (!atom.match(matcher, i, seq))
+                    if (!atom.match(counter, matcher, i, seq))
                         break;
                     if (i + k != matcher.last) {
-                        if (match0(matcher, i, j, seq))
+                        if (match0(counter, matcher, i, j, seq))
                             return true;
                         break;
                     }
                 }
                 while (j > min) {
-                    if (next.match(matcher, i, seq)) {
+                    if (next.match(counter, matcher, i, seq)) {
                         if (capture) {
                             groups[groupIndex+1] = i;
                             groups[groupIndex] = i - k;
@@ -3741,16 +3749,16 @@ public final class Pattern
                 groups[groupIndex] = save0;
                 groups[groupIndex+1] = save1;
             }
-            return next.match(matcher, i, seq);
+            return next.match(counter, matcher, i, seq);
         }
         // Reluctant matching
-        boolean match1(Matcher matcher, int i, int j, CharSequence seq) {
+        boolean match1(Counter counter, Matcher matcher, int i, int j, CharSequence seq) {
             for (;;) {
-                if (next.match(matcher, i, seq))
+                if (next.match(counter, matcher, i, seq))
                     return true;
                 if (j >= cmax)
                     return false;
-                if (!atom.match(matcher, i, seq))
+                if (!atom.match(counter, matcher, i, seq))
                     return false;
                 if (i == matcher.last)
                     return false;
@@ -3763,9 +3771,9 @@ public final class Pattern
             }
         }
         // Possessive matching
-        boolean match2(Matcher matcher, int i, int j, CharSequence seq) {
+        boolean match2(Counter counter, Matcher matcher, int i, int j, CharSequence seq) {
             for (; j < cmax; j++) {
-                if (!atom.match(matcher, i, seq)) {
+                if (!atom.match(counter, matcher, i, seq)) {
                     break;
                 }
                 if (capture) {
@@ -3777,7 +3785,7 @@ public final class Pattern
                 }
                 i = matcher.last;
             }
-            return next.match(matcher, i, seq);
+            return next.match(counter, matcher, i, seq);
         }
         boolean study(TreeInfo info) {
             // Save original info
@@ -3823,8 +3831,8 @@ public final class Pattern
      */
     static final class BranchConn extends Node {
         BranchConn() {};
-        boolean match(Matcher matcher, int i, CharSequence seq) {
-            return next.match(matcher, i, seq);
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
+            return next.match(counter, matcher, i, seq);
         }
         boolean study(TreeInfo info) {
             return info.deterministic;
@@ -3855,12 +3863,12 @@ public final class Pattern
             atoms[size++] = node;
         }
 
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             for (int n = 0; n < size; n++) {
                 if (atoms[n] == null) {
-                    if (conn.next.match(matcher, i, seq))
+                    if (conn.next.match(counter, matcher, i, seq))
                         return true;
-                } else if (atoms[n].match(matcher, i, seq)) {
+                } else if (atoms[n].match(counter, matcher, i, seq)) {
                     return true;
                 }
             }
@@ -3911,17 +3919,17 @@ public final class Pattern
         GroupHead(int localCount) {
             localIndex = localCount;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int save = matcher.locals[localIndex];
             matcher.locals[localIndex] = i;
-            boolean ret = next.match(matcher, i, seq);
+            boolean ret = next.match(counter, matcher, i, seq);
             matcher.locals[localIndex] = save;
             return ret;
         }
-        boolean matchRef(Matcher matcher, int i, CharSequence seq) {
+        boolean matchRef(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int save = matcher.locals[localIndex];
             matcher.locals[localIndex] = ~i; // HACK
-            boolean ret = next.match(matcher, i, seq);
+            boolean ret = next.match(counter, matcher, i, seq);
             matcher.locals[localIndex] = save;
             return ret;
         }
@@ -3937,9 +3945,9 @@ public final class Pattern
         GroupRef(GroupHead head) {
             this.head = head;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
-            return head.matchRef(matcher, i, seq)
-                    && next.match(matcher, matcher.last, seq);
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
+            return head.matchRef(counter, matcher, i, seq)
+                    && next.match(counter, matcher, matcher.last, seq);
         }
         boolean study(TreeInfo info) {
             info.maxValid = false;
@@ -3963,7 +3971,7 @@ public final class Pattern
             localIndex = localCount;
             groupIndex = groupCount + groupCount;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int tmp = matcher.locals[localIndex];
             if (tmp >= 0) { // This is the normal group case.
                 // Save the group so we can unset it if it
@@ -3973,7 +3981,7 @@ public final class Pattern
 
                 matcher.groups[groupIndex] = tmp;
                 matcher.groups[groupIndex+1] = i;
-                if (next.match(matcher, i, seq)) {
+                if (next.match(counter, matcher, i, seq)) {
                     return true;
                 }
                 matcher.groups[groupIndex] = groupStart;
@@ -3996,8 +4004,8 @@ public final class Pattern
         Prolog(Loop loop) {
             this.loop = loop;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
-            return loop.matchInit(matcher, i, seq);
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
+            return loop.matchInit(counter, matcher, i, seq);
         }
         boolean study(TreeInfo info) {
             return loop.study(info);
@@ -4019,7 +4027,7 @@ public final class Pattern
             this.countIndex = countIndex;
             this.beginIndex = beginIndex;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             // Avoid infinite loop in zero-length case.
             if (i > matcher.locals[beginIndex]) {
                 int count = matcher.locals[countIndex];
@@ -4028,7 +4036,7 @@ public final class Pattern
                 // iterations required for the loop to match
                 if (count < cmin) {
                     matcher.locals[countIndex] = count + 1;
-                    boolean b = body.match(matcher, i, seq);
+                    boolean b = body.match(counter, matcher, i, seq);
                     // If match failed we must backtrack, so
                     // the loop count should NOT be incremented
                     if (!b)
@@ -4041,7 +4049,7 @@ public final class Pattern
                 // iterations required for the loop to match
                 if (count < cmax) {
                     matcher.locals[countIndex] = count + 1;
-                    boolean b = body.match(matcher, i, seq);
+                    boolean b = body.match(counter, matcher, i, seq);
                     // If match failed we must backtrack, so
                     // the loop count should NOT be incremented
                     if (!b)
@@ -4050,21 +4058,21 @@ public final class Pattern
                         return true;
                 }
             }
-            return next.match(matcher, i, seq);
+            return next.match(counter, matcher, i, seq);
         }
-        boolean matchInit(Matcher matcher, int i, CharSequence seq) {
+        boolean matchInit(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int save = matcher.locals[countIndex];
             boolean ret = false;
             if (0 < cmin) {
                 matcher.locals[countIndex] = 1;
-                ret = body.match(matcher, i, seq);
+                ret = body.match(counter, matcher, i, seq);
             } else if (0 < cmax) {
                 matcher.locals[countIndex] = 1;
-                ret = body.match(matcher, i, seq);
+                ret = body.match(counter, matcher, i, seq);
                 if (ret == false)
-                    ret = next.match(matcher, i, seq);
+                    ret = next.match(counter, matcher, i, seq);
             } else {
-                ret = next.match(matcher, i, seq);
+                ret = next.match(counter, matcher, i, seq);
             }
             matcher.locals[countIndex] = save;
             return ret;
@@ -4086,24 +4094,24 @@ public final class Pattern
         LazyLoop(int countIndex, int beginIndex) {
             super(countIndex, beginIndex);
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             // Check for zero length group
             if (i > matcher.locals[beginIndex]) {
                 int count = matcher.locals[countIndex];
                 if (count < cmin) {
                     matcher.locals[countIndex] = count + 1;
-                    boolean result = body.match(matcher, i, seq);
+                    boolean result = body.match(counter, matcher, i, seq);
                     // If match failed we must backtrack, so
                     // the loop count should NOT be incremented
                     if (!result)
                         matcher.locals[countIndex] = count;
                     return result;
                 }
-                if (next.match(matcher, i, seq))
+                if (next.match(counter, matcher, i, seq))
                     return true;
                 if (count < cmax) {
                     matcher.locals[countIndex] = count + 1;
-                    boolean result = body.match(matcher, i, seq);
+                    boolean result = body.match(counter, matcher, i, seq);
                     // If match failed we must backtrack, so
                     // the loop count should NOT be incremented
                     if (!result)
@@ -4112,19 +4120,19 @@ public final class Pattern
                 }
                 return false;
             }
-            return next.match(matcher, i, seq);
+            return next.match(counter, matcher, i, seq);
         }
-        boolean matchInit(Matcher matcher, int i, CharSequence seq) {
+        boolean matchInit(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int save = matcher.locals[countIndex];
             boolean ret = false;
             if (0 < cmin) {
                 matcher.locals[countIndex] = 1;
-                ret = body.match(matcher, i, seq);
-            } else if (next.match(matcher, i, seq)) {
+                ret = body.match(counter, matcher, i, seq);
+            } else if (next.match(counter, matcher, i, seq)) {
                 ret = true;
             } else if (0 < cmax) {
                 matcher.locals[countIndex] = 1;
-                ret = body.match(matcher, i, seq);
+                ret = body.match(counter, matcher, i, seq);
             }
             matcher.locals[countIndex] = save;
             return ret;
@@ -4146,7 +4154,7 @@ public final class Pattern
             super();
             groupIndex = groupCount + groupCount;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int j = matcher.groups[groupIndex];
             int k = matcher.groups[groupIndex+1];
 
@@ -4166,7 +4174,7 @@ public final class Pattern
                 if (seq.charAt(i+index) != seq.charAt(j+index))
                     return false;
 
-            return next.match(matcher, i+groupSize, seq);
+            return next.match(counter, matcher, i+groupSize, seq);
         }
         boolean study(TreeInfo info) {
             info.maxValid = false;
@@ -4182,7 +4190,7 @@ public final class Pattern
             groupIndex = groupCount + groupCount;
             this.doUnicodeCase = doUnicodeCase;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int j = matcher.groups[groupIndex];
             int k = matcher.groups[groupIndex+1];
 
@@ -4221,7 +4229,7 @@ public final class Pattern
                 j += Character.charCount(c2);
             }
 
-            return next.match(matcher, i+groupSize, seq);
+            return next.match(counter, matcher, i+groupSize, seq);
         }
         boolean study(TreeInfo info) {
             info.maxValid = false;
@@ -4240,18 +4248,18 @@ public final class Pattern
         First(Node node) {
             this.atom = BnM.optimize(node);
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             if (atom instanceof BnM) {
-                return atom.match(matcher, i, seq)
-                        && next.match(matcher, matcher.last, seq);
+                return atom.match(counter, matcher, i, seq)
+                        && next.match(counter, matcher, matcher.last, seq);
             }
             for (;;) {
                 if (i > matcher.to) {
                     matcher.hitEnd = true;
                     return false;
                 }
-                if (atom.match(matcher, i, seq)) {
-                    return next.match(matcher, matcher.last, seq);
+                if (atom.match(counter, matcher, i, seq)) {
+                    return next.match(counter, matcher, matcher.last, seq);
                 }
                 i += countChars(seq, i, 1);
                 matcher.first++;
@@ -4272,11 +4280,11 @@ public final class Pattern
             this.yes = yes;
             this.not = not;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
-            if (cond.match(matcher, i, seq)) {
-                return yes.match(matcher, i, seq);
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
+            if (cond.match(counter, matcher, i, seq)) {
+                return yes.match(counter, matcher, i, seq);
             } else {
-                return not.match(matcher, i, seq);
+                return not.match(counter, matcher, i, seq);
             }
         }
         boolean study(TreeInfo info) {
@@ -4308,7 +4316,7 @@ public final class Pattern
         Pos(Node cond) {
             this.cond = cond;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int savedTo = matcher.to;
             boolean conditionMatched = false;
 
@@ -4316,12 +4324,12 @@ public final class Pattern
             if (matcher.transparentBounds)
                 matcher.to = matcher.getTextLength();
             try {
-                conditionMatched = cond.match(matcher, i, seq);
+                conditionMatched = cond.match(counter, matcher, i, seq);
             } finally {
                 // Reinstate region boundaries
                 matcher.to = savedTo;
             }
-            return conditionMatched && next.match(matcher, i, seq);
+            return conditionMatched && next.match(counter, matcher, i, seq);
         }
     }
 
@@ -4333,7 +4341,7 @@ public final class Pattern
         Neg(Node cond) {
             this.cond = cond;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int savedTo = matcher.to;
             boolean conditionMatched = false;
 
@@ -4342,18 +4350,18 @@ public final class Pattern
                 matcher.to = matcher.getTextLength();
             try {
                 if (i < matcher.to) {
-                    conditionMatched = !cond.match(matcher, i, seq);
+                    conditionMatched = !cond.match(counter, matcher, i, seq);
                 } else {
                     // If a negative lookahead succeeds then more input
                     // could cause it to fail!
                     matcher.requireEnd = true;
-                    conditionMatched = !cond.match(matcher, i, seq);
+                    conditionMatched = !cond.match(counter, matcher, i, seq);
                 }
             } finally {
                 // Reinstate region boundaries
                 matcher.to = savedTo;
             }
-            return conditionMatched && next.match(matcher, i, seq);
+            return conditionMatched && next.match(counter, matcher, i, seq);
         }
     }
 
@@ -4379,7 +4387,7 @@ public final class Pattern
             this.rmin = rmin;
         }
 
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int savedFrom = matcher.from;
             boolean conditionMatched = false;
             int startIndex = (!matcher.transparentBounds) ?
@@ -4392,11 +4400,11 @@ public final class Pattern
             if (matcher.transparentBounds)
                 matcher.from = 0;
             for (int j = i - rmin; !conditionMatched && j >= from; j--) {
-                conditionMatched = cond.match(matcher, j, seq);
+                conditionMatched = cond.match(counter, matcher, j, seq);
             }
             matcher.from = savedFrom;
             matcher.lookbehindTo = savedLBT;
-            return conditionMatched && next.match(matcher, i, seq);
+            return conditionMatched && next.match(counter, matcher, i, seq);
         }
     }
 
@@ -4408,7 +4416,7 @@ public final class Pattern
         BehindS(Node cond, int rmax, int rmin) {
             super(cond, rmax, rmin);
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int rmaxChars = countChars(seq, i, -rmax);
             int rminChars = countChars(seq, i, -rmin);
             int savedFrom = matcher.from;
@@ -4426,11 +4434,11 @@ public final class Pattern
             for (int j = i - rminChars;
                  !conditionMatched && j >= from;
                  j -= j>from ? countChars(seq, j, -1) : 1) {
-                conditionMatched = cond.match(matcher, j, seq);
+                conditionMatched = cond.match(counter, matcher, j, seq);
             }
             matcher.from = savedFrom;
             matcher.lookbehindTo = savedLBT;
-            return conditionMatched && next.match(matcher, i, seq);
+            return conditionMatched && next.match(counter, matcher, i, seq);
         }
     }
 
@@ -4446,7 +4454,7 @@ public final class Pattern
             this.rmin = rmin;
         }
 
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int savedLBT = matcher.lookbehindTo;
             int savedFrom = matcher.from;
             boolean conditionMatched = false;
@@ -4458,12 +4466,12 @@ public final class Pattern
             if (matcher.transparentBounds)
                 matcher.from = 0;
             for (int j = i - rmin; !conditionMatched && j >= from; j--) {
-                conditionMatched = cond.match(matcher, j, seq);
+                conditionMatched = cond.match(counter, matcher, j, seq);
             }
             // Reinstate region boundaries
             matcher.from = savedFrom;
             matcher.lookbehindTo = savedLBT;
-            return !conditionMatched && next.match(matcher, i, seq);
+            return !conditionMatched && next.match(counter, matcher, i, seq);
         }
     }
 
@@ -4475,7 +4483,7 @@ public final class Pattern
         NotBehindS(Node cond, int rmax, int rmin) {
             super(cond, rmax, rmin);
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int rmaxChars = countChars(seq, i, -rmax);
             int rminChars = countChars(seq, i, -rmin);
             int savedFrom = matcher.from;
@@ -4491,12 +4499,12 @@ public final class Pattern
             for (int j = i - rminChars;
                  !conditionMatched && j >= from;
                  j -= j>from ? countChars(seq, j, -1) : 1) {
-                conditionMatched = cond.match(matcher, j, seq);
+                conditionMatched = cond.match(counter, matcher, j, seq);
             }
             //Reinstate region boundaries
             matcher.from = savedFrom;
             matcher.lookbehindTo = savedLBT;
-            return !conditionMatched && next.match(matcher, i, seq);
+            return !conditionMatched && next.match(counter, matcher, i, seq);
         }
     }
 
@@ -4583,9 +4591,9 @@ public final class Pattern
             }
             return ((left ^ right) ? (right ? LEFT : RIGHT) : NONE);
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             return (check(matcher, i, seq) & type) > 0
-                    && next.match(matcher, i, seq);
+                    && next.match(counter, matcher, i, seq);
         }
     }
 
@@ -4706,7 +4714,7 @@ public final class Pattern
             this.optoSft = optoSft;
             this.next = next;
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int[] src = buffer;
             int patternLength = src.length;
             int last = matcher.to - patternLength;
@@ -4725,7 +4733,7 @@ public final class Pattern
                 }
                 // Entire pattern matched starting at i
                 matcher.first = i;
-                boolean ret = next.match(matcher, i + patternLength, seq);
+                boolean ret = next.match(counter, matcher, i + patternLength, seq);
                 if (ret) {
                     matcher.first = i;
                     matcher.groups[0] = matcher.first;
@@ -4760,7 +4768,7 @@ public final class Pattern
                 lengthInChars += Character.charCount(buffer[x]);
             }
         }
-        boolean match(Matcher matcher, int i, CharSequence seq) {
+        boolean matchImpl(Counter counter, Matcher matcher, int i, CharSequence seq) {
             int[] src = buffer;
             int patternLength = src.length;
             int last = matcher.to - lengthInChars;
@@ -4782,7 +4790,7 @@ public final class Pattern
                 }
                 // Entire pattern matched starting at i
                 matcher.first = i;
-                boolean ret = next.match(matcher, i + lengthInChars, seq);
+                boolean ret = next.match(counter, matcher, i + lengthInChars, seq);
                 if (ret) {
                     matcher.first = i;
                     matcher.groups[0] = matcher.first;
@@ -5005,111 +5013,4 @@ public final class Pattern
         }
     }
 
-    /**
-     * Creates a predicate which can be used to match a string.
-     *
-     * @return  The predicate which can be used for matching on a string
-     * @since   1.8
-     */
-    public Predicate<String> asPredicate() {
-        return s -> matcher(s).find();
-    }
-
-    /**
-     * Creates a stream from the given input sequence around matches of this
-     * pattern.
-     *
-     * <p> The stream returned by this method contains each substring of the
-     * input sequence that is terminated by another subsequence that matches
-     * this pattern or is terminated by the end of the input sequence.  The
-     * substrings in the stream are in the order in which they occur in the
-     * input. Trailing empty strings will be discarded and not encountered in
-     * the stream.
-     *
-     * <p> If this pattern does not match any subsequence of the input then
-     * the resulting stream has just one element, namely the input sequence in
-     * string form.
-     *
-     * <p> When there is a positive-width match at the beginning of the input
-     * sequence then an empty leading substring is included at the beginning
-     * of the stream. A zero-width match at the beginning however never produces
-     * such empty leading substring.
-     *
-     * <p> If the input sequence is mutable, it must remain constant during the
-     * execution of the terminal stream operation.  Otherwise, the result of the
-     * terminal stream operation is undefined.
-     *
-     * @param   input
-     *          The character sequence to be split
-     *
-     * @return  The stream of strings computed by splitting the input
-     *          around matches of this pattern
-     * @see     #split(CharSequence)
-     * @since   1.8
-     */
-    public Stream<String> splitAsStream(final CharSequence input) {
-        class MatcherIterator implements Iterator<String> {
-            private final Matcher matcher;
-            // The start position of the next sub-sequence of input
-            // when current == input.length there are no more elements
-            private int current;
-            // null if the next element, if any, needs to obtained
-            private String nextElement;
-            // > 0 if there are N next empty elements
-            private int emptyElementCount;
-
-            MatcherIterator() {
-                this.matcher = matcher(input);
-            }
-
-            public String next() {
-                if (!hasNext())
-                    throw new NoSuchElementException();
-
-                if (emptyElementCount == 0) {
-                    String n = nextElement;
-                    nextElement = null;
-                    return n;
-                } else {
-                    emptyElementCount--;
-                    return "";
-                }
-            }
-
-            public boolean hasNext() {
-                if (nextElement != null || emptyElementCount > 0)
-                    return true;
-
-                if (current == input.length())
-                    return false;
-
-                // Consume the next matching element
-                // Count sequence of matching empty elements
-                while (matcher.find()) {
-                    nextElement = input.subSequence(current, matcher.start()).toString();
-                    current = matcher.end();
-                    if (!nextElement.isEmpty()) {
-                        return true;
-                    } else if (current > 0) { // no empty leading substring for zero-width
-                        // match at the beginning of the input
-                        emptyElementCount++;
-                    }
-                }
-
-                // Consume last matching element
-                nextElement = input.subSequence(current, input.length()).toString();
-                current = input.length();
-                if (!nextElement.isEmpty()) {
-                    return true;
-                } else {
-                    // Ignore a terminal sequence of matching empty elements
-                    emptyElementCount = 0;
-                    nextElement = null;
-                    return false;
-                }
-            }
-        }
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-                new MatcherIterator(), Spliterator.ORDERED | Spliterator.NONNULL), false);
-    }
 }

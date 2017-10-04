@@ -5,6 +5,8 @@ package regex;
  * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
 
+import patsyn.Counter;
+
 import java.util.Objects;
 
 /**
@@ -193,12 +195,15 @@ public final class Matcher implements MatchResult {
     Matcher() {
     }
 
+    public Counter counter;
+
     /**
      * All matchers have the state used by Pattern during a match.
      */
-    Matcher(Pattern parent, CharSequence text) {
+    Matcher(Counter counter, Pattern parent, CharSequence text) {
         this.parentPattern = parent;
         this.text = text;
+        this.counter = counter;
 
         // Allocate state storage
         int parentGroupCount = Math.max(parent.capturingGroupCount, 10);
@@ -227,7 +232,7 @@ public final class Matcher implements MatchResult {
      * @since 1.5
      */
     public MatchResult toMatchResult() {
-        Matcher result = new Matcher(this.parentPattern, text.toString());
+        Matcher result = new Matcher(counter, this.parentPattern, text.toString());
         result.first = this.first;
         result.last = this.last;
         result.groups = this.groups.clone();
@@ -1225,7 +1230,7 @@ public final class Matcher implements MatchResult {
         for (int i = 0; i < groups.length; i++)
             groups[i] = -1;
         acceptMode = NOANCHOR;
-        boolean result = parentPattern.root.match(this, from, text);
+        boolean result = parentPattern.root.match(counter,this, from, text);
         if (!result)
             this.first = -1;
         this.oldLast = this.last;
@@ -1247,7 +1252,7 @@ public final class Matcher implements MatchResult {
         for (int i = 0; i < groups.length; i++)
             groups[i] = -1;
         acceptMode = anchor;
-        boolean result = parentPattern.matchRoot.match(this, from, text);
+        boolean result = parentPattern.matchRoot.match(counter,this, from, text);
         if (!result)
             this.first = -1;
         this.oldLast = this.last;
