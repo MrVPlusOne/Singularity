@@ -8,7 +8,7 @@ object RegexStatistics {
   def main(args: Array[String]): Unit = {
     val c = new Counter()
     println{
-      Pattern.compile("a.*c").matcher(c, "aaabc").find()
+      Pattern.compile("(abc)+").matcher(c, "abc"*100).find()
     }
     println(s"Count: ${c.read()}")
   }

@@ -24,6 +24,7 @@ class Counter{
 
 case class FuzzingExample(outputTypes: IS[EType],
                           sizeF: PartialFunction[IS[EValue], Int],
+                          sizeOfInterest: Int = 500,
                           resourceUsage: PartialFunction[IS[EValue], Double])
 
 object FuzzingExample{
@@ -119,7 +120,6 @@ object FuzzingExample{
       sizeF = {
         case IS(VectValue(strings)) =>
           strings.map(s => s.asInstanceOf[VectValue].value.length).sum
-        case _ => notPossible()
       },
       resourceUsage = {
         case IS(VectValue(vec)) =>
@@ -135,13 +135,12 @@ object FuzzingExample{
       sizeF = {
         case IS(VectValue(strings)) =>
           strings.map(s => s.asInstanceOf[VectValue].value.length).sum
-        case _ => notPossible()
       },
       resourceUsage = {
         case IS(VectValue(vec)) =>
           val hashes = vec.map(v => {
             vectIntToCharArray(v.asInstanceOf[VectValue])
-          }).distinct.map(hashFunc)
+          }).distinct.map(ccs_hashFunc)
 
           hashes.groupBy(identity).values.map{
             elems => elems.length - 1
@@ -150,13 +149,57 @@ object FuzzingExample{
     )
   }
 
-  def hashFunc(ls: Seq[Char]) = {
+  def toLowercase(i: Int): Char = {
+    ('a' + i % 26).toChar
+  }
+
+  import regex._
+  def regexExample(regex: String, regexDic: Int => String): FuzzingExample = {
+    val pattern = Pattern.compile(regex)
+    FuzzingExample(
+      outputTypes = IS(EVect(EInt)),
+      sizeF = {
+        case IS(VectValue(chars)) => chars.length
+      },
+      sizeOfInterest = 200,
+      resourceUsage = {
+        case IS(VectValue(chars)) =>
+          val counter = new Counter()
+          val s = chars.asInstanceOf[Vector[IntValue]].flatMap(i => regexDic(i.value))
+          pattern.matcher(counter, s).find()
+          counter.read()
+      }
+    )
+  }
+
+  def ccs_hashFunc(ls: Seq[Char]) = {
     val cs = ls.toArray
     var hash = 5381
     for(i <- cs.indices){
       hash = ((hash << 5) + hash) + cs(i)
     }
     hash
+  }
+
+  def gabFeed2_hashCollisionExample: FuzzingExample = {
+    FuzzingExample(
+      outputTypes = IS(EVect(EVect(EInt))),
+      sizeF = {
+        case IS(VectValue(strings)) =>
+          strings.map(s => s.asInstanceOf[VectValue].value.length).sum
+      },
+      resourceUsage = {
+        case IS(VectValue(strings)) =>
+        import gabfeed2.hashmap._
+        val map = new HashMap[String, Int]();
+        strings.foreach{
+          case VectValue(chars) =>
+            val string = chars.map{ case IntValue(i) => toLowercase(i)}.mkString("")
+            map.put(string, 0)
+        }
+        map.collisions.toDouble
+      }
+    )
   }
 }
 

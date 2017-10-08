@@ -18,9 +18,10 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
 
     import scala.collection.parallel
     import parallel._
+    val taskSupport = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(threadNum))
     def toPar[A](seq: Seq[A]): ParSeq[A] = {
       val p = seq.par
-      p.tasksupport = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(threadNum))
+      p.tasksupport = taskSupport
       p
     }
 

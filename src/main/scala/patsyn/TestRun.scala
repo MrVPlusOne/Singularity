@@ -3,7 +3,7 @@ package patsyn
 
 import StandardSystem._
 import measure.TimeTools
-import patsyn.EvolutionRepresentation.IndividualData
+import patsyn.EvolutionRepresentation.{IndividualData, Population}
 import patsyn.GeneticOperator.ExprGen
 
 import scala.util.Random
@@ -20,7 +20,7 @@ object TestRun {
     }
 
     var dataCollected = IS[MonitoringData]()
-    runExample(FuzzingExample.phpHashCollision,
+    runExample(
       monitorCallback = d => {
         dataCollected :+= d
 
@@ -49,11 +49,27 @@ object TestRun {
     ys.indices.map{ i => (i+1).toDouble -> ys(i)}
   }
 
-  def runExample(example: FuzzingExample, monitorCallback: MonitoringData => Unit): Unit = {
+  def intValueAsChar(eValue: EValue): Char = {
+    eValue.asInstanceOf[IntValue].value.toChar
+  }
+
+  def runExample(monitorCallback: MonitoringData => Unit): Unit = {
+
+    val example = FuzzingExample.regexExample(
+      regex = "^(abc)+",  //"(\\.+\\|?)+",
+      regexDic = i => i.toChar.toString
+    )
+
+    val symbols = "abcABC ,.\\(){}[]+-*/=_".toCharArray.toIndexedSeq
+    val intGens: IS[Random => IntValue] = IS(
+      r => r.nextInt(7),
+      r => SimpleMath.randomSelect(r)(symbols).toInt
+    )
+
     val constMap = makeConstMap(
-      EInt -> IS(r => r.nextInt(12)),
+      EInt -> intGens,
       EVect(EInt) -> IS(_ => Vector()),
-      EVect(EVect(EInt)) -> IS(_ => Vector())
+//      EVect(EVect(EInt)) -> IS(_ => Vector())
     )
 
     val functions = IntComponents.collection ++ VectComponents.collection
@@ -75,9 +91,10 @@ object TestRun {
     }
 
     for (seed <- 2 to 5) {
+      val sizeOfInterest = example.sizeOfInterest
       val evaluation = new SimplePerformanceEvaluation(
-        sizeOfInterest = 600, maxTrials = 3, nonsenseFitness = -1.0,
-        resourceUsage = example.resourceUsage, sizeF = example.sizeF, maxMemoryUsage = 600*10
+        sizeOfInterest = sizeOfInterest, maxTrials = 3, nonsenseFitness = -1.0,
+        resourceUsage = example.resourceUsage, sizeF = example.sizeF, maxMemoryUsage = sizeOfInterest*10
       )
       val representation = MultiStateRepresentation(totalSizeTolerance = 60, singleSizeTolerance = 30,
         stateTypes = stateTypes, outputTypes = example.outputTypes, evaluation = evaluation)
@@ -89,7 +106,7 @@ object TestRun {
       )
 
       val generations = optimizer.optimize(
-        populationSize = 500, tournamentSize = 7, neighbourSize = 245,
+        populationSize = 1000, tournamentSize = 7, neighbourSize = 480,
         initOperator = library.initOp(maxDepth = 3),
         operators = operators,
         evaluation = ind => {
@@ -98,6 +115,8 @@ object TestRun {
         threadNum = 8,
         randSeed = seed
       )
+
+      val maxNonIncreaseTime = 150
 
       FileInteraction.runWithAFileLogger(s"$recordDirPath/testResult[seed=$seed].txt") { logger =>
         import logger._
@@ -108,7 +127,21 @@ object TestRun {
         val startTime = System.nanoTime()
 
         var bestSoFar: Option[IndividualData[MultiStateInd]] = None
-        generations.take(10).zipWithIndex.foreach { case (pop, i) =>
+        var nonIncreasingTime = 0
+
+        generations.takeWhile(pop => {
+          val r = bestSoFar match {
+            case Some(previousBest) =>
+              if (pop.bestIndividual.evaluation.fitness > previousBest.evaluation.fitness) {
+                nonIncreasingTime = 0
+              }
+              nonIncreasingTime <= maxNonIncreaseTime
+            case None => true
+          }
+          bestSoFar = Some(pop.bestIndividual)
+          nonIncreasingTime += 1
+          r
+        }).zipWithIndex.foreach { case (pop, i) =>
           val best = pop.bestIndividual
           val data = MonitoringData(pop.averageFitness, best.evaluation.fitness, best.evaluation.performance)
           monitorCallback(data)
@@ -118,8 +151,10 @@ object TestRun {
           println(s"Generation ${i + 1}")
           println(s"Best Result: ${best.evaluation.showAsLinearExpr}, Created by ${best.history.birthOp}")
           representation.printIndividualMultiLine(println)(best.ind)
-          val firstSevenInputs = representation.fitnessEvaluation(best.ind)._2.take(7).map(
-            _.mkString("< ", " | ", " >")).mkString(", ")
+          val firstSevenInputs = representation.fitnessEvaluation(best.ind)._2.take(7).map{ case IS(VectValue(vs)) =>
+            vs.map(intValueAsChar).mkString("")
+//            mkString("< ", " | ", " >")
+          }.mkString(", ")
           println(s"Best Individual Pattern: $firstSevenInputs, ...")
           println(s"Diversity: ${pop.fitnessMap.keySet.size}")
           println(s"Average Size: ${representation.populationAverageSize(pop)}")
@@ -131,7 +166,6 @@ object TestRun {
               case (s, f) => s"$s -> ${"%.3f".format(f)}"
             }.mkString(", ")
           }
-          bestSoFar = Some(best)
         }
 
         val data = bestSoFar.get
