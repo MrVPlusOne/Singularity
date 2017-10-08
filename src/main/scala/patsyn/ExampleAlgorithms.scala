@@ -197,7 +197,7 @@ object FuzzingExample{
             val string = chars.map{ case IntValue(i) => toLowercase(i)}.mkString("")
             map.put(string, 0)
         }
-        map.collisions.toDouble
+        map.resizeNum.toDouble
       }
     )
   }

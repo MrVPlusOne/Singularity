@@ -751,7 +751,7 @@ public final class Pattern
      * permutations of the characters in the input string.
      * This is used to get a list of all possible orderings
      * of a set of combining marks. Note that some of the permutations
-     * are invalid because of combining class collisions, and these
+     * are invalid because of combining class resizeNum, and these
      * possibilities must be removed because they are not canonically
      * equivalent.
      */
