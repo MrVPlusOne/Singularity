@@ -59,23 +59,8 @@ object TestRun {
       regex = "^(abc)+",  //"(\\.+\\|?)+",
       regexDic = i => i.toChar.toString
     )
+    val gpEnv = example.gpEnv
 
-    val symbols = "abcABC ,.\\(){}[]+-*/=_".toCharArray.toIndexedSeq
-    val intGens: IS[Random => IntValue] = IS(
-      r => r.nextInt(7),
-      r => SimpleMath.randomSelect(r)(symbols).toInt
-    )
-
-    val constMap = makeConstMap(
-      EInt -> intGens,
-      EVect(EInt) -> IS(_ => Vector()),
-//      EVect(EVect(EInt)) -> IS(_ => Vector())
-    )
-
-    val functions = IntComponents.collection ++ VectComponents.collection
-
-    val stateTypes = constMap.keys.toIndexedSeq
-    val gpEnv = GPEnvironment(constMap, functions, stateTypes)
     val library = MultiStateGOpLibrary(gpEnv, example.outputTypes)
 
     println("[Function map]")
@@ -97,7 +82,7 @@ object TestRun {
         resourceUsage = example.resourceUsage, sizeF = example.sizeF, maxMemoryUsage = sizeOfInterest*10
       )
       val representation = MultiStateRepresentation(totalSizeTolerance = 60, singleSizeTolerance = 30,
-        stateTypes = stateTypes, outputTypes = example.outputTypes, evaluation = evaluation)
+        stateTypes = gpEnv.stateTypes, outputTypes = example.outputTypes, evaluation = evaluation)
       val optimizer = EvolutionaryOptimizer(representation)
       val operators = IS(
         library.simpleCrossOp -> 0.4,

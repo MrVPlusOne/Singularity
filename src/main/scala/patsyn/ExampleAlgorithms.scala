@@ -1,7 +1,10 @@
 package patsyn
 
 import measure.{TimeMeasureExamples, TimeMeasurement}
-import patsyn.StandardSystem.{EInt, EVect, IntValue, VectValue}
+import patsyn.GeneticOperator.ExprGen
+import patsyn.StandardSystem.{EInt, EVect, IntComponents, IntValue, VectComponents, VectValue}
+import StandardSystem._
+
 
 import scala.util.Random
 
@@ -25,13 +28,32 @@ class Counter{
 case class FuzzingExample(outputTypes: IS[EType],
                           sizeF: PartialFunction[IS[EValue], Int],
                           sizeOfInterest: Int = 500,
-                          resourceUsage: PartialFunction[IS[EValue], Double])
+                          resourceUsage: PartialFunction[IS[EValue], Double],
+                          gpEnv: GPEnvironment)
 
 object FuzzingExample{
   def notPossible[T](): T = throw new Exception("Not possible!")
 
   def toIntVect(v: Vector[EValue]): Vector[Int] = {
     v.asInstanceOf[Vector[IntValue]].map(_.value)
+  }
+
+  def makeConstMap(pairs: (EType, IS[Random => EValue])*): Map[EType, IS[ExprGen[EConst]]] = {
+    pairs.map{ case (t, fs) =>
+      t -> fs.map(f =>ExprGen(t, r => EConst(t, f(r))))
+    }.toMap
+  }
+
+  def sortingEnv: GPEnvironment = {
+    val constMap = makeConstMap(
+      EInt -> IS(r => r.nextInt(12)),
+      EVect(EInt) -> IS(_ => Vector())
+    )
+
+    val functions = IntComponents.collection ++ VectComponents.collection
+
+    val stateTypes = constMap.keys.toIndexedSeq
+    GPEnvironment(constMap, functions, stateTypes)
   }
 
   def insertionSortExample: FuzzingExample = {
@@ -46,7 +68,8 @@ object FuzzingExample{
           val c = new Counter()
           ExampleAlgorithms.insertionSort(c)(toIntVect(v))
           c.read()
-      }
+      },
+      gpEnv = sortingEnv
     )
   }
 
@@ -67,7 +90,8 @@ object FuzzingExample{
           val c = new Counter()
           ExampleAlgorithms.quickSort(c, choosePivot)(toIntVect(vec))
           c.read()
-      }
+      },
+      gpEnv = sortingEnv
     )
   }
 
@@ -84,7 +108,8 @@ object FuzzingExample{
           val c = new Counter()
           ExampleAlgorithms.quickSort(c, xs => xs(random.nextInt(xs.length)))(toIntVect(vec))
           c.read()
-      }
+      },
+      gpEnv = sortingEnv
     )
   }
 
@@ -99,7 +124,8 @@ object FuzzingExample{
           val c = new Counter()
           ExampleAlgorithms.listSearchAndCopy(c)(toIntVect(vec), idx)
           c.read()
-      }
+      },
+      gpEnv = sortingEnv
     )
   }
 
@@ -111,6 +137,19 @@ object FuzzingExample{
     vec.value.map { i =>
       (i.asInstanceOf[IntValue].value % 256).toChar
     }.toList
+  }
+
+  def phpHashEnv: GPEnvironment = {
+    val constMap = makeConstMap(
+      EInt -> IS(r => r.nextInt(12)),
+      EVect(EInt) -> IS(_ => Vector()),
+      EVect(EVect(EInt)) -> IS(_ => Vector())
+    )
+
+    val functions = IntComponents.collection ++ VectComponents.collection
+
+    val stateTypes = constMap.keys.toIndexedSeq
+    GPEnvironment(constMap, functions, stateTypes)
   }
 
   def phpHashTableExample(timeout: TimeMeasurement.DoubleAsMillis): FuzzingExample = {
@@ -125,7 +164,8 @@ object FuzzingExample{
         case IS(VectValue(vec)) =>
           val strings = vec.map(v => vectIntToString(v.asInstanceOf[VectValue]))
           example.measure(strings, timeout)
-      }
+      },
+      gpEnv = phpHashEnv
     )
   }
 
@@ -145,12 +185,32 @@ object FuzzingExample{
           hashes.groupBy(identity).values.map{
             elems => elems.length - 1
           }.sum
-      }
+      },
+      gpEnv = phpHashEnv
     )
   }
 
   def toLowercase(i: Int): Char = {
     ('a' + i % 26).toChar
+  }
+
+  def abcRegexEnv: GPEnvironment = {
+    val symbols = "abcABC ,.\\(){}[]+-*/=_".toCharArray.toIndexedSeq
+    val intGens: IS[Random => IntValue] = IS(
+      r => r.nextInt(7),
+      r => SimpleMath.randomSelect(r)(symbols).toInt
+    )
+
+    val constMap = makeConstMap(
+      EInt -> intGens,
+      EVect(EInt) -> IS(_ => Vector()),
+      //      EVect(EVect(EInt)) -> IS(_ => Vector())
+    )
+
+    val functions = IntComponents.collection ++ VectComponents.collection
+
+    val stateTypes = constMap.keys.toIndexedSeq
+    GPEnvironment(constMap, functions, stateTypes)
   }
 
   import regex._
@@ -168,7 +228,8 @@ object FuzzingExample{
           val s = chars.asInstanceOf[Vector[IntValue]].flatMap(i => regexDic(i.value))
           pattern.matcher(counter, s).find()
           counter.read()
-      }
+      },
+      gpEnv = abcRegexEnv
     )
   }
 
@@ -198,7 +259,8 @@ object FuzzingExample{
             map.put(string, 0)
         }
         map.resizeNum.toDouble
-      }
+      },
+      gpEnv = phpHashEnv
     )
   }
 }
