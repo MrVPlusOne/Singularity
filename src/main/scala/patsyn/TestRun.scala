@@ -1,16 +1,17 @@
 package patsyn
 
 
+import java.awt.Dimension
+
 import StandardSystem._
 import measure.TimeTools
 import patsyn.EvolutionRepresentation.{IndividualData, Population}
-import patsyn.GeneticOperator.ExprGen
-
-import scala.util.Random
 
 object TestRun {
 
-  def main(args: Array[String]): Unit = {
+  case class MonitorManager(monitorCallback: MonitoringData => Unit, evalProgressCallback: Int => Unit)
+
+  def createMonitor(populationSize: Int): MonitorManager ={
     import javax.swing._
     import gui._
 
@@ -20,7 +21,17 @@ object TestRun {
     }
 
     var dataCollected = IS[MonitoringData]()
-    runExample(
+    var monitorPanel: MonitorPanel = null
+
+    val progressLabel = new JLabel()
+    val contentPane = new JPanel(){
+      add(progressLabel)
+    }
+    frame.setContentPane(contentPane)
+    frame.setPreferredSize(new Dimension(300,300))
+    frame.pack()
+
+    MonitorManager(
       monitorCallback = d => {
         dataCollected :+= d
 
@@ -32,15 +43,21 @@ object TestRun {
           "best performance" -> makeXY(bestPerformance),
           "best fitness" -> makeXY(bestFitness),
           "average fitness" -> makeXY(avFitLine))("Performance Curve", "Generations", "Evaluation")
-        frame.setContentPane(new MonitorPanel(chart, 10, (600, 450)))
+        monitorPanel = new MonitorPanel(chart, 10, (600, 450))
+        if(contentPane.getComponentCount >= 1){
+          contentPane.remove(1)
+        }
+        contentPane.add(monitorPanel)
         frame.pack()
-      })
+      },
+      evalProgressCallback = p => {
+        progressLabel.setText(s"progress: $p/$populationSize")
+      }
+    )
   }
 
-  def makeConstMap(pairs: (EType, IS[Random => EValue])*): Map[EType, IS[ExprGen[EConst]]] = {
-    pairs.map{ case (t, fs) =>
-      t -> fs.map(f =>ExprGen(t, r => EConst(t, f(r))))
-    }.toMap
+  def main(args: Array[String]): Unit = {
+    runExample()
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -49,22 +66,20 @@ object TestRun {
     ys.indices.map{ i => (i+1).toDouble -> ys(i)}
   }
 
-  def intValueAsChar(eValue: EValue): Char = {
-    eValue.asInstanceOf[IntValue].value.toChar
-  }
 
-  def runExample(monitorCallback: MonitoringData => Unit): Unit = {
+  def runExample(): Unit = {
 
-    val example = FuzzingExample.regexExample(
-      regex = "^(abc)+",  //"(\\.+\\|?)+",
-      regexDic = i => i.toChar.toString
-    )
-    val gpEnv = example.gpEnv
+//    val example = FuzzingExample.regexExample(
+//      regex = "^(abc)+",  //"(\\.+\\|?)+",
+//      regexDic = i => i.toChar.toString
+//    )
 
-    val library = MultiStateGOpLibrary(gpEnv, example.outputTypes)
+    val example = FuzzingExample.graphAnalyzerExample
+
+    val library = MultiStateGOpLibrary(example.gpEnv, example.outputTypes)
 
     println("[Function map]")
-    gpEnv.functionMap.foreach { case (t, comps) =>
+    example.gpEnv.functionMap.foreach { case (t, comps) =>
       println(s"$t -> ${comps.mkString("{", ", ", "}")}")
     }
     println("[End of Function map]")
@@ -75,14 +90,18 @@ object TestRun {
       s"results/$dateTime"
     }
 
+    val populationSize = 1000
+    val monitor = createMonitor(populationSize)
+    import monitor.{evalProgressCallback, monitorCallback}
+
     for (seed <- 2 to 5) {
       val sizeOfInterest = example.sizeOfInterest
       val evaluation = new SimplePerformanceEvaluation(
         sizeOfInterest = sizeOfInterest, maxTrials = 3, nonsenseFitness = -1.0,
         resourceUsage = example.resourceUsage, sizeF = example.sizeF, maxMemoryUsage = sizeOfInterest*10
       )
-      val representation = MultiStateRepresentation(totalSizeTolerance = 60, singleSizeTolerance = 30,
-        stateTypes = gpEnv.stateTypes, outputTypes = example.outputTypes, evaluation = evaluation)
+      val representation = MultiStateRepresentation(totalSizeTolerance = 50, singleSizeTolerance = 30,
+        stateTypes = example.gpEnv.stateTypes, outputTypes = example.outputTypes, evaluation = evaluation)
       val optimizer = EvolutionaryOptimizer(representation)
       val operators = IS(
         library.simpleCrossOp -> 0.4,
@@ -91,14 +110,15 @@ object TestRun {
       )
 
       val generations = optimizer.optimize(
-        populationSize = 1000, tournamentSize = 7, neighbourSize = 480,
+        populationSize = populationSize, tournamentSize = 7, neighbourSize = 490,
         initOperator = library.initOp(maxDepth = 3),
         operators = operators,
-        evaluation = ind => {
+        indEval = ind => {
           representation.fitnessEvaluation(ind)._1
         },
-        threadNum = 8,
-        randSeed = seed
+        threadNum = 1,
+        randSeed = seed,
+        evalProgressCallback = evalProgressCallback
       )
 
       val maxNonIncreaseTime = 150
@@ -136,9 +156,7 @@ object TestRun {
           println(s"Generation ${i + 1}")
           println(s"Best Result: ${best.evaluation.showAsLinearExpr}, Created by ${best.history.birthOp}")
           representation.printIndividualMultiLine(println)(best.ind)
-          val firstSevenInputs = representation.fitnessEvaluation(best.ind)._2.take(7).map{ case IS(VectValue(vs)) =>
-            vs.map(intValueAsChar).mkString("")
-//            mkString("< ", " | ", " >")
+          val firstSevenInputs = representation.fitnessEvaluation(best.ind)._2.take(7).map{ example.displayValue
           }.mkString(", ")
           println(s"Best Individual Pattern: $firstSevenInputs, ...")
           println(s"Diversity: ${pop.fitnessMap.keySet.size}")

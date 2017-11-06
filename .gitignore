@@ -17,3 +17,4 @@ project/plugins/project/
 *.log
 testResult.txt
 results/*
+output-files/*

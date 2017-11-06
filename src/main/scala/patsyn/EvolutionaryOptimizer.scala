@@ -10,19 +10,30 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
   def optimize(populationSize: Int, tournamentSize: Int, neighbourSize: Int,
                initOperator: GOp,
                operators: IS[(GOp, Double)],
-               evaluation: Individual => IndividualEvaluation,
+               indEval: Individual => IndividualEvaluation,
                threadNum: Int,
-               randSeed: Int
+               randSeed: Int,
+               evalProgressCallback: Int => Unit
                      ): Iterator[Population[Individual]] = {
     require(neighbourSize*2+1 <= populationSize, "Neighbour size too large.")
+
+    var progress = 0
+    def evaluation(individual: Individual): IndividualEvaluation ={
+      val result = indEval(individual)
+      this.synchronized{
+        progress+=1
+        evalProgressCallback(progress)
+      }
+      result
+    }
 
     import scala.collection.parallel
     import parallel._
     val taskSupport = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(threadNum))
-    def toPar[A](seq: Seq[A]): ParSeq[A] = {
+    def parExecute[A, B](seq: Seq[A])(f: A => B): IS[B] = {
       val p = seq.par
       p.tasksupport = taskSupport
-      p
+      p.map(f).toIndexedSeq
     }
 
     val operatorPCF: IS[(GOp, Double)] = {
@@ -39,13 +50,14 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
 
     val initPop = {
       val individuals = (0 until populationSize).map(_ => initOperator.operate(random, IS()))
-      val fitnessMap = toPar(individuals.distinct).map(ind => ind -> evaluation(ind)).toIndexedSeq.toMap
+      val fitnessMap = parExecute(individuals.distinct)(ind => ind -> evaluation(ind)).toMap
 
       Population(individuals.map{ind =>
         val eval = fitnessMap(ind)
         IndividualData(ind, IndividualHistory(IS(), initOperator.name, historyLength = 0), eval)
       }, fitnessMap)
     }
+    progress = 0
 
 
     Iterator.iterate(initPop){ pop =>
@@ -79,9 +91,8 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
       }
 
       val newInds = newIndsAndHistory.map(_._1)
-      val newFitnessMap = toPar(newInds.distinct).map{ind =>
-        ind -> pop.fitnessMap.getOrElse(ind, default = evaluation(ind))
-      }.toIndexedSeq.toMap
+      val newFitnessMap = parExecute(newInds.distinct)(ind =>
+        ind -> pop.fitnessMap.getOrElse(ind, default = evaluation(ind))).toMap
 
       val newData = newIndsAndHistory.indices.map{i =>
         val (ind, history) = newIndsAndHistory(i)
@@ -89,6 +100,7 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
         IndividualData(ind, history, eval)
       }
 
+      progress = 0
       Population(newData, newFitnessMap)
     }
   }

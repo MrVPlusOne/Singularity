@@ -1,11 +1,11 @@
 package patsyn
 
-import measure.{TimeMeasureExamples, TimeMeasurement}
+import measure.{TimeMeasureExamples, TimeMeasurement, TimeTools}
 import patsyn.GeneticOperator.ExprGen
 import patsyn.StandardSystem.{EInt, EVect, IntComponents, IntValue, VectComponents, VectValue}
 import StandardSystem._
 
-
+import scala.concurrent.TimeoutException
 import scala.util.Random
 
 class Counter{
@@ -29,7 +29,9 @@ case class FuzzingExample(outputTypes: IS[EType],
                           sizeF: PartialFunction[IS[EValue], Int],
                           sizeOfInterest: Int = 500,
                           resourceUsage: PartialFunction[IS[EValue], Double],
-                          gpEnv: GPEnvironment)
+                          gpEnv: GPEnvironment,
+                          displayValue: IS[EValue] => String = _.toString
+                         )
 
 object FuzzingExample{
   def notPossible[T](): T = throw new Exception("Not possible!")
@@ -213,6 +215,10 @@ object FuzzingExample{
     GPEnvironment(constMap, functions, stateTypes)
   }
 
+  def intValueAsChar(eValue: EValue): Char = {
+    eValue.asInstanceOf[IntValue].value.toChar
+  }
+
   import regex._
   def regexExample(regex: String, regexDic: Int => String): FuzzingExample = {
     val pattern = Pattern.compile(regex)
@@ -229,7 +235,10 @@ object FuzzingExample{
           pattern.matcher(counter, s).find()
           counter.read()
       },
-      gpEnv = abcRegexEnv
+      gpEnv = abcRegexEnv,
+      displayValue = { case IS(VectValue(vs)) =>
+        vs.map(intValueAsChar).mkString("")
+      }
     )
   }
 
@@ -259,6 +268,71 @@ object FuzzingExample{
             map.put(string, 0)
         }
         map.resizeNum.toDouble
+      },
+      gpEnv = phpHashEnv
+    )
+  }
+
+  def intVectorToGraph(graphId: Int, refs: Vector[Int]): String = {
+    val graphName = if(graphId == 0) "main" else s"L$graphId"
+    val graphBody = refs.zipWithIndex.map { case (ref, i) =>
+      val edgeName = s"$graphName-$i"
+      val label = if(ref == graphId) "net" else s"container:L$ref"
+      s"""    $edgeName [type="$label", color="red", x=30, y=30, h=30, w=30];"""
+    }.mkString("\n")
+    s"""graph "$graphName" {
+       |$graphBody
+       |}
+     """.stripMargin
+  }
+
+  def graphAnalyzerExample: FuzzingExample = {
+    import java.io.FileWriter
+
+    import user.commands.CommandProcessor
+    import edu.utexas.stac.Cost
+
+    FuzzingExample(
+      outputTypes = IS(EVect(EVect(EInt))),
+      sizeF = {
+        case IS(VectValue(graphs)) =>
+          graphs.map(g => g.asInstanceOf[VectValue].value.length+1).sum
+      },
+      sizeOfInterest = 12,
+      resourceUsage = {
+        case IS(VectValue(graphs)) =>
+
+          val fileContent = graphs.zipWithIndex.map{
+            case (graphVec, i) =>
+              val vec = graphVec.asInstanceOf[VectValue].value.map{e => e.asInstanceOf[IntValue].value}
+              FuzzingExample.intVectorToGraph(i, vec)
+          }.mkString("\n")
+
+          val fw = new FileWriter("input-files/genGraph.dot")
+          fw.write(fileContent)
+          fw.close()
+
+          Cost.write(0L)
+
+          val timeLimit = 10*1000
+          try {
+            import scala.concurrent._
+            import scala.concurrent.duration._
+            import scala.concurrent.ExecutionContext.Implicits.global
+
+            Await.result(Future(
+              CommandProcessor.main("dot input-files/genGraph.dot xy diagram png output-files/PNG_output.png".split(" "))
+            ), timeLimit.milliseconds)
+
+            Cost.read().toDouble
+          } catch {
+            case _: NullPointerException =>
+              Cost.read().toDouble
+            case _: TimeoutException =>
+              println("Timed out!")
+              System.exit(1)
+              throw new Exception("Timed out!")
+          }
       },
       gpEnv = phpHashEnv
     )
