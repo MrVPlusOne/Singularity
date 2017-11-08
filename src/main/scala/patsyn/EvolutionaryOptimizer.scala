@@ -7,7 +7,7 @@ import scala.util.Random
 case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresentation[Individual]) {
   type GOp = GeneticOperator[Individual]
 
-  def optimize(populationSize: Int, tournamentSize: Int, neighbourSize: Int,
+  def optimize(populationSize: Int, tournamentSize: Int, neighbourSize: Option[Int] = None,
                initOperator: GOp,
                operators: IS[(GOp, Double)],
                indEval: Individual => IndividualEvaluation,
@@ -16,7 +16,8 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
                evalProgressCallback: Int => Unit,
                timeLimitInMillis: Int, timeoutCallback: Individual => IndividualEvaluation
                      ): Iterator[Population[Individual]] = {
-    require(neighbourSize*2+1 <= populationSize, "Neighbour size too large.")
+
+    neighbourSize.foreach(ns => require(ns*2+1 <= populationSize, "Neighbour size too large."))
 
     var progress = 0
     def evaluation(individual: Individual): IndividualEvaluation = {
@@ -74,12 +75,16 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
 
     Iterator.iterate(initPop){ pop =>
       def tournamentResult(position: Int): (IndividualData[Individual], Int) = {
-        val candidates = IS.fill(tournamentSize){
-          val offset = random.nextInt(neighbourSize*2+1)-neighbourSize
-          val idx = SimpleMath.wrapInRange(offset + position, populationSize)
+        val candidates = IS.fill(tournamentSize) {
+          val idx = neighbourSize match {
+            case Some(ns) =>
+              val offset = random.nextInt(ns * 2 + 1) - ns
+              SimpleMath.wrapInRange(offset + position, populationSize)
+            case None => random.nextInt(populationSize)
+          }
           pop.individuals(idx) -> idx
         }
-        candidates.maxBy{ case (data, _) =>
+        candidates.maxBy { case (data, _) =>
           data.evaluation.fitness
         }
       }

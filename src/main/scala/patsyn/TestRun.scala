@@ -121,7 +121,7 @@ object TestRun {
         )
 
         val generations = optimizer.optimize(
-          populationSize = populationSize, tournamentSize = 7, neighbourSize = 490,
+          populationSize = populationSize, tournamentSize = 7,
           initOperator = library.initOp(maxDepth = 3),
           operators = operators,
           indEval = ind => {
