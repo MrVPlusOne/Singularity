@@ -1,0 +1,172 @@
+
+------------
+[0.004s]Generation 1
+Best Individual: (fitness: 90851.2, performance: 90901.0) -> { {seed: < [] > ; iter: < append(prepend(#0, #1), #0) >}, historyLen: 0 }
+Best Individual Pattern: < [] >, < [0,0] >, < [1,0,0,1] >, < [2,1,0,0,1,2] >, < [3,2,1,0,0,1,2,3] >, ...
+Diversity: 6323
+Average Size: 8.6508
+Average Fitness: 806.4316040340535
+Fitness Variation: 5134.159363773226
+Distribution: [] -> 0.250, #1 -> 0.164, #0 -> 0.107, append -> 0.072, concat -> 0.071, access -> 0.070, prepend -> 0.069, length -> 0.018, 8 -> 0.010, 0 -> 0.009, times -> 0.009, minus -> 0.009
+------------
+[2.054s]Generation 2
+Best Individual: (fitness: 91097.7, performance: 91200.0) -> { {seed: < [] > ; iter: < prepend(#0, append(#1, dec(#0))) >}, historyLen: 1 }
+Best Individual Pattern: < [] >, < [0,-1] >, < [1,0,-1,0] >, < [2,1,0,-1,0,1] >, < [3,2,1,0,-1,0,1,2] >, ...
+Diversity: 7715
+Average Size: 12.837
+Average Fitness: 3722.3054955828943
+Fitness Variation: 11341.5757566559
+Distribution: [] -> 0.157, #1 -> 0.155, #0 -> 0.142, append -> 0.092, prepend -> 0.090, concat -> 0.082, access -> 0.057, length -> 0.022, times -> 0.012, minus -> 0.012, dec -> 0.012, plus -> 0.011
+------------
+[4.913s]Generation 3
+Best Individual: (fitness: 91097.7, performance: 91200.0) -> { {seed: < [] > ; iter: < append(prepend(#0, #1), dec(#0)) >}, historyLen: 2 }
+Best Individual Pattern: < [] >, < [0,-1] >, < [1,0,-1,0] >, < [2,1,0,-1,0,1] >, < [3,2,1,0,-1,0,1,2] >, ...
+Diversity: 6285
+Average Size: 11.3224
+Average Fitness: 11400.999478940168
+Fitness Variation: 22175.926918583566
+Distribution: #0 -> 0.199, #1 -> 0.146, [] -> 0.130, prepend -> 0.103, append -> 0.101, concat -> 0.063, access -> 0.053, length -> 0.022, times -> 0.017, plus -> 0.015, inc -> 0.014, minus -> 0.014
+------------
+[9.173s]Generation 4
+Best Individual: (fitness: 91097.7, performance: 91200.0) -> { {seed: < [] > ; iter: < append(prepend(#0, #1), dec(#0)) >}, historyLen: 3 }
+Best Individual Pattern: < [] >, < [0,-1] >, < [1,0,-1,0] >, < [2,1,0,-1,0,1] >, < [3,2,1,0,-1,0,1,2] >, ...
+Diversity: 5970
+Average Size: 12.3416
+Average Fitness: 28308.627035001104
+Fitness Variation: 35080.52064803663
+Distribution: #0 -> 0.231, #1 -> 0.129, [] -> 0.121, prepend -> 0.113, append -> 0.110, concat -> 0.057, access -> 0.053, length -> 0.022, times -> 0.018, dec -> 0.015, inc -> 0.015, plus -> 0.014
+------------
+[14.220s]Generation 5
+Best Individual: (fitness: 91097.7, performance: 91200.0) -> { {seed: < [] > ; iter: < prepend(inc(#0), append(#1, #0)) >}, historyLen: 4 }
+Best Individual Pattern: < [] >, < [1,0] >, < [2,1,0,1] >, < [3,2,1,0,1,2] >, < [4,3,2,1,0,1,2,3] >, ...
+Diversity: 5043
+Average Size: 11.3824
+Average Fitness: 49713.64867879941
+Fitness Variation: 40731.37376396976
+Distribution: #0 -> 0.258, [] -> 0.126, #1 -> 0.125, prepend -> 0.120, append -> 0.120, concat -> 0.060, access -> 0.056, dec -> 0.017, inc -> 0.014, length -> 0.013, times -> 0.010, plus -> 0.009
+------------
+[16.683s]Generation 6
+Best Individual: (fitness: 180281.8, performance: 181498.0) -> { {seed: < concat([], []) > ; iter: < prepend(length(append(#1, #0)), append(#1, length(#1))) >}, historyLen: 5 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 2820
+Average Size: 8.1677
+Average Fitness: 55210.416661146926
+Fitness Variation: 41917.80157434256
+Distribution: #0 -> 0.301, append -> 0.152, #1 -> 0.149, prepend -> 0.144, [] -> 0.088, concat -> 0.048, access -> 0.030, dec -> 0.019, inc -> 0.012, length -> 0.006, 1 -> 0.004, 11 -> 0.004
+------------
+[18.463s]Generation 7
+Best Individual: (fitness: 180281.8, performance: 181498.0) -> { {seed: < concat([], []) > ; iter: < prepend(length(append(#1, #0)), append(#1, length(#1))) >}, historyLen: 6 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 1956
+Average Size: 7.3193
+Average Fitness: 56469.56751597764
+Fitness Variation: 41861.63529182785
+Distribution: #0 -> 0.313, append -> 0.170, #1 -> 0.161, prepend -> 0.151, [] -> 0.054, dec -> 0.038, concat -> 0.032, inc -> 0.021, access -> 0.011, length -> 0.005, plus -> 0.004, minus -> 0.004
+------------
+[20.406s]Generation 8
+Best Individual: (fitness: 180281.8, performance: 181498.0) -> { {seed: < concat([], []) > ; iter: < prepend(length(append(#1, #0)), append(#1, length(#1))) >}, historyLen: 7 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 1943
+Average Size: 7.6531
+Average Fitness: 58124.03186506618
+Fitness Variation: 41609.98184532722
+Distribution: #0 -> 0.298, append -> 0.163, #1 -> 0.154, prepend -> 0.145, dec -> 0.069, [] -> 0.046, inc -> 0.040, concat -> 0.027, access -> 0.009, length -> 0.006, plus -> 0.004, 1 -> 0.004
+------------
+[22.327s]Generation 9
+Best Individual: (fitness: 180479.4, performance: 181498.0) -> { {seed: < [] > ; iter: < prepend(length(append(#1, #0)), append(#1, length(#1))) >}, historyLen: 8 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 1816
+Average Size: 7.6526
+Average Fitness: 59898.64026310936
+Fitness Variation: 41676.130719896086
+Distribution: #0 -> 0.297, append -> 0.157, #1 -> 0.155, prepend -> 0.150, dec -> 0.085, inc -> 0.052, [] -> 0.033, concat -> 0.014, access -> 0.009, length -> 0.007, times -> 0.003, divide -> 0.003
+------------
+[24.214s]Generation 10
+Best Individual: (fitness: 180479.4, performance: 181498.0) -> { {seed: < [] > ; iter: < prepend(length(append(#1, #0)), append(#1, length(#1))) >}, historyLen: 9 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 1691
+Average Size: 7.6865
+Average Fitness: 61019.79114427199
+Fitness Variation: 42620.091536760825
+Distribution: #0 -> 0.295, #1 -> 0.160, append -> 0.156, prepend -> 0.155, dec -> 0.088, inc -> 0.053, [] -> 0.026, length -> 0.011, access -> 0.008, concat -> 0.007, divide -> 0.003, modular -> 0.003
+------------
+[26.644s]Generation 11
+Best Individual: (fitness: 180479.4, performance: 181498.0) -> { {seed: < [] > ; iter: < prepend(length(append(#1, #0)), append(#1, length(#1))) >}, historyLen: 10 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 1784
+Average Size: 7.9853
+Average Fitness: 62918.75225574484
+Fitness Variation: 46817.042809160535
+Distribution: #0 -> 0.282, #1 -> 0.172, append -> 0.160, prepend -> 0.151, dec -> 0.083, inc -> 0.049, length -> 0.026, [] -> 0.023, access -> 0.008, concat -> 0.006, divide -> 0.004, modular -> 0.004
+------------
+[30.906s]Generation 12
+Best Individual: (fitness: 180479.4, performance: 181498.0) -> { {seed: < [] > ; iter: < prepend(length(append(#1, #0)), append(#1, length(#1))) >}, historyLen: 11 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 2343
+Average Size: 9.2877
+Average Fitness: 69479.36609725216
+Fitness Variation: 57299.581088516046
+Distribution: #0 -> 0.241, #1 -> 0.198, append -> 0.165, prepend -> 0.135, length -> 0.066, dec -> 0.065, inc -> 0.039, [] -> 0.023, access -> 0.013, divide -> 0.007, modular -> 0.007, concat -> 0.006
+------------
+[38.990s]Generation 13
+Best Individual: (fitness: 180479.4, performance: 181498.0) -> { {seed: < [] > ; iter: < prepend(length(append(#1, #0)), append(#1, length(#1))) >}, historyLen: 12 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 3299
+Average Size: 11.8421
+Average Fitness: 87705.97177936324
+Fitness Variation: 72645.28282529519
+Distribution: #1 -> 0.241, append -> 0.172, #0 -> 0.169, length -> 0.133, prepend -> 0.115, dec -> 0.035, inc -> 0.025, [] -> 0.025, access -> 0.016, modular -> 0.012, divide -> 0.011, 6 -> 0.008
+------------
+[46.854s]Generation 14
+Best Individual: (fitness: 180479.4, performance: 181498.0) -> { {seed: < [] > ; iter: < prepend(length(append(#1, #0)), append(#1, length(#1))) >}, historyLen: 13 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 2984
+Average Size: 12.1218
+Average Fitness: 108513.86300967488
+Fitness Variation: 76733.60503275272
+Distribution: #1 -> 0.286, append -> 0.189, length -> 0.187, #0 -> 0.115, prepend -> 0.110, [] -> 0.023, dec -> 0.013, access -> 0.012, inc -> 0.011, modular -> 0.007, divide -> 0.006, concat -> 0.006
+------------
+[51.782s]Generation 15
+Best Individual: (fitness: 180479.4, performance: 181498.0) -> { {seed: < [] > ; iter: < prepend(length(append(#1, 7)), append(#1, length(#1))) >}, historyLen: 14 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 2062
+Average Size: 10.9171
+Average Fitness: 112536.38108551697
+Fitness Variation: 77175.62976329154
+Distribution: #1 -> 0.304, length -> 0.204, append -> 0.199, prepend -> 0.115, #0 -> 0.100, [] -> 0.021, access -> 0.007, concat -> 0.006, dec -> 0.004, 4 -> 0.004, inc -> 0.003, 2 -> 0.003
+------------
+[56.104s]Generation 16
+Best Individual: (fitness: 180479.4, performance: 181498.0) -> { {seed: < [] > ; iter: < prepend(length(append(#1, #0)), append(#1, length(#1))) >}, historyLen: 15 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 1761
+Average Size: 10.5217
+Average Fitness: 112521.75277196977
+Fitness Variation: 77358.63317524054
+Distribution: #1 -> 0.306, length -> 0.205, append -> 0.201, prepend -> 0.117, #0 -> 0.098, [] -> 0.021, access -> 0.007, concat -> 0.006, 4 -> 0.004, 2 -> 0.003, 7 -> 0.003, 1 -> 0.002
+------------
+[60.264s]Generation 17
+Best Individual: (fitness: 180479.4, performance: 181498.0) -> { {seed: < [] > ; iter: < prepend(length(append(#1, #0)), append(#1, length(#1))) >}, historyLen: 16 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 1792
+Average Size: 10.5249
+Average Fitness: 112923.65956325478
+Fitness Variation: 77144.00660833968
+Distribution: #1 -> 0.305, length -> 0.204, append -> 0.201, prepend -> 0.116, #0 -> 0.096, [] -> 0.021, access -> 0.007, concat -> 0.006, 4 -> 0.004, 2 -> 0.003, 10 -> 0.003, 7 -> 0.003
+------------
+[64.662s]Generation 18
+Best Individual: (fitness: 180860.5, performance: 181498.0) -> { {seed: < [] > ; iter: < prepend(inc(length(#1)), append(#1, length(#1))) >}, historyLen: 17 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 1783
+Average Size: 10.5377
+Average Fitness: 112441.77358556047
+Fitness Variation: 77222.06990438138
+Distribution: #1 -> 0.306, length -> 0.205, append -> 0.203, prepend -> 0.116, #0 -> 0.096, [] -> 0.021, access -> 0.007, concat -> 0.006, 4 -> 0.004, 2 -> 0.004, 10 -> 0.003, 6 -> 0.003
+------------
+[69.097s]Generation 19
+Best Individual: (fitness: 180860.5, performance: 181498.0) -> { {seed: < [] > ; iter: < prepend(inc(length(#1)), append(#1, length(#1))) >}, historyLen: 18 }
+Best Individual Pattern: < [] >, < [1,0] >, < [3,1,0,2] >, < [5,3,1,0,2,4] >, < [7,5,3,1,0,2,4,6] >, ...
+Diversity: 1789
+Average Size: 10.5381
+Average Fitness: 113063.18776077266
+Fitness Variation: 76970.53880802762
+Distribution: #1 -> 0.306, length -> 0.205, append -> 0.202, prepend -> 0.116, #0 -> 0.095, [] -> 0.020, access -> 0.006, concat -> 0.006, 4 -> 0.005, 2 -> 0.003, 7 -> 0.003, 1 -> 0.003
