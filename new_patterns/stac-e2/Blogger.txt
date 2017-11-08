@@ -1,0 +1,7 @@
+Use the string to construct malicious http request: "curl -i http://localhost:8080/<string>"
+
+[O0: EVect(EInt)] -> concat(#1, [])
+*
+[S0: EInt]{ seed: 10 ; iter: plus(10, minus(neg(#0), #0)); seedExpr: 10 }
+[S1: EVect(EInt)]{ seed: [] ; iter: prepend(dec(minus(#0, minus(neg(6), #0))), #1); seedExpr: [] }
+Individual Pattern: , \u0019, \uFFF1\u0019, A\uFFF1\u0019, \uFFA1A\uFFF1\u0019, \u00E1\uFFA1A\uFFF1\u0019, \uFF61\u00E1\uFFA1A\uFFF1\u0019, ...

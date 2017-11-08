@@ -344,12 +344,6 @@ object FuzzingExample{
     )
   }
 
-  def escapeStrings(s: String): String = {
-    import org.apache.commons.lang3.StringEscapeUtils
-
-    StringEscapeUtils.escapeJava(s)
-  }
-
 
   /** Http request example */
   def bloggerExample: FuzzingExample = {
@@ -380,8 +374,7 @@ object FuzzingExample{
       gpEnv = sortingEnv,
       displayValue = {
         case IS(vec:VectValue)=>
-          val s = vectIntToString(vec)
-          escapeStrings(s)
+          vectIntToString(vec)
       },
       setUpAction = () => {
         new Thread(() => server.start()).start()
