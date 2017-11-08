@@ -17,6 +17,7 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
                timeLimitInMillis: Int, timeoutCallback: Individual => IndividualEvaluation
                      ): Iterator[Population[Individual]] = {
 
+    require(threadNum>=1)
     neighbourSize.foreach(ns => require(ns*2+1 <= populationSize, "Neighbour size too large."))
 
     var progress = 0
@@ -44,9 +45,13 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
     import parallel._
     val taskSupport = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(threadNum))
     def parExecute[A, B](seq: Seq[A])(f: A => B): IS[B] = {
-      val p = seq.par
-      p.tasksupport = taskSupport
-      p.map(f).toIndexedSeq
+      if(threadNum>1) {
+        val p = seq.par
+        p.tasksupport = taskSupport
+        p.map(f).toIndexedSeq
+      }else{
+        seq.map(f).toIndexedSeq
+      }
     }
 
     val operatorPCF: IS[(GOp, Double)] = {
