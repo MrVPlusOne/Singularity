@@ -25,15 +25,21 @@ class Counter{
   }
 }
 
+import FuzzingExample.emptyAction
+
 case class FuzzingExample(outputTypes: IS[EType],
                           sizeF: PartialFunction[IS[EValue], Int],
                           sizeOfInterest: Int = 500,
                           resourceUsage: PartialFunction[IS[EValue], Double],
                           gpEnv: GPEnvironment,
-                          displayValue: IS[EValue] => String = _.toString
+                          displayValue: IS[EValue] => String = _.toString,
+                          setUpAction: () => Unit = emptyAction,
+                          tearDownAction: () => Unit = emptyAction
                          )
 
 object FuzzingExample{
+  def emptyAction(): Unit = ()
+
   def notPossible[T](): T = throw new Exception("Not possible!")
 
   def toIntVect(v: Vector[EValue]): Vector[Int] = {
@@ -132,7 +138,7 @@ object FuzzingExample{
   }
 
   def vectIntToString(vec: VectValue): String = {
-    String.valueOf(vectIntToCharArray(vec))
+    String.valueOf(vectIntToCharArray(vec).toArray)
   }
 
   def vectIntToCharArray(vec: VectValue): List[Char] = {
@@ -335,6 +341,54 @@ object FuzzingExample{
           }
       },
       gpEnv = phpHashEnv
+    )
+  }
+
+  def escapeStrings(s: String): String = {
+    import org.apache.commons.lang3.StringEscapeUtils
+
+    StringEscapeUtils.escapeJava(s)
+  }
+
+
+  /** Http request example */
+  def bloggerExample: FuzzingExample = {
+    import edu.utexas.stac.Cost
+    import sys.process._
+    import fi.iki.elonen.JavaWebServer
+
+    val server = new JavaWebServer(8080)
+
+    FuzzingExample(
+      outputTypes = IS(EVect(EInt)),
+      sizeF = {
+        case IS(VectValue(chars)) =>
+          chars.length
+      },
+      sizeOfInterest = 100,
+      resourceUsage = {
+        case IS(vec :VectValue) =>
+          val s = vectIntToString(vec)
+          Cost.reset()
+          try{
+            s"curl -i http://localhost:8080/$s" !
+          } catch {
+            case _: java.io.IOException =>
+          }
+          Cost.read().toDouble
+      },
+      gpEnv = sortingEnv,
+      displayValue = {
+        case IS(vec:VectValue)=>
+          val s = vectIntToString(vec)
+          escapeStrings(s)
+      },
+      setUpAction = () => {
+        new Thread(() => server.start()).start()
+      },
+      tearDownAction = () => {
+        server.stop()
+      }
     )
   }
 }

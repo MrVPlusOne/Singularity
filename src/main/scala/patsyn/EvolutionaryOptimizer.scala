@@ -13,18 +13,30 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
                indEval: Individual => IndividualEvaluation,
                threadNum: Int,
                randSeed: Int,
-               evalProgressCallback: Int => Unit
+               evalProgressCallback: Int => Unit,
+               timeLimitInMillis: Int, timeoutCallback: Individual => IndividualEvaluation
                      ): Iterator[Population[Individual]] = {
     require(neighbourSize*2+1 <= populationSize, "Neighbour size too large.")
 
     var progress = 0
-    def evaluation(individual: Individual): IndividualEvaluation ={
-      val result = indEval(individual)
-      this.synchronized{
-        progress+=1
-        evalProgressCallback(progress)
+    def evaluation(individual: Individual): IndividualEvaluation = {
+      import scala.concurrent._
+      import scala.concurrent.duration._
+      import scala.concurrent.ExecutionContext.Implicits.global
+      try {
+        Await.result(Future{
+          val result = indEval(individual)
+          this.synchronized {
+            progress += 1
+            evalProgressCallback(progress)
+          }
+          result
+        }
+        ,timeLimitInMillis.milliseconds)
+      } catch {
+        case _: TimeoutException =>
+          timeoutCallback(individual)
       }
-      result
     }
 
     import scala.collection.parallel

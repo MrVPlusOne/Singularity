@@ -1,24 +1,24 @@
 package patsyn
 
-import java.io.FileWriter
 
 import user.commands.CommandProcessor
 import edu.utexas.stac.Cost
+import fi.iki.elonen.{JavaWebServer, NanoHTTPD$IHTTPSession}
+
 
 object TestCostInstr {
+  import sys.process._
 
   def main(args: Array[String]): Unit = {
-//
-//    val fileContent = FuzzingExample.intVectorToGraph(0, Vector(1, 2, 3, 0,1))
-//    val dotFile = "input-files/genGraph.dot"
-//    val fw = new FileWriter(dotFile)
-//    fw.write(fileContent)
-//    fw.close()
 
-    CommandProcessor.main("dot input-files/small-graph.dot xy diagram png output-files/PNG_output.png".split(" "))
+    new Thread(() => JavaWebServer.main(args)).start()
+
+    "curl -i http://localhost:8080/\r11111111111111111111111" !
+
+//    CommandProcessor.main("dot input-files/small-graph.dot xy diagram png output-files/PNG_output.png".split(" "))
     val cost = Cost.read()
-    Cost.inc()
     println(cost)
+    System.exit(0)
   }
 
 }

@@ -44,7 +44,7 @@ object TestRun {
           "best fitness" -> makeXY(bestFitness),
           "average fitness" -> makeXY(avFitLine))("Performance Curve", "Generations", "Evaluation")
         monitorPanel = new MonitorPanel(chart, 10, (600, 450))
-        if(contentPane.getComponentCount >= 1){
+        if(contentPane.getComponentCount > 1){
           contentPane.remove(1)
         }
         contentPane.add(monitorPanel)
@@ -74,7 +74,7 @@ object TestRun {
 //      regexDic = i => i.toChar.toString
 //    )
 
-    val example = FuzzingExample.graphAnalyzerExample
+    val example = FuzzingExample.bloggerExample
 
     val library = MultiStateGOpLibrary(example.gpEnv, example.outputTypes)
 
@@ -95,6 +95,8 @@ object TestRun {
     import monitor.{evalProgressCallback, monitorCallback}
 
     for (seed <- 2 to 5) {
+      example.setUpAction()
+
       val sizeOfInterest = example.sizeOfInterest
       val evaluation = new SimplePerformanceEvaluation(
         sizeOfInterest = sizeOfInterest, maxTrials = 3, nonsenseFitness = -1.0,
@@ -118,7 +120,19 @@ object TestRun {
         },
         threadNum = 1,
         randSeed = seed,
-        evalProgressCallback = evalProgressCallback
+        evalProgressCallback = evalProgressCallback,
+        timeLimitInMillis = 10000,
+        timeoutCallback = ind => {
+          println("Evaluation timed out!")
+          val firstSevenInputs = representation.individualToPattern(ind).take(7).toList.map{
+            case (_, v) => example.displayValue(v)
+          }.mkString(", ")
+          representation.printIndividualMultiLine(println)(ind)
+          println(s"Individual Pattern: $firstSevenInputs, ...")
+
+          System.exit(0)
+          throw new Exception("Timed out!")
+        }
       )
 
       val maxNonIncreaseTime = 150
@@ -156,7 +170,8 @@ object TestRun {
           println(s"Generation ${i + 1}")
           println(s"Best Result: ${best.evaluation.showAsLinearExpr}, Created by ${best.history.birthOp}")
           representation.printIndividualMultiLine(println)(best.ind)
-          val firstSevenInputs = representation.fitnessEvaluation(best.ind)._2.take(7).map{ example.displayValue
+          val firstSevenInputs = representation.individualToPattern(best.ind).take(7).toList.map{
+            case (_, v) => example.displayValue(v)
           }.mkString(", ")
           println(s"Best Individual Pattern: $firstSevenInputs, ...")
           println(s"Diversity: ${pop.fitnessMap.keySet.size}")
@@ -173,6 +188,8 @@ object TestRun {
 
         val data = bestSoFar.get
         FileInteraction.saveObjectToFile(s"$recordDirPath/bestIndividual[seed=$seed].serialized")(data)
+
+        example.tearDownAction()
       }
     }
   }
