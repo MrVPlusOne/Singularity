@@ -60,6 +60,7 @@ object TestRun {
   def main(args: Array[String]): Unit = {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
     runExample(ioId)
+
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -93,7 +94,7 @@ object TestRun {
     val randomSeeds = Seq(2,3,4,5)
     // *** end of important parameters ***
 
-
+    val useGUI = false
 
     val library = MultiStateGOpLibrary(example.gpEnv, example.outputTypes)
 
@@ -109,9 +110,15 @@ object TestRun {
       s"results/$dateTime[ioId=$ioId]"
     }
 
+    val (evalProgressCallback, monitorCallback): (Int => Unit, MonitoringData => Unit) = {
+      if (useGUI) {
+        val monitor = createMonitor(populationSize)
+        (monitor.evalProgressCallback, monitor.monitorCallback)
+      } else {
+        ((_: Int) => Unit, (_: MonitoringData) => Unit)
+      }
+    }
 
-    val monitor = createMonitor(populationSize)
-    import monitor.{evalProgressCallback, monitorCallback}
 
     for (seed <- randomSeeds) {
       FileInteraction.runWithAFileLogger(s"$recordDirPath/testResult[seed=$seed].txt") { logger =>
