@@ -40,7 +40,6 @@ case class FuzzingExample(outputTypes: IS[EType],
                          )
 
 object FuzzingExample{
-  val inputDirectoryName = "input-files"
 
   def emptyAction(): Unit = ()
 
@@ -296,7 +295,7 @@ object FuzzingExample{
      """.stripMargin
   }
 
-  def graphAnalyzerExample: FuzzingExample = {
+  def graphAnalyzerExample(workingDir: String): FuzzingExample = {
     import java.io.FileWriter
 
     import user.commands.CommandProcessor
@@ -318,7 +317,7 @@ object FuzzingExample{
               FuzzingExample.intVectorToGraph(i, vec)
           }.mkString("\n")
 
-          val fw = new FileWriter(s"$inputDirectoryName/genGraph.dot")
+          val fw = new FileWriter(s"$workingDir/genGraph.dot")
           fw.write(fileContent)
           fw.close()
 
@@ -331,7 +330,7 @@ object FuzzingExample{
             import scala.concurrent.ExecutionContext.Implicits.global
 
             Await.result(Future(
-              CommandProcessor.main(s"dot $inputDirectoryName/genGraph.dot xy diagram png output-files/PNG_output.png".split(" "))
+              CommandProcessor.main(s"dot $workingDir/genGraph.dot xy diagram png output-files/PNG_output.png".split(" "))
             ), timeLimit.milliseconds)
 
             Cost.read().toDouble
@@ -400,12 +399,13 @@ object FuzzingExample{
     GPEnvironment(constMap, functions, stateTypes)
   }
 
-  def imageExample(imageWidth: Int, imageHeight: Int): FuzzingExample = {
+  def imageExample(imageWidth: Int, imageHeight: Int, workingDir: String): FuzzingExample = {
     import java.awt.image.BufferedImage
     import java.io.File
     import javax.imageio.ImageIO
     import sys.process._
 
+    var bestPerformanceSoFar = Double.MinValue
 
     val imageDataSize = imageWidth * imageHeight
     FuzzingExample(
@@ -425,7 +425,7 @@ object FuzzingExample{
             }
             val image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB)
             image.getRaster.setPixels(0, 0, imageWidth, imageHeight, content.toArray)
-            val imagePath = s"$inputDirectoryName/genImage.png"
+            val imagePath = s"$workingDir/genImage.png"
             val file = new File(imagePath)
             ImageIO.write(image, "png", file)
 
@@ -435,14 +435,17 @@ object FuzzingExample{
             //          }
             //          Cost.read().toDouble
             try {
-              //            Seq("cd", "benchmarks/image_processor/examples").lineStream
-              //            val results = Seq("sh","challenge.sh", s"classify ../../../$inputDirectoryName/genImage.png").lineStream
               val jarPath = "benchmarks/image_processor/challenge_program/ipchallenge-ins.jar"
-              val results = Seq("java", "-Xint", "-jar", s"$jarPath", "cluster", s"$inputDirectoryName/genImage.png").lineStream
+              val results = Seq("java", "-Xint", "-jar", s"$jarPath", "cluster", imagePath).lineStream
               println("last result: " + results.last)
               val Array(first, costS) = results.last.split("\\s+")
               assert(first == "[COST]")
-              costS.toInt.toDouble
+              val performance = costS.toInt.toDouble
+              if(performance>bestPerformanceSoFar){
+                ImageIO.write(image, "png", new File(s"$workingDir/bestImageSoFar.png"))
+                bestPerformanceSoFar = performance
+              }
+              performance
             }
           }
       },

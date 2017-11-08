@@ -58,7 +58,8 @@ object TestRun {
   }
 
   def main(args: Array[String]): Unit = {
-    runExample()
+    val ioId = if(args.isEmpty) 0 else args.head.toInt
+    runExample(ioId)
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -73,14 +74,26 @@ object TestRun {
     StringEscapeUtils.escapeJava(s)
   }
 
-  def runExample(): Unit = {
+  def runExample(ioId: Int): Unit = {
 
-    //    val example = FuzzingExample.regexExample(
-    //      regex = "^(abc)+",  //"(\\.+\\|?)+",
-    //      regexDic = i => i.toChar.toString
-    //    )
+    val workingDir = s"workingDir$ioId"
+    FileInteraction.mkDirsAlongPath(workingDir)
 
-    val example = FuzzingExample.imageExample(10,10)
+
+    // *** important parameters ***
+    val example = FuzzingExample.imageExample(10,10, workingDir)
+    val populationSize = 100
+    val tournamentSize = 7
+    val evaluationTrials = 3
+    val totalSizeTolerance = 50
+    val singleSizeTolerance = 30
+    val threadNum = 1
+    val timeLimitInMillis = 10000
+    val maxNonIncreaseTime = 150
+    val randomSeeds = Seq(2,3,4,5)
+    // *** end of important parameters ***
+
+
 
     val library = MultiStateGOpLibrary(example.gpEnv, example.outputTypes)
 
@@ -93,14 +106,14 @@ object TestRun {
     val recordDirPath = {
       import java.util.Calendar
       val dateTime = Calendar.getInstance().getTime
-      s"results/$dateTime"
+      s"results/$dateTime[ioId=$ioId]"
     }
 
-    val populationSize = 100
+
     val monitor = createMonitor(populationSize)
     import monitor.{evalProgressCallback, monitorCallback}
 
-    for (seed <- 2 to 5) {
+    for (seed <- randomSeeds) {
       FileInteraction.runWithAFileLogger(s"$recordDirPath/testResult[seed=$seed].txt") { logger =>
         import logger._
 
@@ -108,10 +121,11 @@ object TestRun {
 
         val sizeOfInterest = example.sizeOfInterest
         val evaluation = new SimplePerformanceEvaluation(
-          sizeOfInterest = sizeOfInterest, maxTrials = 3, nonsenseFitness = -1.0,
+          sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
           resourceUsage = example.resourceUsage, sizeF = example.sizeF, maxMemoryUsage = sizeOfInterest * 10
         )
-        val representation = MultiStateRepresentation(totalSizeTolerance = 50, singleSizeTolerance = 30,
+        val representation = MultiStateRepresentation(totalSizeTolerance = totalSizeTolerance,
+          singleSizeTolerance = singleSizeTolerance,
           stateTypes = example.gpEnv.stateTypes, outputTypes = example.outputTypes, evaluation = evaluation)
         val optimizer = EvolutionaryOptimizer(representation)
         val operators = IS(
@@ -121,16 +135,16 @@ object TestRun {
         )
 
         val generations = optimizer.optimize(
-          populationSize = populationSize, tournamentSize = 7,
+          populationSize = populationSize, tournamentSize = tournamentSize,
           initOperator = library.initOp(maxDepth = 3),
           operators = operators,
           indEval = ind => {
             representation.fitnessEvaluation(ind)._1
           },
-          threadNum = 1,
+          threadNum = threadNum,
           randSeed = seed,
           evalProgressCallback = evalProgressCallback,
-          timeLimitInMillis = 10000,
+          timeLimitInMillis = timeLimitInMillis,
           timeoutCallback = ind => {
             println("Evaluation timed out!")
             val firstSevenInputs = representation.individualToPattern(ind).take(7).toList.map {
@@ -143,8 +157,6 @@ object TestRun {
             throw new Exception("Timed out!")
           }
         )
-
-        val maxNonIncreaseTime = 150
 
 
         val parameterInfo = ""
