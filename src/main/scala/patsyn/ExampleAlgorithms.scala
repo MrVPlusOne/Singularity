@@ -421,9 +421,9 @@ object FuzzingExample{
             val dataSize = data.length
             val content = (0 until imageDataSize).flatMap { i =>
               val intValue = data(SimpleMath.wrapInRange(i, dataSize)).asInstanceOf[IntValue].value
-              IS(intValue & 255, (intValue >> 8) & 255, (intValue >> 8) & 255)
+              IS((intValue >> 24) & 255, intValue & 255, (intValue >> 8) & 255, (intValue >> 16) & 255)
             }
-            val image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB)
+            val image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB)
             image.getRaster.setPixels(0, 0, imageWidth, imageHeight, content.toArray)
             val imagePath = s"$workingDir/genImage.png"
             val file = new File(imagePath)
