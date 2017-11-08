@@ -7,6 +7,8 @@ import StandardSystem._
 
 import scala.concurrent.TimeoutException
 import scala.util.Random
+import edu.utexas.stac.Cost
+
 
 class Counter{
 
@@ -38,6 +40,8 @@ case class FuzzingExample(outputTypes: IS[EType],
                          )
 
 object FuzzingExample{
+  val inputDirectoryName = "input-files"
+
   def emptyAction(): Unit = ()
 
   def notPossible[T](): T = throw new Exception("Not possible!")
@@ -314,7 +318,7 @@ object FuzzingExample{
               FuzzingExample.intVectorToGraph(i, vec)
           }.mkString("\n")
 
-          val fw = new FileWriter("input-files/genGraph.dot")
+          val fw = new FileWriter(s"$inputDirectoryName/genGraph.dot")
           fw.write(fileContent)
           fw.close()
 
@@ -327,7 +331,7 @@ object FuzzingExample{
             import scala.concurrent.ExecutionContext.Implicits.global
 
             Await.result(Future(
-              CommandProcessor.main("dot input-files/genGraph.dot xy diagram png output-files/PNG_output.png".split(" "))
+              CommandProcessor.main(s"dot $inputDirectoryName/genGraph.dot xy diagram png output-files/PNG_output.png".split(" "))
             ), timeLimit.milliseconds)
 
             Cost.read().toDouble
@@ -347,7 +351,6 @@ object FuzzingExample{
 
   /** Http request example */
   def bloggerExample: FuzzingExample = {
-    import edu.utexas.stac.Cost
     import sys.process._
     import fi.iki.elonen.JavaWebServer
 
@@ -382,6 +385,68 @@ object FuzzingExample{
       tearDownAction = () => {
         server.stop()
       }
+    )
+  }
+
+  def imageEnv: GPEnvironment = {
+    val constMap = makeConstMap(
+      EInt -> IS(r => r.nextInt(12)),
+      EVect(EInt) -> IS(_ => Vector())
+    )
+
+    val functions = IntComponents.collection ++ VectComponents.collection ++ IS(IntComponents.shiftByteLeft)
+
+    val stateTypes = constMap.keys.toIndexedSeq ++ IS(EInt, EInt)
+    GPEnvironment(constMap, functions, stateTypes)
+  }
+
+  def imageExample(imageWidth: Int, imageHeight: Int): FuzzingExample = {
+    import java.awt.image.BufferedImage
+    import java.io.File
+    import javax.imageio.ImageIO
+    import sys.process._
+
+
+    val imageDataSize = imageWidth * imageHeight
+    FuzzingExample(
+      outputTypes = IS(EVect(EInt)),
+      sizeF = {
+        case IS(VectValue(data)) => data.length
+      },
+      sizeOfInterest = imageDataSize,
+      resourceUsage = {
+        case IS(VectValue(data)) =>
+          if(data.isEmpty) 0.0
+          else {
+            val dataSize = data.length
+            val content = (0 until imageDataSize).flatMap { i =>
+              val intValue = data(SimpleMath.wrapInRange(i, dataSize)).asInstanceOf[IntValue].value
+              IS(intValue & 255, (intValue >> 8) & 255, (intValue >> 8) & 255)
+            }
+            val image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB)
+            image.getRaster.setPixels(0, 0, imageWidth, imageHeight, content.toArray)
+            val imagePath = s"$inputDirectoryName/genImage.png"
+            val file = new File(imagePath)
+            ImageIO.write(image, "png", file)
+
+            //          Cost.reset()
+            //          try{
+            //            stac.Main.main(Array("cluster", imagePath))
+            //          }
+            //          Cost.read().toDouble
+            try {
+              //            Seq("cd", "benchmarks/image_processor/examples").lineStream
+              //            val results = Seq("sh","challenge.sh", s"classify ../../../$inputDirectoryName/genImage.png").lineStream
+              val jarPath = "benchmarks/image_processor/challenge_program/ipchallenge-ins.jar"
+              val results = Seq("java", "-Xint", "-jar", s"$jarPath", "cluster", s"$inputDirectoryName/genImage.png").lineStream
+              println("last result: " + results.last)
+              val Array(first, costS) = results.last.split("\\s+")
+              assert(first == "[COST]")
+              costS.toInt.toDouble
+            }
+          }
+      },
+      gpEnv = imageEnv
     )
   }
 }

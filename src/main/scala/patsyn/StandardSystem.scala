@@ -80,6 +80,10 @@ object StandardSystem {
     })
 
     val collection: IndexedSeq[EFunction] = IS(inc, dec, neg, plus, minus, times, divide, modular)
+
+    val shiftByteLeft = EConcreteFunc("shiftBL", IS(EInt), EInt, {
+      case IS(IntValue(a)) => a << 8
+    })
   }
 
   object VectComponents {

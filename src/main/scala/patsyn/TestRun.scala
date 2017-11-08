@@ -80,7 +80,7 @@ object TestRun {
     //      regexDic = i => i.toChar.toString
     //    )
 
-    val example = FuzzingExample.bloggerExample
+    val example = FuzzingExample.imageExample(10,10)
 
     val library = MultiStateGOpLibrary(example.gpEnv, example.outputTypes)
 
@@ -96,7 +96,7 @@ object TestRun {
       s"results/$dateTime"
     }
 
-    val populationSize = 1000
+    val populationSize = 100
     val monitor = createMonitor(populationSize)
     import monitor.{evalProgressCallback, monitorCallback}
 
