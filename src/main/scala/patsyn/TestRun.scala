@@ -76,7 +76,7 @@ object TestRun {
   def runExample(taskProvider: FuzzingTaskProvider, seeds: Seq[Int], useGUI: Boolean): Unit = taskProvider.run{ task =>
 
     // *** important parameters ***
-    val populationSize = 100
+    val populationSize = 500
     val tournamentSize = 7
     val evaluationTrials = 3
     val totalSizeTolerance = 50
