@@ -19,7 +19,8 @@ object BenchmarkDriver {
       "slowfuzz/phpHash" -> (_ => phpHashCollision),
       "stac/graphAnalyzer" -> (opt => graphAnalyzerExample(getWorkingDir(opt))),
       "stac/blogger" -> (_ => bloggerExample),
-      "stac/imageProcessor" -> (opt => imageExample(10, 10, getWorkingDir(opt)))
+      "stac/imageProcessor" -> (opt => imageExample(10, 10, getWorkingDir(opt))),
+      "stac/textCrunchr" -> (opt => textCrunchrExample(getWorkingDir(opt)))
     )
   }
 
