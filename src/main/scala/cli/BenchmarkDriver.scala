@@ -1,6 +1,6 @@
 package cli
 
-import patsyn.{FileInteraction, FuzzingExample, TestRun}
+import patsyn.{FileInteraction, FuzzingTask, FuzzingTaskProvider, TestRun}
 
 object BenchmarkDriver {
 
@@ -11,9 +11,9 @@ object BenchmarkDriver {
     workingDir
   }
 
-  val benchmarks: Map[String, CliOption => FuzzingExample] = {
-    import FuzzingExample._
-    Map[String, CliOption => FuzzingExample](
+  val benchmarks = {
+    import FuzzingTaskProvider._
+    Map[String, CliOption => FuzzingTaskProvider](
       "slowfuzz/insertionSort" -> (_ =>insertionSortExample),
       "slowfuzz/quickSort" -> (_ => quickSortExample),
       "stac/graphAnalyzer" -> (opt => graphAnalyzerExample(getWorkingDir(opt))),
@@ -22,17 +22,13 @@ object BenchmarkDriver {
     )
   }
 
-  def benchmarkNames: Set[String] = benchmarks.keySet
-
-  def getBenchmark(name: String, cliOption: CliOption): FuzzingExample = {
-    benchmarks.getOrElse(name,
-      throw new IllegalArgumentException("Cannot find benchmark named " + name)).apply(cliOption)
-  }
-
-  def getBenchmarks(target: String, cliOption: CliOption): Iterator[FuzzingExample] = {
+  def getBenchmarks(target: String, cliOption: CliOption): Iterator[(String, FuzzingTaskProvider)] = {
     target match {
-      case "all" => benchmarks.values.toIterator.map(_.apply(cliOption))
-      case name => Iterator(getBenchmark(name, cliOption))
+      case "all" => benchmarks.toIterator.map{
+        case (name, p) => name -> p(cliOption)
+      }
+      case name => Iterator(name -> benchmarks.getOrElse(name,
+        throw new IllegalArgumentException("Cannot find benchmark named " + name)).apply(cliOption))
     }
   }
 
@@ -54,12 +50,25 @@ object BenchmarkDriver {
       arg[String]("<target>").required().action( (x, c) =>
         c.copy(target=x)).text("Benchmark target to run.")
 
-      note("\nBenchmark target list:\n" + benchmarkNames.map(s => "  " + s).mkString("\n") + "\n")
+      note("\nBenchmark target list:\n" + benchmarks.keys.map(s => "  " + s).mkString("\n") + "\n")
     }
 
     parser.parse(args, CliOption()).foreach { cliOption =>
       val benchs = getBenchmarks(cliOption.target, cliOption)
-      benchs.foreach(bench => TestRun.runExample(bench, cliOption.seed, !cliOption.disableGui))
+      benchs.foreach{ case (name, bench) =>
+        println(s"*** Task $name started ***")
+        try {
+          bench.run { task =>
+            TestRun.runExample(task, cliOption.seed, !cliOption.disableGui)
+            println(s"*** Task $name finished ***")
+          }
+        } catch {
+          case ex: Exception =>
+            System.err.println(s"Exception thrown: $ex")
+            ex.printStackTrace(System.err)
+            System.err.println(s"Task $name aborted. Continuing to the next task...")
+        }
+      }
     }
   }
 }

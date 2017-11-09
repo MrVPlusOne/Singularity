@@ -61,8 +61,10 @@ object TestRun {
     val seed = if(args.isEmpty) 0 else args.head.toInt
     val workingDir = s"workingDir$seed"
     FileInteraction.mkDirsAlongPath(workingDir)
-    val example = FuzzingExample.imageExample(10,10, workingDir)
-    runExample(example, seed, true)
+
+    FuzzingTaskProvider.imageExample(10,10, workingDir).run{task =>
+      runExample(task, seed, useGUI = true)
+    }
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -77,7 +79,7 @@ object TestRun {
     StringEscapeUtils.escapeJava(s)
   }
 
-  def runExample(example: FuzzingExample, seed: Int, useGUI: Boolean): Unit = {
+  def runExample(task: FuzzingTask, seed: Int, useGUI: Boolean): Unit = {
 
     // *** important parameters ***
     val populationSize = 1000
@@ -91,10 +93,10 @@ object TestRun {
     val randomSeeds = Seq(seed)
     // *** end of important parameters ***
 
-    val library = MultiStateGOpLibrary(example.gpEnv, example.outputTypes)
+    val library = MultiStateGOpLibrary(task.gpEnv, task.outputTypes)
 
     println("[Function map]")
-    example.gpEnv.functionMap.foreach { case (t, comps) =>
+    task.gpEnv.functionMap.foreach { case (t, comps) =>
       println(s"$t -> ${comps.mkString("{", ", ", "}")}")
     }
     println("[End of Function map]")
@@ -119,16 +121,14 @@ object TestRun {
       FileInteraction.runWithAFileLogger(s"$recordDirPath/testResult[seed=$seed].txt") { logger =>
         import logger._
 
-        example.setUpAction()
-
-        val sizeOfInterest = example.sizeOfInterest
+        val sizeOfInterest = task.sizeOfInterest
         val evaluation = new SimplePerformanceEvaluation(
           sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
-          resourceUsage = example.resourceUsage, sizeF = example.sizeF, maxMemoryUsage = sizeOfInterest * 10
+          resourceUsage = task.resourceUsage, sizeF = task.sizeF, maxMemoryUsage = sizeOfInterest * 10
         )
         val representation = MultiStateRepresentation(totalSizeTolerance = totalSizeTolerance,
           singleSizeTolerance = singleSizeTolerance,
-          stateTypes = example.gpEnv.stateTypes, outputTypes = example.outputTypes, evaluation = evaluation)
+          stateTypes = task.gpEnv.stateTypes, outputTypes = task.outputTypes, evaluation = evaluation)
         val optimizer = EvolutionaryOptimizer(representation)
         val operators = IS(
           library.simpleCrossOp -> 0.4,
@@ -150,7 +150,7 @@ object TestRun {
           timeoutCallback = ind => {
             println("Evaluation timed out!")
             val firstSevenInputs = representation.individualToPattern(ind).take(7).toList.map {
-              case (_, v) => escapeStrings(example.displayValue(v))
+              case (_, v) => escapeStrings(task.displayValue(v))
             }.mkString(", ")
             representation.printIndividualMultiLine(println)(ind)
             println(s"Individual Pattern: $firstSevenInputs, ...")
@@ -192,7 +192,7 @@ object TestRun {
           println(s"Best Result: ${best.evaluation.showAsLinearExpr}, Created by ${best.history.birthOp}")
           representation.printIndividualMultiLine(println)(best.ind)
           val firstSevenInputs = representation.individualToPattern(best.ind).take(7).toList.map {
-            case (_, v) => escapeStrings(example.displayValue(v))
+            case (_, v) => escapeStrings(task.displayValue(v))
           }.mkString(", ")
           println(s"Best Individual Pattern: $firstSevenInputs, ...")
           println(s"Diversity: ${pop.fitnessMap.keySet.size}")
@@ -209,8 +209,6 @@ object TestRun {
 
         val data = bestSoFar.get
         FileInteraction.saveObjectToFile(s"$recordDirPath/bestIndividual[seed=$seed].serialized")(data)
-
-        example.tearDownAction()
       }
     }
   }

@@ -27,19 +27,35 @@ class Counter{
   }
 }
 
-import FuzzingExample.emptyAction
 
-case class FuzzingExample(outputTypes: IS[EType],
-                          sizeF: PartialFunction[IS[EValue], Int],
-                          sizeOfInterest: Int = 500,
-                          resourceUsage: PartialFunction[IS[EValue], Double],
-                          gpEnv: GPEnvironment,
-                          displayValue: IS[EValue] => String = _.toString,
-                          setUpAction: () => Unit = emptyAction,
-                          tearDownAction: () => Unit = emptyAction
+trait FuzzingTaskProvider{
+  protected def task: FuzzingTask
+
+  def setupTask(task: FuzzingTask): Unit = {}
+
+  def teardownTask(task: FuzzingTask): Unit = {}
+
+  def run[A](f: FuzzingTask => A): A = {
+    val task = this.task
+    try{
+      setupTask(task)
+      f(task)
+    }finally{
+      teardownTask(task)
+    }
+  }
+}
+
+case class FuzzingTask(outputTypes: IS[EType],
+                       sizeF: PartialFunction[IS[EValue], Int],
+                       sizeOfInterest: Int = 500,
+                       resourceUsage: PartialFunction[IS[EValue], Double],
+                       gpEnv: GPEnvironment,
+                       displayValue: IS[EValue] => String = _.toString
                          )
 
-object FuzzingExample{
+//noinspection TypeAnnotation
+object FuzzingTaskProvider{
 
   def emptyAction(): Unit = ()
 
@@ -67,8 +83,8 @@ object FuzzingExample{
     GPEnvironment(constMap, functions, stateTypes)
   }
 
-  def insertionSortExample: FuzzingExample = {
-    FuzzingExample(
+  def insertionSortExample = new FuzzingTaskProvider {
+    protected def task: FuzzingTask = FuzzingTask(
       outputTypes = IS(EVect(EInt)),
       sizeF = {
         case IS(VectValue(v)) =>
@@ -84,13 +100,13 @@ object FuzzingExample{
     )
   }
 
-  def quickSortExample: FuzzingExample = {
+  def quickSortExample = new FuzzingTaskProvider {
     def choosePivot(xs: IS[Int]): Int = {
       xs(xs.length/2) // choose middle
       //      xs(xs.length/3) // 1/3
     }
 
-    FuzzingExample(
+    protected def task: FuzzingTask = FuzzingTask(
       outputTypes = IS(EVect(EInt)),
       sizeF = {
         case IS(VectValue(v)) =>
@@ -106,8 +122,8 @@ object FuzzingExample{
     )
   }
 
-  def randomQuickSortExample(seed: Int): FuzzingExample = {
-    FuzzingExample(
+  def randomQuickSortExample(seed: Int) = new FuzzingTaskProvider {
+    protected def task: FuzzingTask = FuzzingTask(
       outputTypes = IS(EVect(EInt)),
       sizeF = {
         case IS(VectValue(v)) =>
@@ -124,8 +140,8 @@ object FuzzingExample{
     )
   }
 
-  def listSearchExample: FuzzingExample = {
-    FuzzingExample(
+  def listSearchExample = new FuzzingTaskProvider {
+    protected def task: FuzzingTask = FuzzingTask(
       outputTypes = IS(EVect(EInt), EInt),
       sizeF = {
         case IS(VectValue(v), IntValue(_)) => v.length
@@ -163,25 +179,8 @@ object FuzzingExample{
     GPEnvironment(constMap, functions, stateTypes)
   }
 
-  def phpHashTableExample(timeout: TimeMeasurement.DoubleAsMillis): FuzzingExample = {
-    val example = TimeMeasureExamples.phpHashExampleNoFile
-    FuzzingExample(
-      outputTypes = IS(EVect(EVect(EInt))),
-      sizeF = {
-        case IS(VectValue(strings)) =>
-          strings.map(s => s.asInstanceOf[VectValue].value.length).sum
-      },
-      resourceUsage = {
-        case IS(VectValue(vec)) =>
-          val strings = vec.map(v => vectIntToString(v.asInstanceOf[VectValue]))
-          example.measure(strings, timeout)
-      },
-      gpEnv = phpHashEnv
-    )
-  }
-
-  def phpHashCollision: FuzzingExample = {
-    FuzzingExample(
+  def phpHashCollision = new FuzzingTaskProvider {
+    protected def task: FuzzingTask = FuzzingTask(
       outputTypes = IS(EVect(EVect(EInt))),
       sizeF = {
         case IS(VectValue(strings)) =>
@@ -229,26 +228,29 @@ object FuzzingExample{
   }
 
   import regex._
-  def regexExample(regex: String, regexDic: Int => String): FuzzingExample = {
+  def regexExample(regex: String, regexDic: Int => String) = new FuzzingTaskProvider {
     val pattern = Pattern.compile(regex)
-    FuzzingExample(
-      outputTypes = IS(EVect(EInt)),
-      sizeF = {
-        case IS(VectValue(chars)) => chars.length
-      },
-      sizeOfInterest = 200,
-      resourceUsage = {
-        case IS(VectValue(chars)) =>
-          val counter = new Counter()
-          val s = chars.asInstanceOf[Vector[IntValue]].flatMap(i => regexDic(i.value))
-          pattern.matcher(counter, s).find()
-          counter.read()
-      },
-      gpEnv = abcRegexEnv,
-      displayValue = { case IS(VectValue(vs)) =>
-        vs.map(intValueAsChar).mkString("")
-      }
-    )
+
+    protected def task: FuzzingTask = {
+      FuzzingTask(
+        outputTypes = IS(EVect(EInt)),
+        sizeF = {
+          case IS(VectValue(chars)) => chars.length
+        },
+        sizeOfInterest = 200,
+        resourceUsage = {
+          case IS(VectValue(chars)) =>
+            val counter = new Counter()
+            val s = chars.asInstanceOf[Vector[IntValue]].flatMap(i => regexDic(i.value))
+            pattern.matcher(counter, s).find()
+            counter.read()
+        },
+        gpEnv = abcRegexEnv,
+        displayValue = { case IS(VectValue(vs)) =>
+          vs.map(intValueAsChar).mkString("")
+        }
+      )
+    }
   }
 
   def ccs_hashFunc(ls: Seq[Char]) = {
@@ -260,26 +262,28 @@ object FuzzingExample{
     hash
   }
 
-  def gabFeed2_hashCollisionExample: FuzzingExample = {
-    FuzzingExample(
-      outputTypes = IS(EVect(EVect(EInt))),
-      sizeF = {
-        case IS(VectValue(strings)) =>
-          strings.map(s => s.asInstanceOf[VectValue].value.length).sum
-      },
-      resourceUsage = {
-        case IS(VectValue(strings)) =>
-        import gabfeed2.hashmap._
-        val map = new HashMap[String, Int]();
-        strings.foreach{
-          case VectValue(chars) =>
-            val string = chars.map{ case IntValue(i) => toLowercase(i)}.mkString("")
-            map.put(string, 0)
-        }
-        map.resizeNum.toDouble
-      },
-      gpEnv = phpHashEnv
-    )
+  def gabFeed2_hashCollisionExample = new FuzzingTaskProvider {
+    protected def task: FuzzingTask = {
+      FuzzingTask(
+        outputTypes = IS(EVect(EVect(EInt))),
+        sizeF = {
+          case IS(VectValue(strings)) =>
+            strings.map(s => s.asInstanceOf[VectValue].value.length).sum
+        },
+        resourceUsage = {
+          case IS(VectValue(strings)) =>
+            import gabfeed2.hashmap._
+            val map = new HashMap[String, Int]();
+            strings.foreach{
+              case VectValue(chars) =>
+                val string = chars.map{ case IntValue(i) => toLowercase(i)}.mkString("")
+                map.put(string, 0)
+            }
+            map.resizeNum.toDouble
+        },
+        gpEnv = phpHashEnv
+      )
+    }
   }
 
   def intVectorToGraph(graphId: Int, refs: Vector[Int]): String = {
@@ -295,96 +299,101 @@ object FuzzingExample{
      """.stripMargin
   }
 
-  def graphAnalyzerExample(workingDir: String): FuzzingExample = {
-    import java.io.FileWriter
+  def graphAnalyzerExample(workingDir: String) = new FuzzingTaskProvider {
+    protected def task: FuzzingTask = {
+      import java.io.FileWriter
 
-    import user.commands.CommandProcessor
-    import edu.utexas.stac.Cost
+      import user.commands.CommandProcessor
+      import edu.utexas.stac.Cost
 
-    FuzzingExample(
-      outputTypes = IS(EVect(EVect(EInt))),
-      sizeF = {
-        case IS(VectValue(graphs)) =>
-          graphs.map(g => g.asInstanceOf[VectValue].value.length+1).sum
-      },
-      sizeOfInterest = 12,
-      resourceUsage = {
-        case IS(VectValue(graphs)) =>
+      FuzzingTask(
+        outputTypes = IS(EVect(EVect(EInt))),
+        sizeF = {
+          case IS(VectValue(graphs)) =>
+            graphs.map(g => g.asInstanceOf[VectValue].value.length+1).sum
+        },
+        sizeOfInterest = 12,
+        resourceUsage = {
+          case IS(VectValue(graphs)) =>
 
-          val fileContent = graphs.zipWithIndex.map{
-            case (graphVec, i) =>
-              val vec = graphVec.asInstanceOf[VectValue].value.map{e => e.asInstanceOf[IntValue].value}
-              FuzzingExample.intVectorToGraph(i, vec)
-          }.mkString("\n")
+            val fileContent = graphs.zipWithIndex.map{
+              case (graphVec, i) =>
+                val vec = graphVec.asInstanceOf[VectValue].value.map{e => e.asInstanceOf[IntValue].value}
+                intVectorToGraph(i, vec)
+            }.mkString("\n")
 
-          val fw = new FileWriter(s"$workingDir/genGraph.dot")
-          fw.write(fileContent)
-          fw.close()
+            val fw = new FileWriter(s"$workingDir/genGraph.dot")
+            fw.write(fileContent)
+            fw.close()
 
-          Cost.write(0L)
+            Cost.write(0L)
 
-          val timeLimit = 10*1000
-          try {
-            import scala.concurrent._
-            import scala.concurrent.duration._
-            import scala.concurrent.ExecutionContext.Implicits.global
+            val timeLimit = 10*1000
+            try {
+              import scala.concurrent._
+              import scala.concurrent.duration._
+              import scala.concurrent.ExecutionContext.Implicits.global
 
-            Await.result(Future(
-              CommandProcessor.main(s"dot $workingDir/genGraph.dot xy diagram png output-files/PNG_output.png".split(" "))
-            ), timeLimit.milliseconds)
+              Await.result(Future(
+                CommandProcessor.main(s"dot $workingDir/genGraph.dot xy diagram png output-files/PNG_output.png".split(" "))
+              ), timeLimit.milliseconds)
 
-            Cost.read().toDouble
-          } catch {
-            case _: NullPointerException =>
               Cost.read().toDouble
-            case _: TimeoutException =>
-              println("Timed out!")
-              System.exit(1)
-              throw new Exception("Timed out!")
-          }
-      },
-      gpEnv = phpHashEnv
-    )
+            } catch {
+              case _: NullPointerException =>
+                Cost.read().toDouble
+              case _: TimeoutException =>
+                println("Timed out!")
+                System.exit(1)
+                throw new Exception("Timed out!")
+            }
+        },
+        gpEnv = phpHashEnv
+      )
+    }
   }
 
 
   /** Http request example */
-  def bloggerExample: FuzzingExample = {
+  def bloggerExample = new FuzzingTaskProvider {
     import sys.process._
     import fi.iki.elonen.JavaWebServer
-
     val server = new JavaWebServer(8080)
 
-    FuzzingExample(
-      outputTypes = IS(EVect(EInt)),
-      sizeF = {
-        case IS(VectValue(chars)) =>
-          chars.length
-      },
-      sizeOfInterest = 100,
-      resourceUsage = {
-        case IS(vec :VectValue) =>
-          val s = vectIntToString(vec)
-          Cost.reset()
-          try{
-            s"curl -i http://localhost:8080/$s" !
-          } catch {
-            case _: java.io.IOException =>
-          }
-          Cost.read().toDouble
-      },
-      gpEnv = sortingEnv,
-      displayValue = {
-        case IS(vec:VectValue)=>
-          vectIntToString(vec)
-      },
-      setUpAction = () => {
-        new Thread(() => server.start()).start()
-      },
-      tearDownAction = () => {
-        server.stop()
-      }
-    )
+    override def setupTask(task: FuzzingTask): Unit = {
+      new Thread(() => server.start()).start()
+    }
+
+    override def teardownTask(task: FuzzingTask): Unit = {
+      server.stop()
+    }
+
+    protected def task: FuzzingTask = {
+      FuzzingTask(
+        outputTypes = IS(EVect(EInt)),
+        sizeF = {
+          case IS(VectValue(chars)) =>
+            chars.length
+        },
+        sizeOfInterest = 100,
+        resourceUsage = {
+          case IS(vec :VectValue) =>
+            val s = vectIntToString(vec)
+            Cost.reset()
+            try{
+              s"curl -i http://localhost:8080/$s" !
+            } catch {
+              case _: java.io.IOException =>
+            }
+            Cost.read().toDouble
+        },
+        gpEnv = sortingEnv,
+        displayValue = {
+          case IS(vec:VectValue)=>
+            vectIntToString(vec)
+        }
+      )
+    }
   }
 
   def imageEnv: GPEnvironment = {
@@ -399,58 +408,53 @@ object FuzzingExample{
     GPEnvironment(constMap, functions, stateTypes)
   }
 
-  def imageExample(imageWidth: Int, imageHeight: Int, workingDir: String): FuzzingExample = {
+  def imageExample(imageWidth: Int, imageHeight: Int, workingDir: String) = new FuzzingTaskProvider {
     import java.awt.image.BufferedImage
     import java.io.File
     import javax.imageio.ImageIO
     import sys.process._
 
-    var bestPerformanceSoFar = Double.MinValue
+    protected def task: FuzzingTask = {
+      var bestPerformanceSoFar = Double.MinValue
 
-    val imageDataSize = imageWidth * imageHeight
-    FuzzingExample(
-      outputTypes = IS(EVect(EInt)),
-      sizeF = {
-        case IS(VectValue(data)) => data.length
-      },
-      sizeOfInterest = imageDataSize,
-      resourceUsage = {
-        case IS(VectValue(data)) =>
-          if(data.isEmpty) 0.0
-          else {
-            val dataSize = data.length
-            val content = (0 until imageDataSize).flatMap { i =>
-              val intValue = data(SimpleMath.wrapInRange(i, dataSize)).asInstanceOf[IntValue].value
-              IS((intValue >> 24) & 255, intValue & 255, (intValue >> 8) & 255, (intValue >> 16) & 255)
-            }
-            val image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB)
-            image.getRaster.setPixels(0, 0, imageWidth, imageHeight, content.toArray)
-            val imagePath = s"$workingDir/genImage.png"
-            val file = new File(imagePath)
-            ImageIO.write(image, "png", file)
+      val imageDataSize = imageWidth * imageHeight
+      FuzzingTask(
+        outputTypes = IS(EVect(EInt)),
+        sizeF = {
+          case IS(VectValue(data)) => data.length
+        },
+        sizeOfInterest = imageDataSize,
+        resourceUsage = {
+          case IS(VectValue(data)) =>
+            if(data.isEmpty) 0.0
+            else {
+              val dataSize = data.length
+              val content = (0 until imageDataSize).flatMap { i =>
+                val intValue = data(SimpleMath.wrapInRange(i, dataSize)).asInstanceOf[IntValue].value
+                IS((intValue >> 24) & 255, intValue & 255, (intValue >> 8) & 255, (intValue >> 16) & 255)
+              }
+              val image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB)
+              image.getRaster.setPixels(0, 0, imageWidth, imageHeight, content.toArray)
+              val imagePath = s"$workingDir/genImage.png"
+              val file = new File(imagePath)
+              ImageIO.write(image, "png", file)
 
-            //          Cost.reset()
-            //          try{
-            //            stac.Main.main(Array("cluster", imagePath))
-            //          }
-            //          Cost.read().toDouble
-            try {
               val jarPath = "benchmarks/image_processor/challenge_program/ipchallenge-ins.jar"
               val results = Seq("java", "-Xint", "-jar", s"$jarPath", "cluster", imagePath).lineStream
               println("last result: " + results.last)
               val Array(first, costS) = results.last.split("\\s+")
               assert(first == "[COST]")
               val performance = costS.toInt.toDouble
-              if(performance>bestPerformanceSoFar){
+              if (performance > bestPerformanceSoFar) {
                 ImageIO.write(image, "png", new File(s"$workingDir/bestImageSoFar.png"))
                 bestPerformanceSoFar = performance
               }
               performance
             }
-          }
-      },
-      gpEnv = imageEnv
-    )
+        },
+        gpEnv = imageEnv
+      )
+    }
   }
 }
 
