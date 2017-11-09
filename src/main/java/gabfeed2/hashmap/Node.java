@@ -1,8 +1,8 @@
 package gabfeed2.hashmap;
 
 
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 public class Node<K, V> implements Entry<K, V> {
     int hash;

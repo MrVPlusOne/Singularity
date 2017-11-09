@@ -1,12 +1,7 @@
 package gabfeed2.hashmap;
 
 
-import java.util.AbstractMap;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 
 public class HashMap<K, V> extends AbstractMap<K, V> {

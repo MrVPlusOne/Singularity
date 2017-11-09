@@ -3,7 +3,6 @@ package patsyn
 import java.io._
 
 import patsyn.EvolutionRepresentation.IndividualData
-import patsyn.StandardSystem.EInt
 
 class FileLogger(fileName: String, printToConsole: Boolean, writer: FileWriter) {
 

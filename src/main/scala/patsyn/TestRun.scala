@@ -3,9 +3,8 @@ package patsyn
 
 import java.awt.Dimension
 
-import StandardSystem._
 import measure.TimeTools
-import patsyn.EvolutionRepresentation.{IndividualData, Population}
+import patsyn.EvolutionRepresentation.IndividualData
 
 object TestRun {
 
@@ -13,6 +12,7 @@ object TestRun {
 
   def createMonitor(populationSize: Int): MonitorManager = {
     import javax.swing._
+
     import gui._
 
     val frame = new JFrame("GP Monitor") {

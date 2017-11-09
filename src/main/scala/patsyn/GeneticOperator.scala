@@ -1,6 +1,6 @@
 package patsyn
 
-import GeneticOperator._
+import patsyn.GeneticOperator._
 
 import scala.util.Random
 

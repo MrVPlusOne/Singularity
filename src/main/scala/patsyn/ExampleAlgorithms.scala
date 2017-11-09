@@ -2,14 +2,12 @@ package patsyn
 
 import java.awt.image.BufferedImage
 
-import measure.{TimeMeasureExamples, TimeMeasurement, TimeTools}
+import edu.utexas.stac.Cost
 import patsyn.GeneticOperator.ExprGen
-import patsyn.StandardSystem.{EInt, EVect, IntComponents, IntValue, VectComponents, VectValue}
-import StandardSystem._
+import patsyn.StandardSystem.{EInt, EVect, IntComponents, IntValue, VectComponents, VectValue, _}
 
 import scala.concurrent.TimeoutException
 import scala.util.Random
-import edu.utexas.stac.Cost
 
 
 class Counter{
@@ -335,8 +333,8 @@ object FuzzingTaskProvider{
     protected def task: RunningFuzzingTask = {
       import java.io.FileWriter
 
-      import user.commands.CommandProcessor
       import edu.utexas.stac.Cost
+      import user.commands.CommandProcessor
 
       RunningFuzzingTask(
         outputTypes = IS(EVect(EVect(EInt))),
@@ -358,9 +356,9 @@ object FuzzingTaskProvider{
 
             val timeLimit = 10*1000
             try {
+              import scala.concurrent.ExecutionContext.Implicits.global
               import scala.concurrent._
               import scala.concurrent.duration._
-              import scala.concurrent.ExecutionContext.Implicits.global
 
               Await.result(Future(
                 CommandProcessor.main(s"dot $workingDir/genGraph.dot xy diagram png output-files/PNG_output.png".split(" "))
@@ -384,8 +382,9 @@ object FuzzingTaskProvider{
 
   /** Http request example */
   def bloggerExample = new FuzzingTaskProvider {
-    import sys.process._
     import fi.iki.elonen.JavaWebServer
+
+    import sys.process._
     val server = new JavaWebServer(8080)
 
     override def setupTask(task: RunningFuzzingTask): Unit = {
@@ -455,6 +454,7 @@ object FuzzingTaskProvider{
   def imageExample(imageWidth: Int, imageHeight: Int, workingDir: String) = new FuzzingTaskProvider {
     import java.io.File
     import javax.imageio.ImageIO
+
     import sys.process._
 
     def sizeF = {

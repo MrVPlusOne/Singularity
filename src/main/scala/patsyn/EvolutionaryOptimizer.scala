@@ -22,9 +22,9 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
 
     var progress = 0
     def evaluation(individual: Individual): IndividualEvaluation = {
+      import scala.concurrent.ExecutionContext.Implicits.global
       import scala.concurrent._
       import scala.concurrent.duration._
-      import scala.concurrent.ExecutionContext.Implicits.global
       try {
         Await.result(Future{
           val result = indEval(individual)

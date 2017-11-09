@@ -1,6 +1,5 @@
 package cli
 
-import patsyn.EvolutionRepresentation.IndividualData
 import patsyn._
 
 object BenchmarkDriver {
@@ -61,14 +60,14 @@ object BenchmarkDriver {
       note("\nBenchmark target list:\n" + benchmarks.keys.map(s => "  " + s).mkString("\n") + "\n")
     }
 
-    parser.parse(args, CliOption()) match {
-      case Some(cliOption) =>
+    parser.parse(args, CliOption()).foreach {
+      cliOption =>
         val taskProvider = benchmarks.getOrElse(cliOption.target,
           throw new IllegalArgumentException("Cannot find benchmark named " + cliOption.target))(cliOption)
-        cliOption.extrapolatePattern match{
+        cliOption.extrapolatePattern match {
           case None =>
             val benchs = getBenchmarks(cliOption.target, cliOption)
-            benchs.foreach{ case (name, bench) =>
+            benchs.foreach { case (name, bench) =>
               println(s"*** Task $name started ***")
               try {
                 TestRun.runExample(bench, Seq(cliOption.seed), !cliOption.disableGui)
@@ -85,9 +84,6 @@ object BenchmarkDriver {
             val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
             saveExtrapolation(taskProvider, ind, extraArg.size, extraArg.outputName)
         }
-
-      case None =>
-        parser.showUsageAsError()
     }
   }
 

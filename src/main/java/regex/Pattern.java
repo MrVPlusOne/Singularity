@@ -12,18 +12,7 @@ package regex;
 import patsyn.Counter;
 
 import java.text.Normalizer;
-import java.util.Locale;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.*;
 
 
 @SuppressWarnings("WeakerAccess")

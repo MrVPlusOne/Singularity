@@ -1,0 +1,496 @@
+
+------------
+[0.010s]Generation 1
+Best Result: (fitness: 205815.9, performance: 227950.0), Created by Init
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 9 ; iter: 11; seedExpr: inc(8) }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, plus(plus(#0, #3), shiftBL(#0))); seedExpr: [] }
+[S2: EInt]{ seed: -1 ; iter: #3; seedExpr: dec(divide(1, 6)) }
+[S3: EInt]{ seed: 10 ; iter: modular(4, times(access([], #2, #0), plus(#2, #3))); seedExpr: inc(9) }
+Best Individual Pattern: Vector([]), Vector([2323]), Vector([2323,2831]), Vector([2323,2831,2831]), Vector([2323,2831,2831,2831]), Vector([2323,2831,2831,2831,2831]), Vector([2323,2831,2831,2831,2831,2831]), ...
+Diversity: 1000
+Average Size: 29.43
+Average Fitness: 6484.051328074706
+Fitness Variation: 17775.823234451276
+Distribution: [] -> 0.148, #1 -> 0.064, #2 -> 0.063, #3 -> 0.062, #0 -> 0.061, concat -> 0.035, prepend -> 0.035, append -> 0.034, 7 -> 0.024, 9 -> 0.024
+------------
+[396.899s]Generation 2
+Best Result: (fitness: 1135456.8, performance: 1277835.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #2; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: prepend(#2, append(#1, times(#3, #0))); seedExpr: [] }
+[S2: EInt]{ seed: -5 ; iter: dec(#3); seedExpr: plus(divide(5, 6), neg(5)) }
+[S3: EInt]{ seed: -5 ; iter: 6; seedExpr: modular(minus(6, plus(9, 2)), plus(7, times(0, 10))) }
+Best Individual Pattern: Vector([]), Vector([-5,-25]), Vector([-6,-5,-25,-30]), Vector([5,-6,-5,-25,-30,-36]), Vector([5,5,-6,-5,-25,-30,-36,30]), Vector([5,5,5,-6,-5,-25,-30,-36,30,30]), Vector([5,5,5,5,-6,-5,-25,-30,-36,30,30,30]), ...
+Diversity: 942
+Average Size: 36.183
+Average Fitness: 29921.91738379247
+Fitness Variation: 47593.40991501747
+Distribution: [] -> 0.134, #1 -> 0.078, #2 -> 0.062, #0 -> 0.060, #3 -> 0.058, concat -> 0.039, prepend -> 0.039, append -> 0.038, 5 -> 0.027, 4 -> 0.025
+------------
+[994.563s]Generation 3
+Best Result: (fitness: 1158403.4, performance: 1286610.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #2; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: prepend(#2, append(#1, times(#3, #0))); seedExpr: [] }
+[S2: EInt]{ seed: 10 ; iter: dec(#3); seedExpr: plus(divide(5, 6), 10) }
+[S3: EInt]{ seed: -5 ; iter: 6; seedExpr: modular(minus(6, plus(9, 2)), plus(7, times(0, 10))) }
+Best Individual Pattern: Vector([]), Vector([10,-25]), Vector([-6,10,-25,60]), Vector([5,-6,10,-25,60,-36]), Vector([5,5,-6,10,-25,60,-36,30]), Vector([5,5,5,-6,10,-25,60,-36,30,30]), Vector([5,5,5,5,-6,10,-25,60,-36,30,30,30]), ...
+Diversity: 913
+Average Size: 29.991
+Average Fitness: 70427.98819140568
+Fitness Variation: 93616.214912725
+Distribution: #1 -> 0.106, [] -> 0.103, #2 -> 0.074, #0 -> 0.071, #3 -> 0.066, concat -> 0.036, prepend -> 0.036, append -> 0.034, plus -> 0.027, 9 -> 0.026
+------------
+[1701.627s]Generation 4
+Best Result: (fitness: 1251389.5, performance: 1295039.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #2; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: prepend(#2, append(#1, times(#3, #0))); seedExpr: [] }
+[S2: EInt]{ seed: -5 ; iter: dec(#3); seedExpr: plus(divide(5, 6), neg(5)) }
+[S3: EInt]{ seed: 1 ; iter: 6; seedExpr: inc(length([])) }
+Best Individual Pattern: Vector([]), Vector([-5,5]), Vector([0,-5,5,-30]), Vector([5,0,-5,5,-30,0]), Vector([5,5,0,-5,5,-30,0,30]), Vector([5,5,5,0,-5,5,-30,0,30,30]), Vector([5,5,5,5,0,-5,5,-30,0,30,30,30]), ...
+Diversity: 903
+Average Size: 29.051
+Average Fitness: 149587.38741182626
+Fitness Variation: 197409.96649562244
+Distribution: #0 -> 0.096, #3 -> 0.083, [] -> 0.082, #1 -> 0.082, #2 -> 0.075, plus -> 0.050, 9 -> 0.040, 6 -> 0.030, append -> 0.030, shiftBL -> 0.028
+------------
+[2730.649s]Generation 5
+Best Result: (fitness: 2650102.1, performance: 2692456.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 9 ; iter: 6; seedExpr: 9 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, #2); seedExpr: [] }
+[S2: EInt]{ seed: 3 ; iter: times(3, inc(#3)); seedExpr: modular(divide(shiftBL(9), 3), 9) }
+[S3: EInt]{ seed: 9 ; iter: #3; seedExpr: 9 }
+Best Individual Pattern: Vector([]), Vector([3]), Vector([3,30]), Vector([3,30,30]), Vector([3,30,30,30]), Vector([3,30,30,30,30]), Vector([3,30,30,30,30,30]), ...
+Diversity: 916
+Average Size: 28.971
+Average Fitness: 354127.87206265144
+Fitness Variation: 419271.35964471835
+Distribution: #0 -> 0.102, #3 -> 0.084, plus -> 0.074, #2 -> 0.061, [] -> 0.058, 9 -> 0.056, #1 -> 0.055, 6 -> 0.046, times -> 0.041, 5 -> 0.033
+------------
+[4390.539s]Generation 6
+Best Result: (fitness: 2650102.1, performance: 2692456.0), Created by Copy
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 9 ; iter: 6; seedExpr: 9 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, #2); seedExpr: [] }
+[S2: EInt]{ seed: 3 ; iter: times(3, inc(#3)); seedExpr: modular(divide(shiftBL(9), 3), 9) }
+[S3: EInt]{ seed: 9 ; iter: #3; seedExpr: 9 }
+Best Individual Pattern: Vector([]), Vector([3]), Vector([3,30]), Vector([3,30,30]), Vector([3,30,30,30]), Vector([3,30,30,30,30]), Vector([3,30,30,30,30,30]), ...
+Diversity: 926
+Average Size: 30.225
+Average Fitness: 748333.4968410741
+Fitness Variation: 582821.0484416458
+Distribution: #3 -> 0.082, plus -> 0.075, #0 -> 0.066, 6 -> 0.065, times -> 0.061, 5 -> 0.056, #1 -> 0.052, 9 -> 0.051, #2 -> 0.049, 10 -> 0.043
+------------
+[6326.745s]Generation 7
+Best Result: (fitness: 2658369.7, performance: 2692429.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #2; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 10 ; iter: dec(#3); seedExpr: plus(divide(5, 6), 10) }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,60]), Vector([30,60,30]), Vector([30,60,30,30]), Vector([30,60,30,30,30]), Vector([30,60,30,30,30,30]), ...
+Diversity: 917
+Average Size: 27.738
+Average Fitness: 1023543.0672862113
+Fitness Variation: 755997.676175903
+Distribution: #3 -> 0.102, #0 -> 0.076, plus -> 0.072, 6 -> 0.065, #1 -> 0.061, times -> 0.060, 5 -> 0.059, #2 -> 0.053, [] -> 0.041, 9 -> 0.040
+------------
+[8648.795s]Generation 8
+Best Result: (fitness: 2680247.0, performance: 2692483.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 9 ; iter: 6; seedExpr: 9 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, #2); seedExpr: [] }
+[S2: EInt]{ seed: 5 ; iter: times(3, inc(#3)); seedExpr: 5 }
+[S3: EInt]{ seed: 9 ; iter: #3; seedExpr: 9 }
+Best Individual Pattern: Vector([]), Vector([5]), Vector([5,30]), Vector([5,30,30]), Vector([5,30,30,30]), Vector([5,30,30,30,30]), Vector([5,30,30,30,30,30]), ...
+Diversity: 913
+Average Size: 26.93
+Average Fitness: 1382297.7857217721
+Fitness Variation: 1007197.091905992
+Distribution: #3 -> 0.129, #0 -> 0.104, plus -> 0.081, #1 -> 0.062, [] -> 0.054, #2 -> 0.054, 6 -> 0.051, 9 -> 0.044, times -> 0.041, 5 -> 0.039
+------------
+[11251.492s]Generation 9
+Best Result: (fitness: 2680356.0, performance: 2693293.0), Created by Crossover
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #2; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: dec(#3); seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,36]), Vector([30,36,30]), Vector([30,36,30,30]), Vector([30,36,30,30,30]), Vector([30,36,30,30,30,30]), ...
+Diversity: 914
+Average Size: 24.131
+Average Fitness: 1627516.7658854155
+Fitness Variation: 1144006.3430495872
+Distribution: #3 -> 0.123, #0 -> 0.090, plus -> 0.074, 9 -> 0.064, #1 -> 0.060, [] -> 0.055, 6 -> 0.055, #2 -> 0.041, inc -> 0.038, times -> 0.037
+------------
+[13726.533s]Generation 10
+Best Result: (fitness: 2690523.3, performance: 2719186.0), Created by Crossover
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 9 ; iter: 6; seedExpr: 9 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(3, inc(#3))); seedExpr: [] }
+[S2: EInt]{ seed: 3 ; iter: times(3, inc(#3)); seedExpr: 3 }
+[S3: EInt]{ seed: 9 ; iter: #3; seedExpr: 9 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 896
+Average Size: 20.338
+Average Fitness: 1630995.6880742684
+Fitness Variation: 1219621.638818147
+Distribution: #3 -> 0.123, 9 -> 0.080, #1 -> 0.077, #0 -> 0.062, [] -> 0.058, 3 -> 0.058, 6 -> 0.057, inc -> 0.048, plus -> 0.045, #2 -> 0.043
+------------
+[15586.168s]Generation 11
+Best Result: (fitness: 2690523.3, performance: 2719186.0), Created by Crossover
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 9 ; iter: 6; seedExpr: 9 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(3, inc(#3))); seedExpr: [] }
+[S2: EInt]{ seed: 3 ; iter: times(3, inc(#3)); seedExpr: 3 }
+[S3: EInt]{ seed: 9 ; iter: #3; seedExpr: 9 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 834
+Average Size: 17.885
+Average Fitness: 1498015.3697230555
+Fitness Variation: 1272137.0832991553
+Distribution: #3 -> 0.144, #1 -> 0.100, 9 -> 0.094, 3 -> 0.086, inc -> 0.064, #2 -> 0.064, [] -> 0.061, 6 -> 0.049, times -> 0.038, append -> 0.037
+------------
+[17231.826s]Generation 12
+Best Result: (fitness: 2700911.6, performance: 2719186.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 9 ; iter: 6; seedExpr: 9 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(3, inc(#3))); seedExpr: [] }
+[S2: EInt]{ seed: 3 ; iter: neg(#2); seedExpr: 3 }
+[S3: EInt]{ seed: 9 ; iter: 9; seedExpr: 9 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 780
+Average Size: 16.321
+Average Fitness: 1487315.1556318188
+Fitness Variation: 1285458.9103741765
+Distribution: #3 -> 0.173, #1 -> 0.115, 9 -> 0.088, 3 -> 0.080, #2 -> 0.076, inc -> 0.076, [] -> 0.065, 6 -> 0.043, append -> 0.041, times -> 0.040
+------------
+[18857.893s]Generation 13
+Best Result: (fitness: 2702428.3, performance: 2719186.0), Created by Crossover
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: dec(#3); seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: dec(#3); seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 770
+Average Size: 15.829
+Average Fitness: 1475343.8822052015
+Fitness Variation: 1288006.9908388497
+Distribution: #3 -> 0.191, #1 -> 0.120, 9 -> 0.082, inc -> 0.080, 3 -> 0.076, #2 -> 0.071, [] -> 0.065, times -> 0.046, append -> 0.041, 6 -> 0.040
+------------
+[20585.148s]Generation 14
+Best Result: (fitness: 2704605.9, performance: 2719186.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 11 ; iter: 6; seedExpr: 11 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(3, inc(#3))); seedExpr: [] }
+[S2: EInt]{ seed: 9 ; iter: #2; seedExpr: 9 }
+[S3: EInt]{ seed: 9 ; iter: #3; seedExpr: 9 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 765
+Average Size: 16.354
+Average Fitness: 1535107.1753508924
+Fitness Variation: 1280533.3881713033
+Distribution: #3 -> 0.237, #1 -> 0.106, inc -> 0.090, 3 -> 0.085, 9 -> 0.078, [] -> 0.055, times -> 0.053, #2 -> 0.043, plus -> 0.039, append -> 0.038
+------------
+[22628.536s]Generation 15
+Best Result: (fitness: 2706124.6, performance: 2719186.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: dec(#3); seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 812
+Average Size: 17.034
+Average Fitness: 1628452.9769464685
+Fitness Variation: 1265732.3953098494
+Distribution: #3 -> 0.255, 3 -> 0.101, #1 -> 0.101, inc -> 0.101, 9 -> 0.076, times -> 0.058, [] -> 0.049, plus -> 0.045, append -> 0.036, #0 -> 0.028
+------------
+[24838.609s]Generation 16
+Best Result: (fitness: 2706124.6, performance: 2719186.0), Created by Crossover
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: dec(#3); seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 806
+Average Size: 16.609
+Average Fitness: 1787097.3523477262
+Fitness Variation: 1224727.8848298544
+Distribution: #3 -> 0.244, 3 -> 0.118, #1 -> 0.104, inc -> 0.099, 9 -> 0.079, times -> 0.064, [] -> 0.052, append -> 0.037, plus -> 0.036, #2 -> 0.023
+------------
+[26721.988s]Generation 17
+Best Result: (fitness: 2706124.6, performance: 2719186.0), Created by Copy
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: dec(#3); seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 828
+Average Size: 15.521
+Average Fitness: 1620740.4831175173
+Fitness Variation: 1276385.5230600554
+Distribution: #3 -> 0.203, 3 -> 0.132, #1 -> 0.111, inc -> 0.096, 9 -> 0.087, times -> 0.071, [] -> 0.058, append -> 0.042, #2 -> 0.028, 6 -> 0.027
+------------
+[28419.977s]Generation 18
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Crossover
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: #0; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 784
+Average Size: 14.979
+Average Fitness: 1543869.7110054775
+Fitness Variation: 1296570.5529516346
+Distribution: #3 -> 0.186, 3 -> 0.134, #1 -> 0.119, inc -> 0.096, 9 -> 0.086, times -> 0.073, [] -> 0.061, append -> 0.043, 6 -> 0.037, #0 -> 0.033
+------------
+[30362.324s]Generation 19
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 794
+Average Size: 14.838
+Average Fitness: 1614996.3311648897
+Fitness Variation: 1281091.5333491045
+Distribution: #3 -> 0.175, #1 -> 0.122, 3 -> 0.117, inc -> 0.081, times -> 0.079, 9 -> 0.074, [] -> 0.060, #0 -> 0.056, 6 -> 0.053, append -> 0.044
+------------
+[32124.190s]Generation 20
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Crossover
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 776
+Average Size: 14.832
+Average Fitness: 1575483.9758652828
+Fitness Variation: 1291790.9181881573
+Distribution: #3 -> 0.162, #1 -> 0.124, #0 -> 0.099, 6 -> 0.085, times -> 0.077, 3 -> 0.072, [] -> 0.065, inc -> 0.051, 9 -> 0.049, append -> 0.046
+------------
+[33722.815s]Generation 21
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: 5; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 694
+Average Size: 14.624
+Average Fitness: 1550986.5303503529
+Fitness Variation: 1292060.4970940053
+Distribution: #3 -> 0.149, #0 -> 0.142, #1 -> 0.131, 6 -> 0.122, times -> 0.079, [] -> 0.069, append -> 0.048, 5 -> 0.045, 3 -> 0.034, dec -> 0.026
+------------
+[35050.441s]Generation 22
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Crossover
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(6, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 634
+Average Size: 14.162
+Average Fitness: 1617841.367117536
+Fitness Variation: 1282329.5176885661
+Distribution: #0 -> 0.178, 6 -> 0.140, #3 -> 0.140, #1 -> 0.137, times -> 0.086, [] -> 0.065, 5 -> 0.052, append -> 0.048, dec -> 0.019, #2 -> 0.019
+------------
+[36266.929s]Generation 23
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Crossover
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(6, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: 9; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 625
+Average Size: 13.952
+Average Fitness: 1551261.5951439436
+Fitness Variation: 1295209.9407675602
+Distribution: #0 -> 0.180, 6 -> 0.152, #1 -> 0.136, #3 -> 0.131, times -> 0.087, [] -> 0.071, 5 -> 0.054, append -> 0.048, #2 -> 0.019, 3 -> 0.010
+------------
+[37441.329s]Generation 24
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Copy
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: 5; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: #3; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 590
+Average Size: 13.823
+Average Fitness: 1638065.7534456174
+Fitness Variation: 1282070.1371280898
+Distribution: #0 -> 0.180, 6 -> 0.154, #1 -> 0.140, #3 -> 0.128, times -> 0.088, [] -> 0.068, 5 -> 0.060, append -> 0.049, #2 -> 0.023, 9 -> 0.009
+------------
+[38629.958s]Generation 25
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: 8; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 622
+Average Size: 13.883
+Average Fitness: 1582374.8025945602
+Fitness Variation: 1291400.4927920876
+Distribution: #0 -> 0.182, 6 -> 0.155, #1 -> 0.138, #3 -> 0.124, times -> 0.087, [] -> 0.069, 5 -> 0.060, append -> 0.050, #2 -> 0.026, 3 -> 0.008
+------------
+[39880.760s]Generation 26
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: #0; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 641
+Average Size: 13.864
+Average Fitness: 1620709.2049403589
+Fitness Variation: 1285537.6377739825
+Distribution: #0 -> 0.182, 6 -> 0.151, #1 -> 0.141, #3 -> 0.119, times -> 0.085, [] -> 0.074, 5 -> 0.060, append -> 0.049, #2 -> 0.022, 3 -> 0.009
+------------
+[41337.680s]Generation 27
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Copy
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 691
+Average Size: 14.043
+Average Fitness: 1555093.2295202352
+Fitness Variation: 1288866.517005872
+Distribution: #0 -> 0.173, 6 -> 0.146, #1 -> 0.137, #3 -> 0.124, times -> 0.086, [] -> 0.074, 5 -> 0.063, append -> 0.050, #2 -> 0.024, 3 -> 0.010
+------------
+[42654.051s]Generation 28
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Crossover
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(6, 5)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: #3; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 654
+Average Size: 13.83
+Average Fitness: 1634577.117269889
+Fitness Variation: 1282345.4230108936
+Distribution: #0 -> 0.174, 6 -> 0.153, #1 -> 0.140, #3 -> 0.121, times -> 0.087, 5 -> 0.069, [] -> 0.069, append -> 0.051, #2 -> 0.026, 3 -> 0.011
+------------
+[44131.863s]Generation 29
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Crossover
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: 5; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: #3; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 706
+Average Size: 13.918
+Average Fitness: 1594310.4833696499
+Fitness Variation: 1288448.7860261328
+Distribution: #0 -> 0.171, 6 -> 0.151, #1 -> 0.139, #3 -> 0.114, times -> 0.087, 5 -> 0.074, [] -> 0.071, append -> 0.051, #2 -> 0.028, 3 -> 0.009
+------------
+[45670.784s]Generation 30
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Copy
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: #0; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 744
+Average Size: 13.986
+Average Fitness: 1562406.658068685
+Fitness Variation: 1290611.7567789906
+Distribution: #0 -> 0.164, 6 -> 0.149, #1 -> 0.138, #3 -> 0.110, times -> 0.086, 5 -> 0.075, [] -> 0.070, append -> 0.048, #2 -> 0.029, 3 -> 0.012
+------------
+[47295.706s]Generation 31
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Crossover
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(#3, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 759
+Average Size: 13.996
+Average Fitness: 1612292.9228422411
+Fitness Variation: 1282966.2178196744
+Distribution: #0 -> 0.165, 6 -> 0.158, #1 -> 0.141, #3 -> 0.106, times -> 0.086, 5 -> 0.076, [] -> 0.070, append -> 0.050, #2 -> 0.028, 3 -> 0.008
+------------
+[48979.944s]Generation 32
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Crossover
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(6, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 5 ; iter: #3; seedExpr: 5 }
+[S3: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 750
+Average Size: 14.064
+Average Fitness: 1674678.6665334376
+Fitness Variation: 1271937.893298817
+Distribution: #0 -> 0.163, 6 -> 0.158, #1 -> 0.138, #3 -> 0.099, times -> 0.087, 5 -> 0.077, [] -> 0.074, append -> 0.050, #2 -> 0.029, 4 -> 0.009
+------------
+[50672.769s]Generation 33
+Best Result: (fitness: 2709118.7, performance: 2719186.0), Created by Mutate
+[O0: EVect(EInt)] -> #1
+*
+[S0: EInt]{ seed: 5 ; iter: #0; seedExpr: 5 }
+[S1: EVect(EInt)]{ seed: [] ; iter: append(#1, times(6, #0)); seedExpr: [] }
+[S2: EInt]{ seed: 6 ; iter: 6; seedExpr: 6 }
+[S3: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+Best Individual Pattern: Vector([]), Vector([30]), Vector([30,30]), Vector([30,30,30]), Vector([30,30,30,30]), Vector([30,30,30,30,30]), Vector([30,30,30,30,30,30]), ...
+Diversity: 765
+Average Size: 14.021
+Average Fitness: 1624113.4880660162
+Fitness Variation: 1280926.0944349656
+Distribution: #0 -> 0.160, 6 -> 0.155, #1 -> 0.137, #3 -> 0.098, times -> 0.086, 5 -> 0.083, [] -> 0.070, append -> 0.050, #2 -> 0.032, 3 -> 0.010

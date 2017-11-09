@@ -1,9 +1,8 @@
 package patsyn
 
 
-import user.commands.CommandProcessor
 import edu.utexas.stac.Cost
-import fi.iki.elonen.{JavaWebServer, NanoHTTPD$IHTTPSession}
+import fi.iki.elonen.JavaWebServer
 
 
 object TestCostInstr {
