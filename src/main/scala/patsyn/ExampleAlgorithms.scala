@@ -1,6 +1,8 @@
 package patsyn
 
 import java.awt.image.BufferedImage
+import java.io.FileOutputStream
+import java.util.zip.ZipOutputStream
 
 import edu.utexas.stac.Cost
 import patsyn.GeneticOperator.ExprGen
@@ -451,6 +453,12 @@ object FuzzingTaskProvider{
     image
   }
 
+  def parseCost(s: String): Long = {
+    val Array(first, costS) = s.split("\\s+")
+    assert(first == "[COST]")
+    costS.toLong
+  }
+
   def imageExample(imageWidth: Int, imageHeight: Int, workingDir: String) = new FuzzingTaskProvider {
     import java.io.File
     import javax.imageio.ImageIO
@@ -488,10 +496,8 @@ object FuzzingTaskProvider{
 
               val jarPath = "benchmarks/image_processor/challenge_program/ipchallenge-ins.jar"
               val results = Seq("java", "-Xint", "-jar", s"$jarPath", "cluster", imagePath).lineStream
-              println("last result: " + results.last)
-              val Array(first, costS) = results.last.split("\\s+")
-              assert(first == "[COST]")
-              val performance = costS.toInt.toDouble
+              val cost = parseCost(results.last)
+              val performance = cost.toDouble
               if (performance > bestPerformanceSoFar) {
                 ImageIO.write(image, "png", new File(s"$workingDir/bestImageSoFar.png"))
                 bestPerformanceSoFar = performance
@@ -501,6 +507,69 @@ object FuzzingTaskProvider{
         },
         gpEnv = imageEnv
       )
+    }
+  }
+
+  def escapeStrings(s: String): String = {
+    import org.apache.commons.lang3.StringEscapeUtils
+
+    StringEscapeUtils.escapeJava(s)
+  }
+
+  def textCrunchrExample(workDir: String) = new FuzzingTaskProvider {
+    import java.util.zip._
+    import java.io._
+    import sys.process._
+
+    def outputAsZip(outPath: String, content: String, contentFileName: String = "content.txt") = {
+      val f = new File(outPath)
+      val zipStream = new ZipOutputStream(new FileOutputStream(f))
+      val entry = new ZipEntry(contentFileName)
+      zipStream.putNextEntry(entry)
+
+      zipStream.write(content.getBytes)
+      zipStream.close()
+    }
+
+    def sizeF: PartialFunction[IS[EValue], Int] = {
+      case IS(VectValue(chars)) => chars.length
+    }
+
+    protected def task: RunningFuzzingTask = {
+      RunningFuzzingTask(
+        outputTypes = IS(EVect(EInt)),
+        sizeOfInterest = 500,
+        resourceUsage = {
+          case IS(VectValue(chars)) =>
+            val content = vectIntToString(chars)
+            val zipPath = s"$workDir/input.zip"
+            outputAsZip(zipPath, content)
+
+            val cost = parseCost(Seq("java", "-cp", "benchmarks/textChrunchr/textChrunchr_3.jar",
+              "com.cyberpointllc.stac.host.Main", zipPath).lineStream.last)
+
+            println(s"Cost = $cost")
+            cost.toDouble
+        },
+        gpEnv = abcRegexEnv
+      )
+    }
+
+
+    override def displayValue = {
+      case IS(VectValue(chars)) =>
+        val s = vectIntToString(chars)
+        escapeStrings(s)
+    }
+
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      super.saveValueWithName(value, name)
+      value match {
+        case IS(VectValue(chars)) =>
+          val content = vectIntToString(chars)
+          val zipPath = name+".zip"
+          outputAsZip(zipPath, content)
+      }
     }
   }
 }

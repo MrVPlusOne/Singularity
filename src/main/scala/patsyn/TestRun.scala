@@ -5,6 +5,7 @@ import java.awt.Dimension
 
 import measure.TimeTools
 import patsyn.EvolutionRepresentation.IndividualData
+import FuzzingTaskProvider.escapeStrings
 
 object TestRun {
 
@@ -62,7 +63,7 @@ object TestRun {
     val workingDir = s"workingDir$seed"
     FileInteraction.mkDirsAlongPath(workingDir)
 
-    runExample(FuzzingTaskProvider.imageExample(10,10, workingDir), Seq(seed), useGUI = true)
+    runExample(FuzzingTaskProvider.textCrunchrExample(workingDir), Seq(seed), useGUI = true)
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -71,16 +72,11 @@ object TestRun {
     ys.indices.map { i => (i + 1).toDouble -> ys(i) }
   }
 
-  def escapeStrings(s: String): String = {
-    import org.apache.commons.lang3.StringEscapeUtils
-
-    StringEscapeUtils.escapeJava(s)
-  }
 
   def runExample(taskProvider: FuzzingTaskProvider, seeds: Seq[Int], useGUI: Boolean): Unit = taskProvider.run{ task =>
 
     // *** important parameters ***
-    val populationSize = 30
+    val populationSize = 100
     val tournamentSize = 7
     val evaluationTrials = 3
     val totalSizeTolerance = 50
