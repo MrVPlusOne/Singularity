@@ -29,10 +29,10 @@ object BenchmarkDriver {
       throw new IllegalArgumentException("Cannot find benchmark named " + name)).apply(cliOption)
   }
 
-  def getBenchmarks(target: String, cliOption: CliOption): Seq[FuzzingExample] = {
+  def getBenchmarks(target: String, cliOption: CliOption): Iterator[FuzzingExample] = {
     target match {
-      case "all" => benchmarks.values.toSeq.map(_.apply(cliOption))
-      case name => Seq(getBenchmark(name, cliOption))
+      case "all" => benchmarks.values.toIterator.map(_.apply(cliOption))
+      case name => Iterator(getBenchmark(name, cliOption))
     }
   }
 
