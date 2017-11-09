@@ -538,7 +538,7 @@ object FuzzingTaskProvider{
     protected def task: RunningFuzzingTask = {
       RunningFuzzingTask(
         outputTypes = IS(EVect(EInt)),
-        sizeOfInterest = 500,
+        sizeOfInterest = 200,
         resourceUsage = {
           case IS(VectValue(chars)) =>
             val content = vectIntToString(chars)
