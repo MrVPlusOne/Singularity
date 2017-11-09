@@ -11,35 +11,28 @@ object BenchmarkDriver {
     workingDir
   }
 
-  def benchmarkNames = Seq(
-    "slowfuzz/insertionsort",
-    "slowfuzz/quicksort",
-    "stac/graphanalyzer",
-    "stac/blogger",
-    "stac/imageprocessor"
-  )
+  val benchmarks: Map[String, CliOption => FuzzingExample] = {
+    import FuzzingExample._
+    Map[String, CliOption => FuzzingExample](
+      "slowfuzz/insertionSort" -> (_ =>insertionSortExample),
+      "slowfuzz/quickSort" -> (_ => quickSortExample),
+      "stac/graphAnalyzer" -> (opt => graphAnalyzerExample(getWorkingDir(opt))),
+      "stac/blogger" -> (_ => bloggerExample),
+      "stac/imageProcessor" -> (opt => imageExample(10, 10, getWorkingDir(opt)))
+    )
+  }
 
-  // TODO: Make each benchmark take tunable parameters
+  def benchmarkNames: Set[String] = benchmarks.keySet
+
   def getBenchmark(name: String, cliOption: CliOption): FuzzingExample = {
-    name match {
-      case "slowfuzz/insertionsort" =>
-        FuzzingExample.insertionSortExample
-      case "slowfuzz/quicksort" =>
-        FuzzingExample.quickSortExample
-      case "stac/graphanalyzer" =>
-        FuzzingExample.graphAnalyzerExample(getWorkingDir(cliOption))
-      case "stac/blogger" =>
-        FuzzingExample.bloggerExample
-      case "stac/imageprocessor" =>
-        FuzzingExample.imageExample(10, 10, getWorkingDir(cliOption))
-      case _ => throw new IllegalArgumentException("Cannot find benchmark named " + name)
-    }
+    benchmarks.getOrElse(name,
+      throw new IllegalArgumentException("Cannot find benchmark named " + name)).apply(cliOption)
   }
 
   def getBenchmarks(target: String, cliOption: CliOption): Seq[FuzzingExample] = {
     target match {
-      case "all" => benchmarkNames.map(name => getBenchmark(name, cliOption))
-      case _@name => Seq(getBenchmark(name, cliOption))
+      case "all" => benchmarks.values.toSeq.map(_.apply(cliOption))
+      case name => Seq(getBenchmark(name, cliOption))
     }
   }
 
@@ -64,13 +57,9 @@ object BenchmarkDriver {
       note("\nBenchmark target list:\n" + benchmarkNames.map(s => "  " + s).mkString("\n") + "\n")
     }
 
-    parser.parse(args, CliOption()) match {
-      case Some(cliOption) =>
-        val benchs = getBenchmarks(cliOption.target, cliOption)
-        benchs.foreach(bench => TestRun.runExample(bench, cliOption.seed, !cliOption.disableGui))
-
-      case None =>
-        // do nothing
+    parser.parse(args, CliOption()).foreach { cliOption =>
+      val benchs = getBenchmarks(cliOption.target, cliOption)
+      benchs.foreach(bench => TestRun.runExample(bench, cliOption.seed, !cliOption.disableGui))
     }
   }
 }
