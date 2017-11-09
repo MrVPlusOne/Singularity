@@ -556,12 +556,6 @@ object FuzzingTaskProvider{
     }
 
 
-    override def displayValue = {
-      case IS(VectValue(chars)) =>
-        val s = vectIntToString(chars)
-        escapeStrings(s)
-    }
-
     override def saveValueWithName(value: IS[EValue], name: String): Unit = {
       super.saveValueWithName(value, name)
       value match {
