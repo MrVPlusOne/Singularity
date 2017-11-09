@@ -551,7 +551,7 @@ object FuzzingTaskProvider{
             println(s"Cost = $cost")
             cost.toDouble
         },
-        gpEnv = abcRegexEnv
+        gpEnv = abcRegexEnv.copy(stateTypes = abcRegexEnv.stateTypes ++ IS(EInt, EVect(EInt)))
       )
     }
 
