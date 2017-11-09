@@ -9,9 +9,10 @@ libraryDependencies ++= Seq(
   "org.jfree" % "jfreechart" % "1.0.14",
   "com.typesafe.akka" %% "akka-actor" % "2.5.6",
   "com.typesafe.akka" %% "akka-testkit" % "2.5.6" % Test,
-  "org.apache.commons" % "commons-lang3" % "3.1"
+  "org.apache.commons" % "commons-lang3" % "3.1",
+  "com.github.scopt" %% "scopt" % "3.7.0"
 )
 
-mainClass in assembly := Some("patsyn.TestRun")
+mainClass in assembly := Some("cli.BenchmarkDriver")
 test in assembly := {}
-assemblyJarName in assembly := "TestRun.jar"
+assemblyJarName in assembly := "PatternSynthBenchmarkDriver.jar"

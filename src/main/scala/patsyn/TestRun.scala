@@ -58,9 +58,11 @@ object TestRun {
   }
 
   def main(args: Array[String]): Unit = {
-    val ioId = if(args.isEmpty) 0 else args.head.toInt
-    runExample(ioId)
-
+    val seed = if(args.isEmpty) 0 else args.head.toInt
+    val workingDir = s"workingDir$seed"
+    FileInteraction.mkDirsAlongPath(workingDir)
+    val example = FuzzingExample.imageExample(10,10, workingDir)
+    runExample(example, seed, true)
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -75,15 +77,10 @@ object TestRun {
     StringEscapeUtils.escapeJava(s)
   }
 
-  def runExample(ioId: Int): Unit = {
-
-    val workingDir = s"workingDir$ioId"
-    FileInteraction.mkDirsAlongPath(workingDir)
-
+  def runExample(example: FuzzingExample, seed: Int, useGUI: Boolean): Unit = {
 
     // *** important parameters ***
-    val example = FuzzingExample.imageExample(10,10, workingDir)
-    val populationSize = 100
+    val populationSize = 1000
     val tournamentSize = 7
     val evaluationTrials = 3
     val totalSizeTolerance = 50
@@ -91,10 +88,8 @@ object TestRun {
     val threadNum = 1
     val timeLimitInMillis = 10000
     val maxNonIncreaseTime = 150
-    val randomSeeds = Seq(2,3,4,5)
+    val randomSeeds = Seq(seed)
     // *** end of important parameters ***
-
-    val useGUI = false
 
     val library = MultiStateGOpLibrary(example.gpEnv, example.outputTypes)
 
@@ -107,7 +102,7 @@ object TestRun {
     val recordDirPath = {
       import java.util.Calendar
       val dateTime = Calendar.getInstance().getTime
-      s"results/$dateTime[ioId=$ioId]"
+      s"results/$dateTime[seed=$seed]"
     }
 
     val (evalProgressCallback, monitorCallback): (Int => Unit, MonitoringData => Unit) = {
