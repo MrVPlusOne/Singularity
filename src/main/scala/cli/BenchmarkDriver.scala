@@ -1,6 +1,7 @@
 package cli
 
-import patsyn.{FileInteraction, FuzzingTask, FuzzingTaskProvider, TestRun}
+import patsyn.EvolutionRepresentation.IndividualData
+import patsyn._
 
 object BenchmarkDriver {
 
@@ -16,6 +17,7 @@ object BenchmarkDriver {
     Map[String, CliOption => FuzzingTaskProvider](
       "slowfuzz/insertionSort" -> (_ =>insertionSortExample),
       "slowfuzz/quickSort" -> (_ => quickSortExample),
+      "slowfuzz/phpHash" -> (_ => phpHashCollision),
       "stac/graphAnalyzer" -> (opt => graphAnalyzerExample(getWorkingDir(opt))),
       "stac/blogger" -> (_ => bloggerExample),
       "stac/imageProcessor" -> (opt => imageExample(10, 10, getWorkingDir(opt)))
@@ -42,6 +44,12 @@ object BenchmarkDriver {
       opt[Int]('s', "seed").action( (x, c) =>
         c.copy(seed=x)).text("The random seed to use. Default to 0.")
 
+      opt[Seq[String]]('e', "extrapolate").valueName("<indPath>,<outName>,<size>").
+        action({ case (Seq(input, output, size), c) =>
+        c.copy(extrapolatePattern = Some(ExtrapolationArgs(input, output, size.toInt)))
+      }).
+        text("Read a MultiStateIndividual from <indPath> and try to construct an input of size <size>, then save it using name <outName>")
+
       help("help").text("Prints this usage text")
       version("version").text("Prints the version info")
 
@@ -53,22 +61,52 @@ object BenchmarkDriver {
       note("\nBenchmark target list:\n" + benchmarks.keys.map(s => "  " + s).mkString("\n") + "\n")
     }
 
-    parser.parse(args, CliOption()).foreach { cliOption =>
-      val benchs = getBenchmarks(cliOption.target, cliOption)
-      benchs.foreach{ case (name, bench) =>
-        println(s"*** Task $name started ***")
-        try {
-          bench.run { task =>
-            TestRun.runExample(task, cliOption.seed, !cliOption.disableGui)
-            println(s"*** Task $name finished ***")
-          }
-        } catch {
-          case ex: Exception =>
-            System.err.println(s"Exception thrown: $ex")
-            ex.printStackTrace(System.err)
-            System.err.println(s"Task $name aborted. Continuing to the next task...")
+    parser.parse(args, CliOption()) match {
+      case Some(cliOption) =>
+        val taskProvider = benchmarks.getOrElse(cliOption.target,
+          throw new IllegalArgumentException("Cannot find benchmark named " + cliOption.target))(cliOption)
+        cliOption.extrapolatePattern match{
+          case None =>
+            val benchs = getBenchmarks(cliOption.target, cliOption)
+            benchs.foreach{ case (name, bench) =>
+              println(s"*** Task $name started ***")
+              try {
+                TestRun.runExample(bench, Seq(cliOption.seed), !cliOption.disableGui)
+                println(s"*** Task $name finished ***")
+
+              } catch {
+                case ex: Exception =>
+                  System.err.println(s"Exception thrown: $ex")
+                  ex.printStackTrace(System.err)
+                  System.err.println(s"Task $name aborted. Continuing to the next task...")
+              }
+            }
+          case Some(extraArg) =>
+            val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
+            saveExtrapolation(taskProvider, ind, extraArg.size, extraArg.outputName)
         }
-      }
+
+      case None =>
+        parser.showUsageAsError()
     }
+  }
+
+  def saveExtrapolation(taskProvider: FuzzingTaskProvider, individual: MultiStateInd, size: Int, name: String): Unit = {
+    println(s"Calculating extrapolation at size = $size ...")
+    var lastSize = Int.MinValue
+    val valueOfInterest = MultiStateRepresentation.individualToPattern(individual).map(_._2).takeWhile{
+      value =>
+        val newSize = taskProvider.sizeF(value)
+        if(newSize <= lastSize){
+          println("Warning: Can't reach specified size using this individual")
+          false
+        }else{
+          lastSize = newSize
+          newSize <= size
+        }
+    }.last
+
+    println(s"Extrapolation calculated. Now save results to $name")
+    taskProvider.saveValueWithName(valueOfInterest, name)
   }
 }

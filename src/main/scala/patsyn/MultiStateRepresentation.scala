@@ -34,6 +34,19 @@ case class MultiStateInd(exprs: IS[Expr], nStates: Int){
   }
 }
 
+object MultiStateRepresentation{
+  def individualToPattern(ind: MultiStateInd): Stream[(MemoryUsage, IS[EValue])] = {
+    val iters = ind.iters
+    val initStates = ind.seeds.map(seed => Expr.evaluateWithCheck(seed, IS()))
+    val states = Stream.iterate(initStates)(ls => {
+      iters.map { iter => Expr.evaluateWithCheck(iter, ls) }
+    })
+    states.map(xs => {
+      val totalSize = xs.map(_.size).sum
+      MemoryUsage(totalSize) -> ind.outputs.map(f => Expr.evaluateWithCheck(f, xs))
+    })
+  }
+}
 
 case class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType],
                                     totalSizeTolerance: Double, singleSizeTolerance: Double,
@@ -78,15 +91,7 @@ case class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType
   }
 
   def individualToPattern(ind: MultiStateInd): Stream[(MemoryUsage, IS[EValue])] = {
-    val iters = ind.iters
-    val initStates = ind.seeds.map(seed => Expr.evaluateWithCheck(seed, IS()))
-    val states = Stream.iterate(initStates)(ls => {
-            iters.map { iter => Expr.evaluateWithCheck(iter, ls) }
-          })
-    states.map(xs => {
-      val totalSize = xs.map(_.size).sum
-      MemoryUsage(totalSize) -> ind.outputs.map(f => Expr.evaluateWithCheck(f, xs))
-    })
+    MultiStateRepresentation.individualToPattern(ind)
   }
 
   def sizePenaltyFactor(ind: MultiStateInd): Double = {

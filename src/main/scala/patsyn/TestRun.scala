@@ -62,9 +62,7 @@ object TestRun {
     val workingDir = s"workingDir$seed"
     FileInteraction.mkDirsAlongPath(workingDir)
 
-    FuzzingTaskProvider.imageExample(10,10, workingDir).run{task =>
-      runExample(task, seed, useGUI = true)
-    }
+    runExample(FuzzingTaskProvider.imageExample(10,10, workingDir), Seq(seed), useGUI = true)
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -79,10 +77,10 @@ object TestRun {
     StringEscapeUtils.escapeJava(s)
   }
 
-  def runExample(task: FuzzingTask, seed: Int, useGUI: Boolean): Unit = {
+  def runExample(taskProvider: FuzzingTaskProvider, seeds: Seq[Int], useGUI: Boolean): Unit = taskProvider.run{ task =>
 
     // *** important parameters ***
-    val populationSize = 1000
+    val populationSize = 30
     val tournamentSize = 7
     val evaluationTrials = 3
     val totalSizeTolerance = 50
@@ -90,7 +88,7 @@ object TestRun {
     val threadNum = 1
     val timeLimitInMillis = 10000
     val maxNonIncreaseTime = 150
-    val randomSeeds = Seq(seed)
+    val randomSeeds = seeds
     // *** end of important parameters ***
 
     val library = MultiStateGOpLibrary(task.gpEnv, task.outputTypes)
@@ -101,30 +99,30 @@ object TestRun {
     }
     println("[End of Function map]")
 
-    val recordDirPath = {
-      import java.util.Calendar
-      val dateTime = Calendar.getInstance().getTime
-      s"results/$dateTime[seed=$seed]"
-    }
-
-    val (evalProgressCallback, monitorCallback): (Int => Unit, MonitoringData => Unit) = {
-      if (useGUI) {
-        val monitor = createMonitor(populationSize)
-        (monitor.evalProgressCallback, monitor.monitorCallback)
-      } else {
-        ((_: Int) => Unit, (_: MonitoringData) => Unit)
-      }
-    }
-
 
     for (seed <- randomSeeds) {
+      val recordDirPath = {
+        import java.util.Calendar
+        val dateTime = Calendar.getInstance().getTime
+        s"results/$dateTime[seed=$seed]"
+      }
+
+      val (evalProgressCallback, monitorCallback): (Int => Unit, MonitoringData => Unit) = {
+        if (useGUI) {
+          val monitor = createMonitor(populationSize)
+          (monitor.evalProgressCallback, monitor.monitorCallback)
+        } else {
+          ((_: Int) => Unit, (_: MonitoringData) => Unit)
+        }
+      }
+
       FileInteraction.runWithAFileLogger(s"$recordDirPath/testResult[seed=$seed].txt") { logger =>
         import logger._
 
         val sizeOfInterest = task.sizeOfInterest
         val evaluation = new SimplePerformanceEvaluation(
           sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
-          resourceUsage = task.resourceUsage, sizeF = task.sizeF, maxMemoryUsage = sizeOfInterest * 10
+          resourceUsage = task.resourceUsage, sizeF = taskProvider.sizeF, maxMemoryUsage = sizeOfInterest * 10
         )
         val representation = MultiStateRepresentation(totalSizeTolerance = totalSizeTolerance,
           singleSizeTolerance = singleSizeTolerance,
@@ -150,7 +148,7 @@ object TestRun {
           timeoutCallback = ind => {
             println("Evaluation timed out!")
             val firstSevenInputs = representation.individualToPattern(ind).take(7).toList.map {
-              case (_, v) => escapeStrings(task.displayValue(v))
+              case (_, v) => escapeStrings(taskProvider.displayValue(v))
             }.mkString(", ")
             representation.printIndividualMultiLine(println)(ind)
             println(s"Individual Pattern: $firstSevenInputs, ...")
@@ -192,7 +190,7 @@ object TestRun {
           println(s"Best Result: ${best.evaluation.showAsLinearExpr}, Created by ${best.history.birthOp}")
           representation.printIndividualMultiLine(println)(best.ind)
           val firstSevenInputs = representation.individualToPattern(best.ind).take(7).toList.map {
-            case (_, v) => escapeStrings(task.displayValue(v))
+            case (_, v) => escapeStrings(taskProvider.displayValue(v))
           }.mkString(", ")
           println(s"Best Individual Pattern: $firstSevenInputs, ...")
           println(s"Diversity: ${pop.fitnessMap.keySet.size}")
@@ -205,10 +203,8 @@ object TestRun {
               case (s, f) => s"$s -> ${"%.3f".format(f)}"
             }.mkString(", ")
           }
+          FileInteraction.saveObjectToFile(s"$recordDirPath/bestIndividual[seed=$seed].serialized")(best.ind)
         }
-
-        val data = bestSoFar.get
-        FileInteraction.saveObjectToFile(s"$recordDirPath/bestIndividual[seed=$seed].serialized")(data)
       }
     }
   }

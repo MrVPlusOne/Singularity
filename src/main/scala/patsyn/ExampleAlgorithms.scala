@@ -1,5 +1,7 @@
 package patsyn
 
+import java.awt.image.BufferedImage
+
 import measure.{TimeMeasureExamples, TimeMeasurement, TimeTools}
 import patsyn.GeneticOperator.ExprGen
 import patsyn.StandardSystem.{EInt, EVect, IntComponents, IntValue, VectComponents, VectValue}
@@ -29,13 +31,29 @@ class Counter{
 
 
 trait FuzzingTaskProvider{
-  protected def task: FuzzingTask
+  protected def task: RunningFuzzingTask
 
-  def setupTask(task: FuzzingTask): Unit = {}
+  def sizeF: PartialFunction[IS[EValue], Int]
 
-  def teardownTask(task: FuzzingTask): Unit = {}
+  def setupTask(task: RunningFuzzingTask): Unit = {}
 
-  def run[A](f: FuzzingTask => A): A = {
+  def teardownTask(task: RunningFuzzingTask): Unit = {}
+
+  def displayValue: PartialFunction[IS[EValue], String] = {
+    case v => v.toString
+  }
+
+  def saveValueWithName(value: IS[EValue], name: String): Unit = {
+    import java.io._
+    val fw = new FileWriter(new File(name+".txt"))
+    try{
+      fw.write(displayValue(value))
+    } finally {
+      fw.close()
+    }
+  }
+
+  def run[A](f: RunningFuzzingTask => A): A = {
     val task = this.task
     try{
       setupTask(task)
@@ -46,13 +64,12 @@ trait FuzzingTaskProvider{
   }
 }
 
-case class FuzzingTask(outputTypes: IS[EType],
-                       sizeF: PartialFunction[IS[EValue], Int],
-                       sizeOfInterest: Int = 500,
-                       resourceUsage: PartialFunction[IS[EValue], Double],
-                       gpEnv: GPEnvironment,
-                       displayValue: IS[EValue] => String = _.toString
-                         )
+
+case class RunningFuzzingTask(outputTypes: IS[EType],
+                              sizeOfInterest: Int = 500,
+                              resourceUsage: PartialFunction[IS[EValue], Double],
+                              gpEnv: GPEnvironment
+                      )
 
 //noinspection TypeAnnotation
 object FuzzingTaskProvider{
@@ -84,12 +101,12 @@ object FuzzingTaskProvider{
   }
 
   def insertionSortExample = new FuzzingTaskProvider {
-    protected def task: FuzzingTask = FuzzingTask(
+    def sizeF = {
+      case IS(VectValue(v)) => v.length
+    }
+
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
       outputTypes = IS(EVect(EInt)),
-      sizeF = {
-        case IS(VectValue(v)) =>
-          v.length
-      },
       resourceUsage = {
         case IS(VectValue(v)) =>
           val c = new Counter()
@@ -106,12 +123,8 @@ object FuzzingTaskProvider{
       //      xs(xs.length/3) // 1/3
     }
 
-    protected def task: FuzzingTask = FuzzingTask(
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
       outputTypes = IS(EVect(EInt)),
-      sizeF = {
-        case IS(VectValue(v)) =>
-          v.length
-      },
       resourceUsage = {
         case IS(VectValue(vec)) =>
           val c = new Counter()
@@ -120,15 +133,16 @@ object FuzzingTaskProvider{
       },
       gpEnv = sortingEnv
     )
+
+    def sizeF = {
+      case IS(VectValue(v)) =>
+        v.length
+    }
   }
 
   def randomQuickSortExample(seed: Int) = new FuzzingTaskProvider {
-    protected def task: FuzzingTask = FuzzingTask(
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
       outputTypes = IS(EVect(EInt)),
-      sizeF = {
-        case IS(VectValue(v)) =>
-          v.length
-      },
       resourceUsage = {
         case IS(VectValue(vec)) =>
           val random = new Random(seed)
@@ -138,14 +152,16 @@ object FuzzingTaskProvider{
       },
       gpEnv = sortingEnv
     )
+
+    def sizeF = {
+      case IS(VectValue(v)) =>
+        v.length
+    }
   }
 
   def listSearchExample = new FuzzingTaskProvider {
-    protected def task: FuzzingTask = FuzzingTask(
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
       outputTypes = IS(EVect(EInt), EInt),
-      sizeF = {
-        case IS(VectValue(v), IntValue(_)) => v.length
-      },
       resourceUsage = {
         case IS(VectValue(vec), IntValue(idx)) =>
           val c = new Counter()
@@ -154,6 +170,10 @@ object FuzzingTaskProvider{
       },
       gpEnv = sortingEnv
     )
+
+    def sizeF = {
+      case IS(VectValue(v), IntValue(_)) => v.length
+    }
   }
 
   def vectIntToString(vec: VectValue): String = {
@@ -180,12 +200,8 @@ object FuzzingTaskProvider{
   }
 
   def phpHashCollision = new FuzzingTaskProvider {
-    protected def task: FuzzingTask = FuzzingTask(
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
       outputTypes = IS(EVect(EVect(EInt))),
-      sizeF = {
-        case IS(VectValue(strings)) =>
-          strings.map(s => s.asInstanceOf[VectValue].value.length).sum
-      },
       resourceUsage = {
         case IS(VectValue(vec)) =>
           val hashes = vec.map(v => {
@@ -198,6 +214,11 @@ object FuzzingTaskProvider{
       },
       gpEnv = phpHashEnv
     )
+
+    def sizeF = {
+      case IS(VectValue(strings)) =>
+        strings.map(s => s.asInstanceOf[VectValue].value.length).sum
+    }
   }
 
   def toLowercase(i: Int): Char = {
@@ -231,12 +252,15 @@ object FuzzingTaskProvider{
   def regexExample(regex: String, regexDic: Int => String) = new FuzzingTaskProvider {
     val pattern = Pattern.compile(regex)
 
-    protected def task: FuzzingTask = {
-      FuzzingTask(
+
+    override def displayValue = {
+      case IS(VectValue(vs)) =>
+      vs.map(intValueAsChar).mkString("")
+    }
+
+    protected def task: RunningFuzzingTask = {
+      RunningFuzzingTask(
         outputTypes = IS(EVect(EInt)),
-        sizeF = {
-          case IS(VectValue(chars)) => chars.length
-        },
         sizeOfInterest = 200,
         resourceUsage = {
           case IS(VectValue(chars)) =>
@@ -245,11 +269,12 @@ object FuzzingTaskProvider{
             pattern.matcher(counter, s).find()
             counter.read()
         },
-        gpEnv = abcRegexEnv,
-        displayValue = { case IS(VectValue(vs)) =>
-          vs.map(intValueAsChar).mkString("")
-        }
+        gpEnv = abcRegexEnv
       )
+    }
+
+    def sizeF = {
+      case IS(VectValue(chars)) => chars.length
     }
   }
 
@@ -263,13 +288,9 @@ object FuzzingTaskProvider{
   }
 
   def gabFeed2_hashCollisionExample = new FuzzingTaskProvider {
-    protected def task: FuzzingTask = {
-      FuzzingTask(
+    protected def task: RunningFuzzingTask = {
+      RunningFuzzingTask(
         outputTypes = IS(EVect(EVect(EInt))),
-        sizeF = {
-          case IS(VectValue(strings)) =>
-            strings.map(s => s.asInstanceOf[VectValue].value.length).sum
-        },
         resourceUsage = {
           case IS(VectValue(strings)) =>
             import gabfeed2.hashmap._
@@ -283,6 +304,11 @@ object FuzzingTaskProvider{
         },
         gpEnv = phpHashEnv
       )
+    }
+
+    def sizeF = {
+      case IS(VectValue(strings)) =>
+        strings.map(s => s.asInstanceOf[VectValue].value.length).sum
     }
   }
 
@@ -300,18 +326,20 @@ object FuzzingTaskProvider{
   }
 
   def graphAnalyzerExample(workingDir: String) = new FuzzingTaskProvider {
-    protected def task: FuzzingTask = {
+
+    def sizeF = {
+      case IS(VectValue(graphs)) =>
+        graphs.map(g => g.asInstanceOf[VectValue].value.length+1).sum
+    }
+
+    protected def task: RunningFuzzingTask = {
       import java.io.FileWriter
 
       import user.commands.CommandProcessor
       import edu.utexas.stac.Cost
 
-      FuzzingTask(
+      RunningFuzzingTask(
         outputTypes = IS(EVect(EVect(EInt))),
-        sizeF = {
-          case IS(VectValue(graphs)) =>
-            graphs.map(g => g.asInstanceOf[VectValue].value.length+1).sum
-        },
         sizeOfInterest = 12,
         resourceUsage = {
           case IS(VectValue(graphs)) =>
@@ -360,21 +388,27 @@ object FuzzingTaskProvider{
     import fi.iki.elonen.JavaWebServer
     val server = new JavaWebServer(8080)
 
-    override def setupTask(task: FuzzingTask): Unit = {
+    override def setupTask(task: RunningFuzzingTask): Unit = {
       new Thread(() => server.start()).start()
     }
 
-    override def teardownTask(task: FuzzingTask): Unit = {
+    override def teardownTask(task: RunningFuzzingTask): Unit = {
       server.stop()
     }
 
-    protected def task: FuzzingTask = {
-      FuzzingTask(
+
+    override def displayValue = {
+      case IS(vec:VectValue)=> vectIntToString(vec)
+    }
+
+    def sizeF = {
+      case IS(VectValue(chars)) =>
+        chars.length
+    }
+
+    protected def task: RunningFuzzingTask = {
+      RunningFuzzingTask(
         outputTypes = IS(EVect(EInt)),
-        sizeF = {
-          case IS(VectValue(chars)) =>
-            chars.length
-        },
         sizeOfInterest = 100,
         resourceUsage = {
           case IS(vec :VectValue) =>
@@ -387,11 +421,7 @@ object FuzzingTaskProvider{
             }
             Cost.read().toDouble
         },
-        gpEnv = sortingEnv,
-        displayValue = {
-          case IS(vec:VectValue)=>
-            vectIntToString(vec)
-        }
+        gpEnv = sortingEnv
       )
     }
   }
@@ -408,36 +438,53 @@ object FuzzingTaskProvider{
     GPEnvironment(constMap, functions, stateTypes)
   }
 
-  def imageExample(imageWidth: Int, imageHeight: Int, workingDir: String) = new FuzzingTaskProvider {
+  def intsToImage(imageWidth: Int, imageHeight: Int, name: String, data: IS[Int]): BufferedImage = {
     import java.awt.image.BufferedImage
+
+    val imageDataSize = imageWidth * imageHeight
+    val dataSize = data.length
+    val content = (0 until imageDataSize).flatMap { i =>
+      val intValue = data(SimpleMath.wrapInRange(i, dataSize))
+      IS((intValue >> 24) & 255, intValue & 255, (intValue >> 8) & 255, (intValue >> 16) & 255)
+    }
+    val image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB)
+    image.getRaster.setPixels(0, 0, imageWidth, imageHeight, content.toArray)
+    image
+  }
+
+  def imageExample(imageWidth: Int, imageHeight: Int, workingDir: String) = new FuzzingTaskProvider {
     import java.io.File
     import javax.imageio.ImageIO
     import sys.process._
 
-    protected def task: FuzzingTask = {
+    def sizeF = {
+      case IS(VectValue(data)) => data.length
+    }
+
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      super.saveValueWithName(value, name)
+      val data = value.head
+      val width = math.max(1, math.sqrt(data.size).toInt)
+      val image = intsToImage(width, width, name,
+        data.asInstanceOf[VectValue].value.map(_.asInstanceOf[IntValue].value))
+      ImageIO.write(image, "png", new File(name + ".png"))
+    }
+
+    protected def task: RunningFuzzingTask = {
       var bestPerformanceSoFar = Double.MinValue
 
       val imageDataSize = imageWidth * imageHeight
-      FuzzingTask(
+      RunningFuzzingTask(
         outputTypes = IS(EVect(EInt)),
-        sizeF = {
-          case IS(VectValue(data)) => data.length
-        },
         sizeOfInterest = imageDataSize,
         resourceUsage = {
           case IS(VectValue(data)) =>
             if(data.isEmpty) 0.0
             else {
-              val dataSize = data.length
-              val content = (0 until imageDataSize).flatMap { i =>
-                val intValue = data(SimpleMath.wrapInRange(i, dataSize)).asInstanceOf[IntValue].value
-                IS((intValue >> 24) & 255, intValue & 255, (intValue >> 8) & 255, (intValue >> 16) & 255)
-              }
-              val image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB)
-              image.getRaster.setPixels(0, 0, imageWidth, imageHeight, content.toArray)
-              val imagePath = s"$workingDir/genImage.png"
-              val file = new File(imagePath)
-              ImageIO.write(image, "png", file)
+              val imageName = s"$workingDir/genImage"
+              val imagePath  = imageName + ".png"
+              val image = intsToImage(imageWidth, imageHeight, imageName, data.map(_.asInstanceOf[IntValue].value))
+              ImageIO.write(image, "png", new File(imagePath))
 
               val jarPath = "benchmarks/image_processor/challenge_program/ipchallenge-ins.jar"
               val results = Seq("java", "-Xint", "-jar", s"$jarPath", "cluster", imagePath).lineStream
