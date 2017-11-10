@@ -80,7 +80,20 @@ object Runner {
                        threadNum: Int = 1,
                        timeLimitInMillis: Int = 10000,
                        maxNonIncreaseTime: Int = 150,
-                      )
+                      ){
+    def show: String = {
+      s"""
+         |populationSize: $populationSize
+         |tournamentSize: $tournamentSize
+         |evaluationTrials：$evaluationTrials
+         |totalSizeTolerance：$totalSizeTolerance
+         |singleSizeTolerance：$singleSizeTolerance
+         |threadNum：$threadNum
+         |timeLimitInMillis：$timeLimitInMillis
+         |maxNonIncreaseTime：$maxNonIncreaseTime
+       """.stripMargin
+    }
+  }
 
   def runExample(taskProvider: FuzzingTaskProvider, seeds: Seq[Int], useGUI: Boolean): Unit = taskProvider.run{ task =>
 
@@ -116,7 +129,7 @@ object Runner {
         }
 
         printSection("Configuration"){
-          println(config)
+          println(config.show)
         }
 
         printSection("Function map"){
