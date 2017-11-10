@@ -1,6 +1,7 @@
 package patsyn
 
 import java.io._
+import java.nio.file.Path
 
 import patsyn.EvolutionRepresentation.IndividualData
 
@@ -26,6 +27,16 @@ class FileLogger(fileName: String, printToConsole: Boolean, writer: FileWriter) 
 }
 
 object FileInteraction{
+  def writeToFile(filePath: String)(content: String): Unit = {
+    import java.io._
+    val fw = new FileWriter(filePath)
+    try {
+      fw.write(content)
+    }finally{
+      fw.close()
+    }
+  }
+
   def runWithAFileLogger[T](fileName: String, printToConsole: Boolean = true)(f: FileLogger => T): T = {
     mkDirsAlongPath(fileName.split("/").init.mkString("/"))
     val writer = new FileWriter(fileName)

@@ -63,6 +63,7 @@ object Runner {
     val workingDir = s"workingDir$ioId"
     FileInteraction.mkDirsAlongPath(workingDir)
 
+//    runExample(FuzzingTaskProvider.gabFeed2Example(ioId ,workingDir), Seq(ioId), useGUI = true)
     runExample(FuzzingTaskProvider.textCrunchrExample(workingDir), Seq(ioId), useGUI = true)
   }
 
@@ -72,14 +73,14 @@ object Runner {
     ys.indices.map { i => (i + 1).toDouble -> ys(i) }
   }
 
-  case class RunConfig(populationSize: Int = 500,
+  case class RunConfig(populationSize: Int = 100,
                        tournamentSize: Int = 7,
                        evaluationTrials: Int = 3,
                        totalSizeTolerance: Int = 50,
                        singleSizeTolerance: Int = 30,
                        threadNum: Int = 1,
-                       timeLimitInMillis: Int = 10000,
-                       maxNonIncreaseTime: Int = 150,
+                       timeLimitInMillis: Int = 20000,
+                       maxNonIncreaseTime: Int = 150
                       ){
     def show: String = {
       s"""

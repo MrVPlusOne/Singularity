@@ -20,7 +20,8 @@ object BenchmarkDriver {
       "stac/graphAnalyzer" -> (opt => graphAnalyzerExample(getWorkingDir(opt))),
       "stac/blogger" -> (_ => bloggerExample),
       "stac/imageProcessor" -> (opt => imageExample(10, 10, getWorkingDir(opt))),
-      "stac/textCrunchr" -> (opt => textCrunchrExample(getWorkingDir(opt)))
+      "stac/textCrunchr" -> (opt => textCrunchrExample(getWorkingDir(opt))),
+      "stac/gabfeed2" -> (opt => gabFeed2Example(opt.ioId, getWorkingDir(opt)))
     )
   }
 

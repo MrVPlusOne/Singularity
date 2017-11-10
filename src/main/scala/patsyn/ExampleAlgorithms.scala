@@ -287,31 +287,6 @@ object FuzzingTaskProvider{
     hash
   }
 
-  def gabFeed2_hashCollisionExample = new FuzzingTaskProvider {
-    protected def task: RunningFuzzingTask = {
-      RunningFuzzingTask(
-        outputTypes = IS(EVect(EVect(EInt))),
-        resourceUsage = {
-          case IS(VectValue(strings)) =>
-            import gabfeed2.hashmap._
-            val map = new HashMap[String, Int]();
-            strings.foreach{
-              case VectValue(chars) =>
-                val string = chars.map{ case IntValue(i) => toLowercase(i)}.mkString("")
-                map.put(string, 0)
-            }
-            map.resizeNum.toDouble
-        },
-        gpEnv = phpHashEnv
-      )
-    }
-
-    def sizeF = {
-      case IS(VectValue(strings)) =>
-        strings.map(s => s.asInstanceOf[VectValue].value.length).sum
-    }
-  }
-
   def intVectorToGraph(graphId: Int, refs: Vector[Int]): String = {
     val graphName = if(graphId == 0) "main" else s"L$graphId"
     val graphBody = refs.zipWithIndex.map { case (ref, i) =>
@@ -538,9 +513,9 @@ object FuzzingTaskProvider{
     protected def task: RunningFuzzingTask = {
       RunningFuzzingTask(
         outputTypes = IS(EVect(EInt)),
-        sizeOfInterest = 200,
+        sizeOfInterest = 10000,
         resourceUsage = {
-          case IS(VectValue(chars)) =>
+          case IS(chars: VectValue) =>
             val content = vectIntToString(chars)
             val zipPath = s"$workDir/input.zip"
             outputAsZip(zipPath, content)
@@ -566,6 +541,54 @@ object FuzzingTaskProvider{
       }
     }
   }
+
+  def sendCommand(cmd: String): Unit = {
+    import sys.process._
+
+    cmd.split("\\s+").toSeq.!
+  }
+
+  def gabFeed2Example(ioId: Int, workDir: String) = new FuzzingTaskProvider {
+    import gabfeed2.ServerManager
+
+    val port = 8080+ioId
+    val serverMain = ServerManager.makeServer(port, "benchmarks/gabfeed2/data", false,
+      "benchmarks/gabfeed2/ServersPrivateKey.txt","benchmarks/gabfeed2/ServersPasswordKey.txt", null)
+
+    override def setupTask(task: RunningFuzzingTask): Unit = {
+      serverMain.start()
+    }
+
+    override def teardownTask(task: RunningFuzzingTask): Unit = {
+      serverMain.stop()
+    }
+
+    def sizeF: PartialFunction[IS[EValue], Int] = ???
+
+    protected def task: RunningFuzzingTask = {
+      RunningFuzzingTask(
+        outputTypes = IS(EVect(EInt)),
+        sizeOfInterest = 300,
+        resourceUsage = {
+
+          case IS(chars:VectValue) =>
+            val content = vectIntToString(chars)
+
+            val messagePath = s"$workDir/gabfeed2.txt"
+            FileInteraction.writeToFile(messagePath)(content)
+
+            Cost.reset()
+            sendCommand(s"curl -s -c cookies.txt -F username=foo -F password=df89gy9Qw --insecure https://localhost:$port/login")
+            sendCommand(s"curl -s -F messageContents=@$messagePath -b cookies.txt --insecure https://localhost:$port/newmessage/1_0")
+            sendCommand(s"curl -s -L -b cookies.txt --insecure https://localhost:$port/thread/1_0?suppressTimestamp=true")
+
+            Cost.read().toDouble
+        },
+        gpEnv = abcRegexEnv.copy(stateTypes = abcRegexEnv.stateTypes ++ IS(EInt, EVect(EInt)))
+      )
+    }
+  }
+
 }
 
 object ExampleAlgorithms {
