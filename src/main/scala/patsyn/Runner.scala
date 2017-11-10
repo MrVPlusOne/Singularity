@@ -96,9 +96,10 @@ object Runner {
     }
   }
 
-  def runExample(taskProvider: FuzzingTaskProvider, seeds: Seq[Int], useGUI: Boolean): Unit = taskProvider.run{ task =>
+  def runExample(taskProvider: FuzzingTaskProvider, seeds: Seq[Int], config: RunConfig = RunConfig(), useGUI: Boolean)
+  : Unit = taskProvider
+    .run{ task =>
 
-    val config = RunConfig()
     import config._
 
     val library = MultiStateGOpLibrary(task.gpEnv, task.outputTypes)

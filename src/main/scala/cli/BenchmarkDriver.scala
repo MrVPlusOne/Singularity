@@ -1,5 +1,6 @@
 package cli
 
+import patsyn.Runner.RunConfig
 import patsyn._
 
 object BenchmarkDriver {
@@ -35,6 +36,19 @@ object BenchmarkDriver {
     }
   }
 
+  def getRunConfig(option: CliOption): RunConfig = {
+    RunConfig(
+      populationSize = option.populationSize,
+      tournamentSize = option.tournamentSize,
+      evaluationTrials = option.evaluationTrials,
+      totalSizeTolerance = option.totalSizeTolerance,
+      singleSizeTolerance = option.singleSizeTolerance,
+      threadNum = option.threadNum,
+      timeLimitInMillis = option.timeLimitInMillis,
+      maxNonIncreaseTime = option.maxNonIncreaseTime
+    )
+  }
+
   def main(args: Array[String]): Unit = {
     val parser = new scopt.OptionParser[CliOption]("patsyn_cli_driver") {
       head("patsyn Command Line Driver", "0.1")
@@ -48,6 +62,32 @@ object BenchmarkDriver {
 
       opt[Seq[Int]]('s', "seeds").valueName("<seed1>,<seed2>,...").action( (ss, c) =>
         c.copy(seeds=ss)).text("The random seeds to use. Default to {0} (only 1 seed).")
+
+      opt[Int]('p', "population-size").action( (x, c) =>
+        c.copy(tournamentSize = x)).text("[GP parameter] Population size. Default to 500.")
+
+      opt[Int]("tournament-size").hidden().action( (x, c) =>
+        c.copy(populationSize = x)).text("[GP parameter] Tournament size. Default to 7.")
+
+      opt[Int]("evaluation-trials").hidden().action( (x, c) =>
+        c.copy(evaluationTrials = x)).text("[GP parameter] Number of evaluation trials. Default to 3.")
+
+      opt[Int]("total-size-tolerance").hidden().action( (x, c) =>
+        c.copy(totalSizeTolerance = x)).text("[GP parameter] Total size tolerance. Default to 50.")
+
+      opt[Int]("single-size-tolerance").hidden().action( (x, c) =>
+        c.copy(singleSizeTolerance = x)).text("[GP parameter] Single size tolerance. Default to 30.")
+
+      opt[Int]("thread-num").hidden().action( (x, c) =>
+        c.copy(threadNum = x)).text("[GP parameter UNUSED] Thread number. Default to 1.")
+
+      opt[Int]("time-limit").action( (x, c) =>
+        c.copy(timeLimitInMillis = x)).text("Time limit for each black-box execution (in milliseconds). Default to " +
+        "10000.")
+
+      opt[Int]("max-nonincrease-gen").hidden().action( (x, c) =>
+        c.copy(maxNonIncreaseTime = x)).text("[GP parameter] Stop after this number of generations if the fitness " +
+        " for the best individual does not increase. Default to 150.")
 
       opt[Seq[String]]('e', "extrapolate").valueName("<indPath>,<outName>,<size>").
         action({ case (Seq(input, output, size), c) =>
@@ -73,10 +113,11 @@ object BenchmarkDriver {
         cliOption.extrapolatePattern match {
           case None =>
             val benchs = getBenchmarks(cliOption.target, cliOption)
+            val config = getRunConfig(cliOption)
             benchs.foreach { case (name, bench) =>
               println(s"*** Task $name started ***")
               try {
-                Runner.runExample(bench, cliOption.seeds, !cliOption.disableGui)
+                Runner.runExample(bench, cliOption.seeds, config, useGUI = !cliOption.disableGui)
                 println(s"*** Task $name finished ***")
 
               } catch {
