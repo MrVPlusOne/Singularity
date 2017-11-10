@@ -567,7 +567,9 @@ object FuzzingTaskProvider{
       serverMain.stop()
     }
 
-    def sizeF: PartialFunction[IS[EValue], Int] = ???
+    def sizeF: PartialFunction[IS[EValue], Int] = {
+      case IS(VectValue(chars)) => chars.length
+    }
 
     protected def task: RunningFuzzingTask = {
       RunningFuzzingTask(

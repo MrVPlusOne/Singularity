@@ -63,8 +63,8 @@ object Runner {
     val workingDir = s"workingDir$ioId"
     FileInteraction.mkDirsAlongPath(workingDir)
 
-//    runExample(FuzzingTaskProvider.gabFeed2Example(ioId ,workingDir), Seq(ioId), useGUI = true)
-    runExample(FuzzingTaskProvider.textCrunchrExample(workingDir), Seq(ioId), useGUI = true)
+    runExample(FuzzingTaskProvider.gabFeed2Example(ioId ,workingDir), Seq(ioId), useGUI = true)
+//    runExample(FuzzingTaskProvider.textCrunchrExample(workingDir), Seq(ioId), useGUI = true)
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
