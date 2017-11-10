@@ -5,8 +5,8 @@ import patsyn._
 object BenchmarkDriver {
 
   def getWorkingDir(cliOption: CliOption): String = {
-    val seed = cliOption.seed
-    val workingDir = s"workingDir$seed"
+    val ioId = cliOption.ioId
+    val workingDir = s"workingDir$ioId"
     FileInteraction.mkDirsAlongPath(workingDir)
     workingDir
   }
@@ -38,11 +38,15 @@ object BenchmarkDriver {
     val parser = new scopt.OptionParser[CliOption]("patsyn_cli_driver") {
       head("patsyn Command Line Driver", "0.1")
 
-      opt[Unit]('n', "no-gui").action( (x, c) =>
+      opt[Unit]('n', "no-gui").action( (_, c) =>
         c.copy(disableGui = true)).text("Disable the GUI panel.")
 
-      opt[Int]('s', "seed").action( (x, c) =>
-        c.copy(seed=x)).text("The random seed to use. Default to 0.")
+      opt[Int]('i', "ioId").action( (id, c) =>
+        c.copy(ioId = id)
+      ).text("The id used to perform IO actions. If you have n processes running at the same time, just set their idIo to 0 through n.")
+
+      opt[Seq[Int]]('s', "seeds").valueName("<seed1>,<seed2>,...").action( (ss, c) =>
+        c.copy(seeds=ss)).text("The random seeds to use. Default to {0} (only 1 seed).")
 
       opt[Seq[String]]('e', "extrapolate").valueName("<indPath>,<outName>,<size>").
         action({ case (Seq(input, output, size), c) =>
@@ -71,7 +75,7 @@ object BenchmarkDriver {
             benchs.foreach { case (name, bench) =>
               println(s"*** Task $name started ***")
               try {
-                Runner.runExample(bench, Seq(cliOption.seed), !cliOption.disableGui)
+                Runner.runExample(bench, cliOption.seeds, !cliOption.disableGui)
                 println(s"*** Task $name finished ***")
 
               } catch {

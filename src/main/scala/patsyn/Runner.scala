@@ -59,11 +59,11 @@ object Runner {
   }
 
   def main(args: Array[String]): Unit = {
-    val seed = if(args.isEmpty) 0 else args.head.toInt
-    val workingDir = s"workingDir$seed"
+    val ioId = if(args.isEmpty) 0 else args.head.toInt
+    val workingDir = s"workingDir$ioId"
     FileInteraction.mkDirsAlongPath(workingDir)
 
-    runExample(FuzzingTaskProvider.textCrunchrExample(workingDir), Seq(seed), useGUI = true)
+    runExample(FuzzingTaskProvider.textCrunchrExample(workingDir), Seq(ioId), useGUI = true)
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)

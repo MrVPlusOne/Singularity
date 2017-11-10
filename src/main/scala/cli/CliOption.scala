@@ -1,7 +1,8 @@
 package cli
 
 case class CliOption(target: String = "",
-                     seed: Int = 0,
+                     ioId: Int = 0,
+                     seeds: Seq[Int] = Seq(0),
                      disableGui: Boolean = false,
                      extrapolatePattern: Option[ExtrapolationArgs] = None
                     )
