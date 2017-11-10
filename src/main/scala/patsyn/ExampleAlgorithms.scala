@@ -545,7 +545,7 @@ object FuzzingTaskProvider{
             val zipPath = s"$workDir/input.zip"
             outputAsZip(zipPath, content)
 
-            val cost = parseCost(Seq("java", "-cp", "benchmarks/textChrunchr/textChrunchr_3.jar",
+            val cost = parseCost(Seq("java", "-Xint", "-cp", "benchmarks/textChrunchr/textChrunchr_3.jar",
               "com.cyberpointllc.stac.host.Main", zipPath).lineStream.last)
 
             println(s"Cost = $cost")

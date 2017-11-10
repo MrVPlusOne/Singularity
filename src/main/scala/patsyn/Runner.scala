@@ -7,7 +7,7 @@ import measure.TimeTools
 import patsyn.EvolutionRepresentation.IndividualData
 import FuzzingTaskProvider.escapeStrings
 
-object TestRun {
+object Runner {
 
   case class MonitorManager(monitorCallback: MonitoringData => Unit, evalProgressCallback: Int => Unit)
 
@@ -72,31 +72,24 @@ object TestRun {
     ys.indices.map { i => (i + 1).toDouble -> ys(i) }
   }
 
+  case class RunConfig(populationSize: Int = 500,
+                       tournamentSize: Int = 7,
+                       evaluationTrials: Int = 3,
+                       totalSizeTolerance: Int = 50,
+                       singleSizeTolerance: Int = 30,
+                       threadNum: Int = 1,
+                       timeLimitInMillis: Int = 10000,
+                       maxNonIncreaseTime: Int = 150,
+                      )
 
   def runExample(taskProvider: FuzzingTaskProvider, seeds: Seq[Int], useGUI: Boolean): Unit = taskProvider.run{ task =>
 
-    // *** important parameters ***
-    val populationSize = 500
-    val tournamentSize = 7
-    val evaluationTrials = 3
-    val totalSizeTolerance = 50
-    val singleSizeTolerance = 30
-    val threadNum = 1
-    val timeLimitInMillis = 10000
-    val maxNonIncreaseTime = 150
-    val randomSeeds = seeds
-    // *** end of important parameters ***
+    val config = RunConfig()
+    import config._
 
     val library = MultiStateGOpLibrary(task.gpEnv, task.outputTypes)
 
-    println("[Function map]")
-    task.gpEnv.functionMap.foreach { case (t, comps) =>
-      println(s"$t -> ${comps.mkString("{", ", ", "}")}")
-    }
-    println("[End of Function map]")
-
-
-    for (seed <- randomSeeds) {
+    for (seed <- seeds) {
       val recordDirPath = {
         import java.util.Calendar
         val dateTime = Calendar.getInstance().getTime
@@ -114,6 +107,23 @@ object TestRun {
 
       FileInteraction.runWithAFileLogger(s"$recordDirPath/testResult[seed=$seed].txt") { logger =>
         import logger._
+
+        def printSection[A](name: String)(content: => A): A = {
+          println(s"[$name]")
+          val r = content
+          println(s"[End of $name]\n")
+          r
+        }
+
+        printSection("Configuration"){
+          println(config)
+        }
+
+        printSection("Function map"){
+          task.gpEnv.functionMap.foreach { case (t, comps) =>
+            println(s"$t -> ${comps.mkString("{", ", ", "}")}")
+          }
+        }
 
         val sizeOfInterest = task.sizeOfInterest
         val evaluation = new SimplePerformanceEvaluation(
@@ -154,9 +164,6 @@ object TestRun {
           }
         )
 
-
-        val parameterInfo = ""
-        println(parameterInfo)
 
         val startTime = System.nanoTime()
 

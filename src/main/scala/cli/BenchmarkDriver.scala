@@ -71,7 +71,7 @@ object BenchmarkDriver {
             benchs.foreach { case (name, bench) =>
               println(s"*** Task $name started ***")
               try {
-                TestRun.runExample(bench, Seq(cliOption.seed), !cliOption.disableGui)
+                Runner.runExample(bench, Seq(cliOption.seed), !cliOption.disableGui)
                 println(s"*** Task $name finished ***")
 
               } catch {
