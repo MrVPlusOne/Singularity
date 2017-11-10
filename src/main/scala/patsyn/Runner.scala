@@ -73,10 +73,10 @@ object Runner {
     ys.indices.map { i => (i + 1).toDouble -> ys(i) }
   }
 
-  case class RunConfig(populationSize: Int = 100,
+  case class RunConfig(populationSize: Int = 500,
                        tournamentSize: Int = 7,
-                       evaluationTrials: Int = 3,
-                       totalSizeTolerance: Int = 50,
+                       evaluationTrials: Int = 1,
+                       totalSizeTolerance: Int = 60,
                        singleSizeTolerance: Int = 30,
                        threadNum: Int = 1,
                        timeLimitInMillis: Int = 20000,
@@ -143,7 +143,7 @@ object Runner {
         val sizeOfInterest = task.sizeOfInterest
         val evaluation = new SimplePerformanceEvaluation(
           sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
-          resourceUsage = task.resourceUsage, sizeF = taskProvider.sizeF, maxMemoryUsage = sizeOfInterest * 10
+          resourceUsage = task.resourceUsage, sizeF = taskProvider.sizeF, breakingMemoryUsage = sizeOfInterest * 10
         )
         val representation = MultiStateRepresentation(totalSizeTolerance = totalSizeTolerance,
           singleSizeTolerance = singleSizeTolerance,

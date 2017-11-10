@@ -513,7 +513,7 @@ object FuzzingTaskProvider{
     protected def task: RunningFuzzingTask = {
       RunningFuzzingTask(
         outputTypes = IS(EVect(EInt)),
-        sizeOfInterest = 10000,
+        sizeOfInterest = 5000,
         resourceUsage = {
           case IS(chars: VectValue) =>
             val content = vectIntToString(chars)
@@ -526,7 +526,11 @@ object FuzzingTaskProvider{
             println(s"Cost = $cost")
             cost.toDouble
         },
-        gpEnv = abcRegexEnv.copy(stateTypes = abcRegexEnv.stateTypes ++ IS(EInt, EVect(EInt)))
+        gpEnv = abcRegexEnv.copy(
+          stateTypes = abcRegexEnv.stateTypes ++ IS(EInt, EVect(EInt)),
+          functions = IntComponents.collection ++ VectComponents.collection ++
+            IS(VectComponents.shift, VectComponents.intToString)
+        )
       )
     }
 

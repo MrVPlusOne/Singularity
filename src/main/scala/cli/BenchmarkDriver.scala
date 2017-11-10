@@ -137,6 +137,8 @@ object BenchmarkDriver {
   def saveExtrapolation(taskProvider: FuzzingTaskProvider, individual: MultiStateInd, size: Int, name: String): Unit = {
     println(s"Calculating extrapolation at size = $size ...")
     var lastSize = Int.MinValue
+    var progress = 0
+
     val valueOfInterest = MultiStateRepresentation.individualToPattern(individual).map(_._2).takeWhile{
       value =>
         val newSize = taskProvider.sizeF(value)
@@ -144,6 +146,8 @@ object BenchmarkDriver {
           println("Warning: Can't reach specified size using this individual")
           false
         }else{
+          progress += 1
+
           lastSize = newSize
           newSize <= size
         }

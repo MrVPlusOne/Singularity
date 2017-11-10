@@ -128,6 +128,13 @@ object StandardSystem {
       }
     })
 
+    val intToString = EConcreteFunc("int2String", IS(EInt, EInt), EVect(EInt), {
+      case IS(IntValue(x), IntValue(base)) =>
+        val p = if(x<0) -x else x
+        val b = if(base < 10) 10 else base
+        SimpleMath.natToList(p, b).toVector.map(IntValue.apply)
+    })
+
     val collection: IndexedSeq[EFunction] = IS(append, prepend, access, concat, length)
   }
 

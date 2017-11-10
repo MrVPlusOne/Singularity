@@ -18,4 +18,18 @@ object SimpleMath {
     val i = random.nextInt(xs.length)
     xs(i)
   }
+
+  def natToList(n: Int, base: Int): List[Int] = {
+    require(n>=0)
+    require(base > 0)
+    def rec(n: Int): List[Int] = {
+      if(n==0) List()
+      else{
+        val residual = n % base
+        residual :: rec(n/base)
+      }
+    }
+    val r = rec(n).reverse
+    if(r.isEmpty) List(0) else r
+  }
 }
