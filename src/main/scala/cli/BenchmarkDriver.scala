@@ -89,11 +89,14 @@ object BenchmarkDriver {
         c.copy(maxNonIncreaseTime = x)).text("[GP parameter] Stop after this number of generations if the fitness " +
         " for the best individual does not increase. Default to 150.")
 
-      opt[Seq[String]]('e', "extrapolate").valueName("<indPath>,<outName>,<size>").
-        action({ case (Seq(input, output, size), c) =>
-        c.copy(extrapolatePattern = Some(ExtrapolationArgs(input, output, size.toInt)))
+      opt[Seq[String]]('e', "extrapolate").valueName("<indPath>,<outName>,<size>[,<memory>]").
+        action({
+          case (Seq(input, output, size), c) =>
+            c.copy(extrapolatePattern = Some(ExtrapolationArgs(input, output, size.toInt, Long.MaxValue)))
+          case (Seq(input, output, size, memory), c) =>
+            c.copy(extrapolatePattern = Some(ExtrapolationArgs(input, output, size.toInt, memory.toLong)))
       }).
-        text("Read a MultiStateIndividual from <indPath> and try to construct an input of size <size>, then save it using name <outName>")
+        text("Read a MultiStateIndividual from <indPath> and try to construct an input of size <size>, then save it using name <outName>. Optionally, you can specify a memory limit for large input construction.")
 
       help("help").text("Prints this usage text")
       version("version").text("Prints the version info")
@@ -129,18 +132,21 @@ object BenchmarkDriver {
             }
           case Some(extraArg) =>
             val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
-            saveExtrapolation(taskProvider, ind, extraArg.size, extraArg.outputName)
+            saveExtrapolation(taskProvider, ind, extraArg.size, extraArg.memoryLimit, extraArg.outputName)
         }
     }
   }
 
-  def saveExtrapolation(taskProvider: FuzzingTaskProvider, individual: MultiStateInd, size: Int, name: String): Unit = {
-    println(s"Calculating extrapolation at size = $size ...")
+  def saveExtrapolation(taskProvider: FuzzingTaskProvider, individual: MultiStateInd,
+                        sizeLimit: Int, memoryLimit: Long, name: String): Unit = {
+    import EvolutionRepresentation.MemoryUsage
+
+    println(s"Calculating extrapolation at size = $sizeLimit ...")
     var lastSize = Int.MinValue
     var progress = 0
 
-    val valueOfInterest = MultiStateRepresentation.individualToPattern(individual).map(_._2).takeWhile{
-      value =>
+    val valueOfInterest = MultiStateRepresentation.individualToPattern(individual).takeWhile{
+      case (MemoryUsage(memory), value) =>
         val newSize = taskProvider.sizeF(value)
         if(newSize <= lastSize){
           println("Warning: Can't reach specified size using this individual")
@@ -149,9 +155,9 @@ object BenchmarkDriver {
           progress += 1
 
           lastSize = newSize
-          newSize <= size
+          newSize <= sizeLimit && memory <= memoryLimit
         }
-    }.last
+    }.last._2
 
     println(s"Extrapolation calculated. Now save results to $name")
     taskProvider.saveValueWithName(valueOfInterest, name)

@@ -1,5 +1,0 @@
-package evaluator
-
-class EvaluationMaster {
-
-}

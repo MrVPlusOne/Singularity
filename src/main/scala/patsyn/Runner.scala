@@ -173,6 +173,7 @@ object Runner {
             }.mkString(", ")
             representation.printIndividualMultiLine(println)(ind)
             println(s"Individual Pattern: $firstSevenInputs, ...")
+            FileInteraction.saveObjectToFile(s"$recordDirPath/timeoutIndividual[seed=$seed].serialized")(ind)
 
             System.exit(0)
             throw new Exception("Timed out!")
