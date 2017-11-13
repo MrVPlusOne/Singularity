@@ -2,6 +2,7 @@ package patsyn
 
 
 import java.awt.Dimension
+import java.util.concurrent.TimeoutException
 
 import measure.TimeTools
 import patsyn.EvolutionRepresentation.IndividualData
@@ -63,8 +64,8 @@ object Runner {
     val workingDir = s"workingDir$ioId"
     FileInteraction.mkDirsAlongPath(workingDir)
 
-    runExample(FuzzingTaskProvider.gabFeed2Example(ioId ,workingDir), Seq(ioId), useGUI = true)
-//    runExample(FuzzingTaskProvider.textCrunchrExample(workingDir), Seq(ioId), useGUI = true)
+//    runExample(FuzzingTaskProvider.gabFeed2Example(ioId ,workingDir), Seq(ioId), useGUI = true)
+    runExample(FuzzingTaskProvider.textCrunchrExample(workingDir), Seq(ioId), useGUI = true)
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -140,10 +141,23 @@ object Runner {
           }
         }
 
+        @throws[TimeoutException]
+        def timeLimitedResourceUsage(timeLimitInMillis: Int)(value: IS[EValue]): Double = {
+          import scala.concurrent.ExecutionContext.Implicits.global
+          import scala.concurrent._
+          import scala.concurrent.duration._
+          Await.result(
+            Future {
+              task.resourceUsage(value)
+            }
+            , timeLimitInMillis.milliseconds
+          )
+        }
+
         val sizeOfInterest = task.sizeOfInterest
         val evaluation = new SimplePerformanceEvaluation(
           sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
-          resourceUsage = task.resourceUsage, sizeF = taskProvider.sizeF, breakingMemoryUsage = sizeOfInterest * 10
+          resourceUsage = timeLimitedResourceUsage(timeLimitInMillis), sizeF = taskProvider.sizeF, breakingMemoryUsage = sizeOfInterest * 10
         )
         val representation = MultiStateRepresentation(totalSizeTolerance = totalSizeTolerance,
           singleSizeTolerance = singleSizeTolerance,
@@ -160,24 +174,25 @@ object Runner {
           initOperator = library.initOp(maxDepth = 3),
           operators = operators,
           indEval = ind => {
-            representation.fitnessEvaluation(ind)._1
+            try {
+              representation.fitnessEvaluation(ind)._1
+            } catch {
+              case _: TimeoutException =>
+                println("Evaluation timed out!")
+                val firstSevenInputs = representation.individualToPattern(ind).take(7).toList.map {
+                  case (_, v) => escapeStrings(taskProvider.displayValue(v))
+                }.mkString(", ")
+                representation.printIndividualMultiLine(println)(ind)
+                println(s"Individual Pattern: $firstSevenInputs, ...")
+                FileInteraction.saveObjectToFile(s"$recordDirPath/timeoutIndividual[seed=$seed].serialized")(ind)
+
+                System.exit(0)
+                throw new Exception("Timed out!")
+            }
           },
           threadNum = threadNum,
           randSeed = seed,
-          evalProgressCallback = evalProgressCallback,
-          timeLimitInMillis = timeLimitInMillis,
-          timeoutCallback = ind => {
-            println("Evaluation timed out!")
-            val firstSevenInputs = representation.individualToPattern(ind).take(7).toList.map {
-              case (_, v) => escapeStrings(taskProvider.displayValue(v))
-            }.mkString(", ")
-            representation.printIndividualMultiLine(println)(ind)
-            println(s"Individual Pattern: $firstSevenInputs, ...")
-            FileInteraction.saveObjectToFile(s"$recordDirPath/timeoutIndividual[seed=$seed].serialized")(ind)
-
-            System.exit(0)
-            throw new Exception("Timed out!")
-          }
+          evalProgressCallback = evalProgressCallback
         )
 
 
