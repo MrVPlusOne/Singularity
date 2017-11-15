@@ -11,6 +11,8 @@ object StandardSystem {
 
   case object EBool extends EType
 
+  case class EPair(t1: EType, t2: EType) extends EType
+
   // Value declarations
   case class IntValue(value: Int) extends EValue {
     def hasType(ty: EType): Boolean = ty == EInt
@@ -37,6 +39,15 @@ object StandardSystem {
     def size: Long = 1
   }
 
+  case class PairValue(value: (EValue, EValue)) extends EValue{
+    def hasType(ty: EType): Boolean = {
+      case EPair(t1, t2) => value._1.hasType(t1) && value._2.hasType(t2)
+      case _ => false
+    }
+
+    def size: Long = value._1.size + value._2.size
+  }
+
   implicit def intValue(v: Int): IntValue = IntValue(v)
 
   implicit def vectValue[E](v: Vector[EValue]): VectValue = {
@@ -44,6 +55,10 @@ object StandardSystem {
   }
 
   implicit def boolValue(b: Boolean): BoolValue = BoolValue(b)
+
+  implicit def pairValue(p: (EValue, EValue)): PairValue = {
+    PairValue(p)
+  }
 
   object IntComponents{
     val inc =  EConcreteFunc("inc", IS(EInt), EInt, {
@@ -170,4 +185,32 @@ object StandardSystem {
     val collection: IndexedSeq[EFunction] = IS(not, and, or, lessThan, equal, ifElse)
   }
 
+  object PairComponents {
+    val pair1 = EAbstractFunc("pair1", tyVarNum = 2,
+      typeInstantiation = {
+        case IS(t1,t2) => IS(EPair(t1,t2)) -> t1
+      }, eval = {
+        case IS(PairValue(value)) => value._1
+      }
+    )
+
+    val pair2 = EAbstractFunc("pair2", tyVarNum = 2,
+      typeInstantiation = {
+        case IS(t1,t2) => IS(EPair(t1,t2)) -> t2
+      }, eval = {
+        case IS(PairValue(value)) => value._2
+      }
+    )
+
+    val mkPair = EAbstractFunc("mkPair", tyVarNum = 2,
+      typeInstantiation = {
+        case IS(t1,t2) => IS(t1,t2) -> EPair(t1,t2)
+      }, eval = {
+        case IS(v1,v2) => (v1,v2)
+      }
+    )
+
+    // examples on how to make a concrete version
+    val mkIntPair: EConcreteFunc = mkPair.concretize(IS(EInt, EInt))
+  }
 }

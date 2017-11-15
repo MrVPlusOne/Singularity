@@ -97,7 +97,12 @@ object Runner {
     }
   }
 
-  def runExample(taskProvider: FuzzingTaskProvider, seeds: Seq[Int], config: RunConfig = RunConfig(), useGUI: Boolean)
+  object RunConfig{
+    def default = RunConfig()
+  }
+
+  def runExample(taskProvider: FuzzingTaskProvider, seeds: Seq[Int], config: RunConfig = RunConfig.default,
+                 useGUI: Boolean = true)
   : Unit = taskProvider
     .run{ task =>
 
