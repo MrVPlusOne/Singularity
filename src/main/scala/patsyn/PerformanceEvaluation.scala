@@ -90,7 +90,9 @@ class SimplePerformanceEvaluation(sizeOfInterest: Int, evaluationTrials: Int, va
       lastSize = inputSize
       sizeF(input) <= sizeOfInterest
     }.takeRight(evaluationTrials)
-    pointsToTry.map(_._2).map(resourceUsage).max
+    Debug.debug("eval") {
+      pointsToTry.map(_._2).map(resourceUsage).max
+    }
   }
 }
 

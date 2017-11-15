@@ -494,6 +494,92 @@ object FuzzingTaskProvider{
     }
   }
 
+  def linearAlgebraEnv: GPEnvironment = {
+    val constMap = makeConstMap(
+      EInt -> IS(r => r.nextInt(12)),
+      EVect(EInt) -> IS(_ => Vector())
+    )
+
+    val functions = IntComponents.collection ++ VectComponents.collection
+
+    val stateTypes = IS(EInt, EInt, EInt, EInt, EVect(EInt), EVect(EInt))
+    GPEnvironment(constMap, functions, stateTypes)
+  }
+
+  def linearAlgebraExample(rowSize: Int, midSize: Int, colSize: Int) = new FuzzingTaskProvider {
+    // We try to multiply a matrix of rowSize * midSize with another one of midSize * colSize
+
+    import patbench.linearalgebra.com.example.linalg.external.serialization.OperationRequest
+    import patbench.linearalgebra.com.example.linalg.external.serialization.OperationRequest$Argument
+
+    override def displayValue = {
+      case IS(lhs:VectValue, rhs:VectValue)=>
+        s"(LHS = $lhs, RHS = $rhs)"
+    }
+
+    override def sizeF: PartialFunction[IS[EValue], Int] = {
+      case IS(VectValue(lhs), VectValue(rhs)) => lhs.length + rhs.length
+    }
+
+    def toMatrixString(data: IS[Int], width: Int, height: Int): String = {
+      myPrint("toMatrixString")
+      val matrixSize = width * height
+      val dataSize = data.length
+      (0 until matrixSize)
+        .map(i => data(SimpleMath.wrapInRange(i, dataSize)))
+        .grouped(width)
+        .map(row => row.mkString(","))
+        .mkString("\n")
+    }
+
+    def toRequest(lhs: String, lhsWidth: Int, lhsHeight: Int,
+                  rhs: String, rhsWidth: Int, rhsHeight: Int): OperationRequest = {
+      require(!lhs.isEmpty)
+      require(!rhs.isEmpty)
+      myPrint("toRequest")
+
+      val req = new OperationRequest
+      req.operation = 1
+      req.numberOfArguments = 2
+
+      val arg0 = new OperationRequest$Argument(req)
+      arg0.rows = lhsWidth
+      arg0.cols = lhsHeight
+      arg0.matrix = lhs
+      val arg1 = new OperationRequest$Argument(req)
+      arg1.rows = rhsWidth
+      arg1.cols = rhsHeight
+      arg1.matrix = rhs
+      req.args = Array(arg0, arg1)
+
+      req
+    }
+
+    override protected def task: RunningFuzzingTask = {
+      import patbench.linearalgebra.com.example.linalg.external.operations.MultiplyOperation
+
+      RunningFuzzingTask(
+        outputTypes = IS(EVect(EInt), EVect(EInt)),
+        sizeOfInterest = rowSize * midSize + midSize * colSize,
+        resourceUsage = {
+          case IS(lhs: VectValue, rhs: VectValue) =>
+            if (lhs.value.isEmpty || rhs.value.isEmpty)
+              0
+            else {
+              val lhsMatrix = toMatrixString(toIntVect(lhs.value), rowSize, midSize)
+              val rhsMatrix = toMatrixString(toIntVect(rhs.value), midSize, colSize)
+              val req = toRequest(lhsMatrix, rowSize, midSize, rhsMatrix, midSize, colSize)
+
+              Cost.reset()
+              new MultiplyOperation().compute(req)
+              Cost.read()
+            }
+        },
+        gpEnv = linearAlgebraEnv
+      )
+    }
+  }
+
   def sendCommand(cmd: String): Unit = {
     import sys.process._
 
