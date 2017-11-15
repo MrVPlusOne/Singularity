@@ -40,7 +40,7 @@ object StandardSystem {
   }
 
   case class PairValue(value: (EValue, EValue)) extends EValue{
-    def hasType(ty: EType): Boolean = {
+    def hasType(ty: EType): Boolean = ty match {
       case EPair(t1, t2) => value._1.hasType(t1) && value._2.hasType(t2)
       case _ => false
     }

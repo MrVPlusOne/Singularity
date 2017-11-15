@@ -2,7 +2,7 @@ package patsyn
 
 
 import edu.utexas.stac.Cost
-import fi.iki.elonen.JavaWebServer
+import patbench.blogger.fi.iki.elonen.JavaWebServer
 
 
 object TestCostInstr {
