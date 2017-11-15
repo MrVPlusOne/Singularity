@@ -83,16 +83,14 @@ class SimplePerformanceEvaluation(sizeOfInterest: Int, evaluationTrials: Int, va
 
   def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): Double = {
     var lastSize = Int.MinValue
-    val pointsToTry = inputStream.takeWhile{case (usage, input) =>
+    val pointsToTry = inputStream.takeWhile { case (usage, input) =>
       val inputSize = sizeF(input)
-      if(inputSize <= lastSize || usage.amount > breakingMemoryUsage)
+      if (inputSize <= lastSize || usage.amount > breakingMemoryUsage)
         return nonsenseFitness
       lastSize = inputSize
       sizeF(input) <= sizeOfInterest
     }.takeRight(evaluationTrials)
-    Debug.debug("eval") {
-      pointsToTry.map(_._2).map(resourceUsage).max
-    }
+    pointsToTry.map(_._2).map(resourceUsage).max
   }
 }
 

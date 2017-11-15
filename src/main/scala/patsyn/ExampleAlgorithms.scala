@@ -522,7 +522,6 @@ object FuzzingTaskProvider{
     }
 
     def toMatrixString(data: IS[Int], width: Int, height: Int): String = {
-      myPrint("toMatrixString")
       val matrixSize = width * height
       val dataSize = data.length
       (0 until matrixSize)
@@ -536,7 +535,6 @@ object FuzzingTaskProvider{
                   rhs: String, rhsWidth: Int, rhsHeight: Int): OperationRequest = {
       require(!lhs.isEmpty)
       require(!rhs.isEmpty)
-      myPrint("toRequest")
 
       val req = new OperationRequest
       req.operation = 1

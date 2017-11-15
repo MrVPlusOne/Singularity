@@ -243,6 +243,9 @@ object Runner {
           }
           FileInteraction.saveObjectToFile(s"$recordDirPath/bestIndividual[seed=$seed].serialized")(best.ind)
         }
+
+        println("Evolution Finished!")
+        System.exit(0)
       }
     }
   }

@@ -82,27 +82,31 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
         }
       }
 
-      val newIndsAndHistory = for (i <- 0 until populationSize) yield {
-        val geneticOp = {
-          val x = random.nextDouble()
+      val newIndsAndHistory = {
+        for (i <- 0 until populationSize) yield {
+          val geneticOp = {
+            val x = random.nextDouble()
 
-          operatorPCF.find {
-            case (op, pAcc) => x < pAcc
-          }.getOrElse(operatorPCF.last)._1
-        }
+            operatorPCF.find {
+              case (op, pAcc) => x < pAcc
+            }.getOrElse(operatorPCF.last)._1
+          }
 
-        val participates = IS.fill(geneticOp.arity) {
-          tournamentResult(i)
+          val participates = IS.fill(geneticOp.arity) {
+            tournamentResult(i)
+          }
+          val newInd = geneticOp.operate(random, participates.map(_._1.ind))
+          val historyLen = if (participates.isEmpty) 0 else participates.map(_._1.history.historyLength).max + 1
+          val newHistory = IndividualHistory(participates.map(_._2), geneticOp.name, historyLen)
+          newInd -> newHistory
         }
-        val newInd = geneticOp.operate(random, participates.map(_._1.ind))
-        val historyLen = if(participates.isEmpty) 0 else participates.map(_._1.history.historyLength).max + 1
-        val newHistory = IndividualHistory(participates.map(_._2), geneticOp.name, historyLen)
-        newInd -> newHistory
       }
 
       val newInds = newIndsAndHistory.map(_._1)
-      val newFitnessMap = parExecute(newInds.distinct)(ind =>
-        ind -> pop.fitnessMap.getOrElse(ind, default = evaluation(ind))).toMap
+      val newFitnessMap = {
+        parExecute(newInds.distinct)(ind =>
+          ind -> pop.fitnessMap.getOrElse(ind, default = evaluation(ind))).toMap
+      }
 
       val newData = newIndsAndHistory.indices.map{i =>
         val (ind, history) = newIndsAndHistory(i)
