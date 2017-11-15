@@ -12,24 +12,6 @@ import scala.concurrent.TimeoutException
 import scala.util.Random
 
 
-class Counter{
-
-  private var counter = 0L
-
-  def count(): Unit = {
-    counter += 1
-  }
-
-  def count(n: Int): Unit = {
-    counter += n
-  }
-
-  def read(): Double = {
-    counter.toDouble
-  }
-}
-
-
 trait FuzzingTaskProvider{
   protected def task: RunningFuzzingTask
 
@@ -101,6 +83,8 @@ object FuzzingTaskProvider{
   }
 
   def insertionSortExample = new FuzzingTaskProvider {
+    import patbench.slowfuzz.InsertionSort
+
     def sizeF = {
       case IS(VectValue(v)) => v.length
     }
@@ -108,28 +92,28 @@ object FuzzingTaskProvider{
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
       outputTypes = IS(EVect(EInt)),
       resourceUsage = {
+
+
         case IS(VectValue(v)) =>
-          val c = new Counter()
-          ExampleAlgorithms.insertionSort(c)(toIntVect(v))
-          c.read()
+          Cost.reset()
+          InsertionSort.main(toIntVect(v).map(i=>i.toString).toArray)
+          Cost.read()
       },
       gpEnv = sortingEnv
     )
   }
 
   def quickSortExample = new FuzzingTaskProvider {
-    def choosePivot(xs: IS[Int]): Int = {
-      xs(xs.length/2) // choose middle
-      //      xs(xs.length/3) // 1/3
-    }
+    import patbench.slowfuzz.QuickSort
 
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
       outputTypes = IS(EVect(EInt)),
       resourceUsage = {
         case IS(VectValue(vec)) =>
-          val c = new Counter()
-          ExampleAlgorithms.quickSort(c, choosePivot)(toIntVect(vec))
-          c.read()
+          Cost.reset()
+          val args = toIntVect(vec).map(i=>i.toString).toArray
+          QuickSort.main(args)
+          Cost.read()
       },
       gpEnv = sortingEnv
     )
@@ -137,42 +121,6 @@ object FuzzingTaskProvider{
     def sizeF = {
       case IS(VectValue(v)) =>
         v.length
-    }
-  }
-
-  def randomQuickSortExample(seed: Int) = new FuzzingTaskProvider {
-    protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EVect(EInt)),
-      resourceUsage = {
-        case IS(VectValue(vec)) =>
-          val random = new Random(seed)
-          val c = new Counter()
-          ExampleAlgorithms.quickSort(c, xs => xs(random.nextInt(xs.length)))(toIntVect(vec))
-          c.read()
-      },
-      gpEnv = sortingEnv
-    )
-
-    def sizeF = {
-      case IS(VectValue(v)) =>
-        v.length
-    }
-  }
-
-  def listSearchExample = new FuzzingTaskProvider {
-    protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EVect(EInt), EInt),
-      resourceUsage = {
-        case IS(VectValue(vec), IntValue(idx)) =>
-          val c = new Counter()
-          ExampleAlgorithms.listSearchAndCopy(c)(toIntVect(vec), idx)
-          c.read()
-      },
-      gpEnv = sortingEnv
-    )
-
-    def sizeF = {
-      case IS(VectValue(v), IntValue(_)) => v.length
     }
   }
 
@@ -248,8 +196,8 @@ object FuzzingTaskProvider{
     eValue.asInstanceOf[IntValue].value.toChar
   }
 
-  import regex._
   def regexExample(regex: String, regexDic: Int => String) = new FuzzingTaskProvider {
+    import patbench.slowfuzz.regex._
     val pattern = Pattern.compile(regex)
 
 
@@ -264,10 +212,10 @@ object FuzzingTaskProvider{
         sizeOfInterest = 200,
         resourceUsage = {
           case IS(VectValue(chars)) =>
-            val counter = new Counter()
+            Cost.reset()
             val s = chars.asInstanceOf[Vector[IntValue]].flatMap(i => regexDic(i.value))
-            pattern.matcher(counter, s).find()
-            counter.read()
+            pattern.matcher(s).find()
+            Cost.read()
         },
         gpEnv = abcRegexEnv
       )
@@ -311,7 +259,7 @@ object FuzzingTaskProvider{
       import java.io.FileWriter
 
       import edu.utexas.stac.Cost
-      import user.commands.CommandProcessor
+      import patbench.graphanalyzer.user.commands.CommandProcessor
 
       RunningFuzzingTask(
         outputTypes = IS(EVect(EVect(EInt))),
@@ -329,7 +277,7 @@ object FuzzingTaskProvider{
             fw.write(fileContent)
             fw.close()
 
-            Cost.write(0L)
+            Cost.reset()
 
             val timeLimit = 10*1000
             try {
@@ -359,7 +307,7 @@ object FuzzingTaskProvider{
 
   /** Http request example */
   def bloggerExample = new FuzzingTaskProvider {
-    import fi.iki.elonen.JavaWebServer
+    import patbench.blogger.fi.iki.elonen.JavaWebServer
 
     import sys.process._
     val server = new JavaWebServer(8080)
@@ -595,67 +543,4 @@ object FuzzingTaskProvider{
     }
   }
 
-}
-
-object ExampleAlgorithms {
-
-  def quickSort(c: Counter, pivotChoose: (IS[Int]) => Int)(xs: IS[Int]): IS[Int] = {
-    c.count()
-    if(xs.length < 2) return xs
-
-    val pivot = pivotChoose(xs)
-    val left = xs.filter(_ < pivot)
-    val right = xs.filter(_ > pivot)
-    val middle = xs.filter(_ == pivot)
-    c.count(xs.length)
-    quickSort(c, pivotChoose)(left) ++ middle ++ quickSort(c, pivotChoose)(right)
-  }
-
-  def insertionSort(c: Counter)(xs: IS[Int]): IS[Int] = {
-    val array = xs.toArray
-
-    def sortPart(n: Int): Unit = {
-      val x = array(n)
-      for(i <- n-1 to 0 by -1){
-        c.count(2)
-        array(i+1) = array(i)
-
-        c.count()
-        if(array(i)<=x){
-          c.count()
-          array(i) = x
-          return
-        }
-      }
-      c.count()
-      array(0) = x
-    }
-    for(i <- xs.indices){
-      c.count()
-      sortPart(i)
-    }
-    array
-  }
-
-  def listSearchAndCopy(c: Counter)(xs: IS[Int], e: Int): Option[IS[Int]] = {
-    for(i <- xs.indices){
-      c.count(2)
-      if(xs(i) == e){
-        c.count(i+1)
-        return Some(xs.take(i))
-      }
-    }
-    c.count()
-    None
-  }
-
-
-
-  def main(args: Array[String]): Unit = {
-    val c = new Counter()
-    val rand = new Random(1)
-    val r = quickSort(c, _.last)(0 until 20)
-    println(r)
-    println(c.read())
-  }
 }

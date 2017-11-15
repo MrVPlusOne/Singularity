@@ -12,6 +12,8 @@ project/plugins/project/
 .history
 .cache
 .lib/
+.idea/
+workingDir*
 ### Scala template
 *.class
 *.log
