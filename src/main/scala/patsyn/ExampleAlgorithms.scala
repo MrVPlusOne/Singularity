@@ -1,8 +1,6 @@
 package patsyn
 
 import java.awt.image.BufferedImage
-import java.io.FileOutputStream
-import java.util.zip.ZipOutputStream
 
 import edu.utexas.stac.Cost
 import patsyn.GeneticOperator.ExprGen
@@ -502,12 +500,12 @@ object FuzzingTaskProvider{
 
     val functions = IntComponents.collection ++ VectComponents.collection
 
-    val stateTypes = IS(EInt, EInt, EInt, EInt, EVect(EInt), EVect(EInt))
+    val stateTypes = IS(EInt, EInt, EInt, EVect(EInt), EVect(EInt))
     GPEnvironment(constMap, functions, stateTypes)
   }
 
-  def linearAlgebraExample(rowSize: Int, midSize: Int, colSize: Int) = new FuzzingTaskProvider {
-    // We try to multiply a matrix of rowSize * midSize with another one of midSize * colSize
+  def linearAlgebraExample(matSize: Int, workingDir: String) = new FuzzingTaskProvider {
+    val rowSize, midSize, colSize: Int = matSize
 
     import patbench.linearalgebra.com.example.linalg.external.serialization.OperationRequest
     import patbench.linearalgebra.com.example.linalg.external.serialization.OperationRequest$Argument
@@ -523,9 +521,10 @@ object FuzzingTaskProvider{
 
     def toMatrixString(data: IS[Int], width: Int, height: Int): String = {
       val matrixSize = width * height
-      val dataSize = data.length
+      val (dataSize, dataSeq) = if (data.isEmpty) { (1, IS(0)) } else { (data.length, data) }
       (0 until matrixSize)
-        .map(i => data(SimpleMath.wrapInRange(i, dataSize)))
+        .map(i => math.abs(dataSeq(SimpleMath.wrapInRange(i, dataSize))))
+        .map(i => "%.16f".format(i.toDouble / 1000))
         .grouped(width)
         .map(row => row.mkString(","))
         .mkString("\n")
@@ -533,9 +532,6 @@ object FuzzingTaskProvider{
 
     def toRequest(lhs: String, lhsWidth: Int, lhsHeight: Int,
                   rhs: String, rhsWidth: Int, rhsHeight: Int): OperationRequest = {
-      require(!lhs.isEmpty)
-      require(!rhs.isEmpty)
-
       val req = new OperationRequest
       req.operation = 1
       req.numberOfArguments = 2
@@ -553,6 +549,14 @@ object FuzzingTaskProvider{
       req
     }
 
+    def makeRequestFromVectValues(lhs: VectValue, rhs: VectValue): OperationRequest = {
+      val lhsMatrix = toMatrixString(toIntVect(lhs.value), rowSize, midSize)
+      val rhsMatrix = toMatrixString(toIntVect(rhs.value), midSize, colSize)
+      toRequest(
+        lhsMatrix, rowSize, midSize,
+        rhsMatrix, midSize, colSize)
+    }
+
     override protected def task: RunningFuzzingTask = {
       import patbench.linearalgebra.com.example.linalg.external.operations.MultiplyOperation
 
@@ -561,24 +565,43 @@ object FuzzingTaskProvider{
         sizeOfInterest = rowSize * midSize + midSize * colSize,
         resourceUsage = {
           case IS(lhs: VectValue, rhs: VectValue) =>
-            if (lhs.value.isEmpty || rhs.value.isEmpty)
-              0
-            else {
-              val lhsMatrix = toMatrixString(toIntVect(lhs.value), rowSize, midSize)
-              val rhsMatrix = toMatrixString(toIntVect(rhs.value), midSize, colSize)
-              val req = toRequest(lhsMatrix, rowSize, midSize, rhsMatrix, midSize, colSize)
+            val req = makeRequestFromVectValues(lhs, rhs)
+            import patbench.linearalgebra.com.google.gson.Gson
+            println(new Gson().toJson(req))
 
-              Cost.reset()
-              new MultiplyOperation().compute(req)
-              Cost.read()
-            }
+            Cost.reset()
+            new MultiplyOperation().compute(req)
+            Cost.read()
         },
         gpEnv = linearAlgebraEnv
       )
     }
+
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      import java.io.FileWriter
+      import java.io.IOException
+      import patbench.linearalgebra.com.google.gson.Gson
+
+      super.saveValueWithName(value, name)
+      value match {
+        case IS(lhs: VectValue, rhs: VectValue) =>
+          val jsonFileName = name + ".json"
+          val req = makeRequestFromVectValues(lhs, rhs)
+
+          try {
+            val writer = new FileWriter(jsonFileName)
+            try {
+              val gson = new Gson
+              gson.toJson(req, writer)
+            } finally if (writer != null) writer.close()
+          } catch {
+            case e: IOException => println(s"Error when writing to file \'$jsonFileName\': ${e.getMessage}")
+          }
+      }
+    }
   }
 
-  def sendCommand(cmd: String): Unit = {
+  /*def sendCommand(cmd: String): Unit = {
     import sys.process._
 
     cmd.split("\\s+").toSeq.!
@@ -625,6 +648,6 @@ object FuzzingTaskProvider{
         gpEnv = abcRegexEnv.copy(stateTypes = abcRegexEnv.stateTypes ++ IS(EInt, EVect(EInt)))
       )
     }
-  }
+  }*/
 
 }

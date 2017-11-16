@@ -1,12 +1,11 @@
 package gabfeed2;
 
-import com.cyberpointllc.stac.host.Main;
-
-import java.io.File;
+// import com.cyberpointllc.stac.host.Main;
+// import java.io.File;
 
 public class ServerManager {
 
-    public static Main makeServer(int port, String dataPath, boolean rebuildDB,
+    /*public static Main makeServer(int port, String dataPath, boolean rebuildDB,
                                   String serverKeyPath, String passswordKeyPath, String loginId) throws Exception {
 
         File dataPathFile = new File(dataPath);
@@ -40,6 +39,6 @@ public class ServerManager {
     private static void mainHelper2(File passwordKeyFile) throws Exception {
         System.err.println("ERROR: specified password key " + passwordKeyFile + " does not exist");
         System.exit(1);
-    }
+    }*/
 
 }

@@ -7,6 +7,7 @@ import java.util.concurrent.TimeoutException
 import measure.TimeTools
 import patsyn.EvolutionRepresentation.IndividualData
 import FuzzingTaskProvider.escapeStrings
+import cli.BenchmarkDriver
 
 object Runner {
 
@@ -64,7 +65,7 @@ object Runner {
     val workingDir = s"workingDir$ioId"
     FileInteraction.mkDirsAlongPath(workingDir)
 
-    runExample(FuzzingTaskProvider.linearAlgebraExample(10, 10, 10), Seq(ioId), useGUI = true)
+    runExample(FuzzingTaskProvider.linearAlgebraExample(10, workingDir), Seq(ioId), useGUI = true)
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -136,6 +137,7 @@ object Runner {
         }
 
         printSection("Configuration"){
+          println(s"sizeOfInterest = ${task.sizeOfInterest}")
           println(config.show)
         }
 
@@ -189,6 +191,10 @@ object Runner {
                 representation.printIndividualMultiLine(println)(ind)
                 println(s"Individual Pattern: $firstSevenInputs, ...")
                 FileInteraction.saveObjectToFile(s"$recordDirPath/timeoutIndividual[seed=$seed].serialized")(ind)
+
+                // We might also be interested in the value
+                BenchmarkDriver.saveExtrapolation(taskProvider, ind, task.sizeOfInterest, Long.MaxValue,
+                  s"$recordDirPath/timeoutValue")
 
                 System.exit(0)
                 throw new Exception("Timed out!")
