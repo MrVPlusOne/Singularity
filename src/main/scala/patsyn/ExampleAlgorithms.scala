@@ -10,7 +10,7 @@ import scala.concurrent.TimeoutException
 import scala.util.Random
 
 
-trait FuzzingTaskProvider{
+trait FuzzingTaskProvider {
   protected def task: RunningFuzzingTask
 
   def sizeF: PartialFunction[IS[EValue], Int]
@@ -25,8 +25,8 @@ trait FuzzingTaskProvider{
 
   def saveValueWithName(value: IS[EValue], name: String): Unit = {
     import java.io._
-    val fw = new FileWriter(new File(name+".txt"))
-    try{
+    val fw = new FileWriter(new File(name + ".txt"))
+    try {
       fw.write(displayValue(value))
     } finally {
       fw.close()
@@ -35,10 +35,10 @@ trait FuzzingTaskProvider{
 
   def run[A](f: RunningFuzzingTask => A): A = {
     val task = this.task
-    try{
+    try {
       setupTask(task)
       f(task)
-    }finally{
+    } finally {
       teardownTask(task)
     }
   }
@@ -49,10 +49,10 @@ case class RunningFuzzingTask(outputTypes: IS[EType],
                               sizeOfInterest: Int = 500,
                               resourceUsage: PartialFunction[IS[EValue], Double],
                               gpEnv: GPEnvironment
-                      )
+                             )
 
 //noinspection TypeAnnotation
-object FuzzingTaskProvider{
+object FuzzingTaskProvider {
 
   def emptyAction(): Unit = ()
 
@@ -63,8 +63,8 @@ object FuzzingTaskProvider{
   }
 
   def makeConstMap(pairs: (EType, IS[Random => EValue])*): Map[EType, IS[ExprGen[EConst]]] = {
-    pairs.map{ case (t, fs) =>
-      t -> fs.map(f =>ExprGen(t, r => EConst(t, f(r))))
+    pairs.map { case (t, fs) =>
+      t -> fs.map(f => ExprGen(t, r => EConst(t, f(r))))
     }.toMap
   }
 
@@ -81,6 +81,7 @@ object FuzzingTaskProvider{
   }
 
   def insertionSortExample = new FuzzingTaskProvider {
+
     import patbench.slowfuzz.InsertionSort
 
     def sizeF = {
@@ -94,7 +95,7 @@ object FuzzingTaskProvider{
 
         case IS(VectValue(v)) =>
           Cost.reset()
-          InsertionSort.main(toIntVect(v).map(i=>i.toString).toArray)
+          InsertionSort.main(toIntVect(v).map(i => i.toString).toArray)
           Cost.read()
       },
       gpEnv = sortingEnv
@@ -102,6 +103,7 @@ object FuzzingTaskProvider{
   }
 
   def quickSortExample = new FuzzingTaskProvider {
+
     import patbench.slowfuzz.QuickSort
 
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
@@ -109,7 +111,7 @@ object FuzzingTaskProvider{
       resourceUsage = {
         case IS(VectValue(vec)) =>
           Cost.reset()
-          val args = toIntVect(vec).map(i=>i.toString).toArray
+          val args = toIntVect(vec).map(i => i.toString).toArray
           QuickSort.main(args)
           Cost.read()
       },
@@ -154,7 +156,7 @@ object FuzzingTaskProvider{
             vectIntToCharArray(v.asInstanceOf[VectValue])
           }).distinct.map(ccs_hashFunc)
 
-          hashes.groupBy(identity).values.map{
+          hashes.groupBy(identity).values.map {
             elems => elems.length - 1
           }.sum
       },
@@ -195,13 +197,15 @@ object FuzzingTaskProvider{
   }
 
   def regexExample(regex: String, regexDic: Int => String) = new FuzzingTaskProvider {
+
     import patbench.slowfuzz.regex._
+
     val pattern = Pattern.compile(regex)
 
 
     override def displayValue = {
       case IS(VectValue(vs)) =>
-      vs.map(intValueAsChar).mkString("")
+        vs.map(intValueAsChar).mkString("")
     }
 
     protected def task: RunningFuzzingTask = {
@@ -227,17 +231,17 @@ object FuzzingTaskProvider{
   def ccs_hashFunc(ls: Seq[Char]) = {
     val cs = ls.toArray
     var hash = 5381
-    for(i <- cs.indices){
+    for (i <- cs.indices) {
       hash = ((hash << 5) + hash) + cs(i)
     }
     hash
   }
 
   def intVectorToGraph(graphId: Int, refs: Vector[Int]): String = {
-    val graphName = if(graphId == 0) "main" else s"L$graphId"
+    val graphName = if (graphId == 0) "main" else s"L$graphId"
     val graphBody = refs.zipWithIndex.map { case (ref, i) =>
       val edgeName = s"$graphName-$i"
-      val label = if(ref == graphId) "net" else s"container:L$ref"
+      val label = if (ref == graphId) "net" else s"container:L$ref"
       s"""    $edgeName [type="$label", color="red", x=30, y=30, h=30, w=30];"""
     }.mkString("\n")
     s"""graph "$graphName" {
@@ -250,7 +254,7 @@ object FuzzingTaskProvider{
 
     def sizeF = {
       case IS(VectValue(graphs)) =>
-        graphs.map(g => g.asInstanceOf[VectValue].value.length+1).sum
+        graphs.map(g => g.asInstanceOf[VectValue].value.length + 1).sum
     }
 
     protected def task: RunningFuzzingTask = {
@@ -265,9 +269,9 @@ object FuzzingTaskProvider{
         resourceUsage = {
           case IS(VectValue(graphs)) =>
 
-            val fileContent = graphs.zipWithIndex.map{
+            val fileContent = graphs.zipWithIndex.map {
               case (graphVec, i) =>
-                val vec = graphVec.asInstanceOf[VectValue].value.map{e => e.asInstanceOf[IntValue].value}
+                val vec = graphVec.asInstanceOf[VectValue].value.map { e => e.asInstanceOf[IntValue].value }
                 intVectorToGraph(i, vec)
             }.mkString("\n")
 
@@ -277,7 +281,7 @@ object FuzzingTaskProvider{
 
             Cost.reset()
 
-            val timeLimit = 10*1000
+            val timeLimit = 10 * 1000
             try {
               import scala.concurrent.ExecutionContext.Implicits.global
               import scala.concurrent._
@@ -305,9 +309,11 @@ object FuzzingTaskProvider{
 
   /** Http request example */
   def bloggerExample = new FuzzingTaskProvider {
+
     import patbench.blogger.fi.iki.elonen.JavaWebServer
 
     import sys.process._
+
     val server = new JavaWebServer(8080)
 
     override def setupTask(task: RunningFuzzingTask): Unit = {
@@ -320,7 +326,7 @@ object FuzzingTaskProvider{
 
 
     override def displayValue = {
-      case IS(vec:VectValue)=> vectIntToString(vec)
+      case IS(vec: VectValue) => vectIntToString(vec)
     }
 
     def sizeF = {
@@ -333,10 +339,10 @@ object FuzzingTaskProvider{
         outputTypes = IS(EVect(EInt)),
         sizeOfInterest = 100,
         resourceUsage = {
-          case IS(vec :VectValue) =>
+          case IS(vec: VectValue) =>
             val s = vectIntToString(vec)
             Cost.reset()
-            try{
+            try {
               s"curl -i http://localhost:8080/$s" !
             } catch {
               case _: java.io.IOException =>
@@ -381,6 +387,7 @@ object FuzzingTaskProvider{
   }
 
   def imageExample(imageWidth: Int, imageHeight: Int, workingDir: String) = new FuzzingTaskProvider {
+
     import java.io.File
     import javax.imageio.ImageIO
 
@@ -408,10 +415,10 @@ object FuzzingTaskProvider{
         sizeOfInterest = imageDataSize,
         resourceUsage = {
           case IS(VectValue(data)) =>
-            if(data.isEmpty) 0.0
+            if (data.isEmpty) 0.0
             else {
               val imageName = s"$workingDir/genImage"
-              val imagePath  = imageName + ".png"
+              val imagePath = imageName + ".png"
               val image = intsToImage(imageWidth, imageHeight, imageName, data.map(_.asInstanceOf[IntValue].value))
               ImageIO.write(image, "png", new File(imagePath))
 
@@ -438,8 +445,10 @@ object FuzzingTaskProvider{
   }
 
   def textCrunchrExample(workDir: String) = new FuzzingTaskProvider {
-    import java.util.zip._
+
     import java.io._
+    import java.util.zip._
+
     import sys.process._
 
     def outputAsZip(outPath: String, content: String, contentFileName: String = "content.txt") = {
@@ -486,7 +495,7 @@ object FuzzingTaskProvider{
       value match {
         case IS(VectValue(chars)) =>
           val content = vectIntToString(chars)
-          val zipPath = name+".zip"
+          val zipPath = name + ".zip"
           outputAsZip(zipPath, content)
       }
     }
@@ -507,11 +516,10 @@ object FuzzingTaskProvider{
   def linearAlgebraExample(matSize: Int, workingDir: String) = new FuzzingTaskProvider {
     val rowSize, midSize, colSize: Int = matSize
 
-    import patbench.linearalgebra.com.example.linalg.external.serialization.OperationRequest
-    import patbench.linearalgebra.com.example.linalg.external.serialization.OperationRequest$Argument
+    import patbench.linearalgebra.com.example.linalg.external.serialization.{OperationRequest, OperationRequest$Argument}
 
     override def displayValue = {
-      case IS(lhs:VectValue, rhs:VectValue)=>
+      case IS(lhs: VectValue, rhs: VectValue) =>
         s"(LHS = $lhs, RHS = $rhs)"
     }
 
@@ -521,7 +529,11 @@ object FuzzingTaskProvider{
 
     def toMatrixString(data: IS[Int], width: Int, height: Int): String = {
       val matrixSize = width * height
-      val (dataSize, dataSeq) = if (data.isEmpty) { (1, IS(0)) } else { (data.length, data) }
+      val (dataSize, dataSeq) = if (data.isEmpty) {
+        (1, IS(0))
+      } else {
+        (data.length, data)
+      }
       (0 until matrixSize)
         .map(i => math.abs(dataSeq(SimpleMath.wrapInRange(i, dataSize))))
         .map(i => "%.16f".format(i.toDouble / 1000))
@@ -578,8 +590,8 @@ object FuzzingTaskProvider{
     }
 
     override def saveValueWithName(value: IS[EValue], name: String): Unit = {
-      import java.io.FileWriter
-      import java.io.IOException
+      import java.io.{FileWriter, IOException}
+
       import patbench.linearalgebra.com.google.gson.Gson
 
       super.saveValueWithName(value, name)
@@ -621,10 +633,11 @@ object FuzzingTaskProvider{
 
     def valueToGraph(graphValue: IS[EValue]): WeightedGraph = {
       val numNodes = graphValue.length
-      def toAdjList (srcIdx: Int, vec: IS[EValue]): IS[(Int, Int)] = {
+
+      def toAdjList(srcIdx: Int, vec: IS[EValue]): IS[(Int, Int)] = {
 
 
-        val edgeDict = vec.foldLeft(Map[Int, Int]())( (edgeDict, elemValue: EValue) => {
+        val edgeDict = vec.foldLeft(Map[Int, Int]())((edgeDict, elemValue: EValue) => {
           val (dstValue, weightValue) = elemValue.asInstanceOf[PairValue].value
           val dst = Math.floorMod(dstValue.asInstanceOf[IntValue].value, numNodes)
           val weight = weightValue.asInstanceOf[IntValue].value
@@ -754,6 +767,134 @@ object FuzzingTaskProvider{
         },
         gpEnv = airplanEnv
       )
+    }
+  }
+
+  def airplan3Example(workingDir: String) = new AirplanFuzzingTaskProvider {
+
+    def edgesToString(graph: WeightedGraph): String = {
+      val numEdges = graph.map(l => l.length).sum
+      val edgeLines = graph.zipWithIndex.map {
+        case (adjList, srcIdx) =>
+          adjList.map(edgePair =>
+            s"$srcIdx ${edgePair._1} ${math.abs(edgePair._2)} 0 0 0 0 0"
+          ).mkString("\n")
+      }.mkString("\n")
+      s"$numEdges\n$edgeLines"
+    }
+
+    override def routeMapToString(graph: WeightedGraph, fileName: String) = {
+      airportsToString(graph.length) + edgesToString(graph)
+    }
+
+    override protected def task: RunningFuzzingTask = {
+      RunningFuzzingTask(
+        outputTypes = IS(EInt, EInt, EVect(EVect(EPair(EInt, EInt)))),
+        sizeOfInterest = 100,
+        resourceUsage = {
+          case IS(origin: IntValue, dest: IntValue, VectValue(graph)) =>
+            import patbench.airplan3.edu.utexas.stac.AirplanNoServer
+
+            val routeMapFileName = s"$workingDir/routemap.txt"
+            val (originName, destName) = prepareRouteMap(
+              origin.value,
+              dest.value,
+              valueToGraph(graph),
+              routeMapFileName)
+
+            Cost.reset()
+            AirplanNoServer.run(workingDir, routeMapFileName, originName, destName)
+            Cost.read()
+        },
+        gpEnv = airplanEnv
+      )
+    }
+  }
+
+  // Airplan5 is purely about the XML parser and therefore it does not share anything with other airplan benchmarks
+  def airplan5Example(workingDir: String) = new FuzzingTaskProvider {
+
+    override def sizeF: PartialFunction[IS[EValue], Int] = {
+      case IS(VectValue(graph)) =>
+        val numEdges = graph.map(g => g.asInstanceOf[VectValue].value.length).sum
+        val numNodes = graph.size
+        numNodes + numEdges
+    }
+
+    type Graph = IS[IS[Int]]
+
+    def valueToGraph(graphValue: IS[EValue]): Graph = {
+      val numNodes = graphValue.length
+
+      def toAdjList(srcIdx: Int, vec: IS[EValue]): IS[Int] = {
+        vec.foldLeft(IS[Int]())((edgeList, elemValue: EValue) => {
+          val dstValue = elemValue.asInstanceOf[IntValue]
+          val dst = Math.floorMod(dstValue.value, numNodes)
+          if (srcIdx == dst) edgeList else edgeList :+ dst
+        })
+      }
+
+      graphValue.zipWithIndex.map {
+        case (l, srcIdx) => toAdjList(srcIdx, l.asInstanceOf[VectValue].value)
+      }
+    }
+
+    def graphToXmlString(graph: Graph): String = {
+      def adjListToXmlString(src: Int, dsts: IS[Int]): String = {
+        val refString =
+          if (dsts.nonEmpty)
+            dsts.map(i => s"&a$i;").mkString("")
+          else
+            "dummy"
+        "<!ENTITY a%d \"%s\">".format(src, refString)
+      }
+
+      if (graph.isEmpty)
+        ""
+      else {
+        val doctDef = graph.zipWithIndex.map {
+          case (adjList, srcIdx) => adjListToXmlString(srcIdx, adjList)
+        }.mkString("\n")
+
+        s"""
+           |<!DOCTYPE doct [
+           |$doctDef
+           |]>
+           |<doct>&a${graph.size - 1};</doct>
+       """.stripMargin
+      }
+    }
+
+    def writeRouteMapToFile(graph: Graph, fileName: String) = {
+      FileInteraction.writeToFile(fileName)(graphToXmlString(graph))
+    }
+
+    override protected def task: RunningFuzzingTask = {
+      RunningFuzzingTask(
+        outputTypes = IS(EVect(EVect(EInt))),
+        sizeOfInterest = 100,
+        resourceUsage = {
+          case IS(VectValue(graph)) =>
+            import patbench.airplan5.edu.utexas.stac.AirplanNoServer
+
+            val routeMapFileName = s"$workingDir/routemap.xml"
+            writeRouteMapToFile(valueToGraph(graph), routeMapFileName)
+
+            Cost.reset()
+            AirplanNoServer.run(workingDir, routeMapFileName)
+            Cost.read()
+        },
+        gpEnv = phpHashEnv
+      )
+    }
+
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      super.saveValueWithName(value, name)
+
+      value match {
+        case IS(VectValue(graph)) =>
+          writeRouteMapToFile(valueToGraph(graph), s"$name.routemap.xml")
+      }
     }
   }
 
