@@ -56,8 +56,8 @@ object StandardSystem {
 
   implicit def boolValue(b: Boolean): BoolValue = BoolValue(b)
 
-  implicit def pairValue(p: (EValue, EValue)): PairValue = {
-    PairValue(p)
+  implicit def pairValue[A,B](p: (A, B))(implicit convA: A => EValue, convB: B => EValue): PairValue = {
+    PairValue(convA(p._1) -> convB(p._2))
   }
 
   object IntComponents{
@@ -209,6 +209,8 @@ object StandardSystem {
         case IS(v1,v2) => (v1,v2)
       }
     )
+
+    val collection: IndexedSeq[EFunction] = IS(pair1, pair2, mkPair)
 
     // examples on how to make a concrete version
     val mkIntPair: EConcreteFunc = mkPair.concretize(IS(EInt, EInt))

@@ -1,0 +1,50 @@
+[Configuration]
+sizeOfInterest = 100
+
+populationSize: 500
+tournamentSize: 7
+evaluationTrials：1
+totalSizeTolerance：100
+singleSizeTolerance：30
+threadNum：1
+timeLimitInMillis：20000
+maxNonIncreaseTime：150
+       
+[End of Configuration]
+
+[Function map]
+EPair(EVect(EVect(EPair(EInt,EInt))),EVect(EVect(EPair(EInt,EInt)))) -> {mkPair: (EVect(EVect(EPair(EInt,EInt))),EVect(EVect(EPair(EInt,EInt)))) => EPair(EVect(EVect(EPair(EInt,EInt))),EVect(EVect(EPair(EInt,EInt))))}
+EInt -> {inc: (EInt) => EInt, dec: (EInt) => EInt, neg: (EInt) => EInt, plus: (EInt,EInt) => EInt, minus: (EInt,EInt) => EInt, times: (EInt,EInt) => EInt, divide: (EInt,EInt) => EInt, modular: (EInt,EInt) => EInt, length: (EVect(EPair(EInt,EInt))) => EInt, length: (EVect(EVect(EPair(EInt,EInt)))) => EInt, pair1: (EPair(EInt,EInt)) => EInt, pair2: (EPair(EInt,EInt)) => EInt}
+EPair(EVect(EPair(EInt,EInt)),EVect(EVect(EPair(EInt,EInt)))) -> {mkPair: (EVect(EPair(EInt,EInt)),EVect(EVect(EPair(EInt,EInt)))) => EPair(EVect(EPair(EInt,EInt)),EVect(EVect(EPair(EInt,EInt))))}
+EPair(EVect(EVect(EPair(EInt,EInt))),EInt) -> {mkPair: (EVect(EVect(EPair(EInt,EInt))),EInt) => EPair(EVect(EVect(EPair(EInt,EInt))),EInt)}
+EPair(EInt,EVect(EPair(EInt,EInt))) -> {mkPair: (EInt,EVect(EPair(EInt,EInt))) => EPair(EInt,EVect(EPair(EInt,EInt)))}
+EVect(EPair(EInt,EInt)) -> {append: (EVect(EPair(EInt,EInt)),EPair(EInt,EInt)) => EVect(EPair(EInt,EInt)), prepend: (EPair(EInt,EInt),EVect(EPair(EInt,EInt))) => EVect(EPair(EInt,EInt)), access: (EVect(EVect(EPair(EInt,EInt))),EInt,EVect(EPair(EInt,EInt))) => EVect(EPair(EInt,EInt)), concat: (EVect(EPair(EInt,EInt)),EVect(EPair(EInt,EInt))) => EVect(EPair(EInt,EInt))}
+EPair(EVect(EPair(EInt,EInt)),EInt) -> {mkPair: (EVect(EPair(EInt,EInt)),EInt) => EPair(EVect(EPair(EInt,EInt)),EInt)}
+EPair(EVect(EVect(EPair(EInt,EInt))),EPair(EInt,EInt)) -> {mkPair: (EVect(EVect(EPair(EInt,EInt))),EPair(EInt,EInt)) => EPair(EVect(EVect(EPair(EInt,EInt))),EPair(EInt,EInt))}
+EPair(EInt,EVect(EVect(EPair(EInt,EInt)))) -> {mkPair: (EInt,EVect(EVect(EPair(EInt,EInt)))) => EPair(EInt,EVect(EVect(EPair(EInt,EInt))))}
+EPair(EVect(EPair(EInt,EInt)),EPair(EInt,EInt)) -> {mkPair: (EVect(EPair(EInt,EInt)),EPair(EInt,EInt)) => EPair(EVect(EPair(EInt,EInt)),EPair(EInt,EInt))}
+EPair(EVect(EVect(EPair(EInt,EInt))),EVect(EPair(EInt,EInt))) -> {mkPair: (EVect(EVect(EPair(EInt,EInt))),EVect(EPair(EInt,EInt))) => EPair(EVect(EVect(EPair(EInt,EInt))),EVect(EPair(EInt,EInt)))}
+EPair(EInt,EInt) -> {access: (EVect(EPair(EInt,EInt)),EInt,EPair(EInt,EInt)) => EPair(EInt,EInt), mkPair: (EInt,EInt) => EPair(EInt,EInt)}
+EPair(EVect(EPair(EInt,EInt)),EVect(EPair(EInt,EInt))) -> {mkPair: (EVect(EPair(EInt,EInt)),EVect(EPair(EInt,EInt))) => EPair(EVect(EPair(EInt,EInt)),EVect(EPair(EInt,EInt)))}
+EVect(EVect(EPair(EInt,EInt))) -> {append: (EVect(EVect(EPair(EInt,EInt))),EVect(EPair(EInt,EInt))) => EVect(EVect(EPair(EInt,EInt))), prepend: (EVect(EPair(EInt,EInt)),EVect(EVect(EPair(EInt,EInt)))) => EVect(EVect(EPair(EInt,EInt))), concat: (EVect(EVect(EPair(EInt,EInt))),EVect(EVect(EPair(EInt,EInt)))) => EVect(EVect(EPair(EInt,EInt)))}
+EPair(EPair(EInt,EInt),EVect(EPair(EInt,EInt))) -> {mkPair: (EPair(EInt,EInt),EVect(EPair(EInt,EInt))) => EPair(EPair(EInt,EInt),EVect(EPair(EInt,EInt)))}
+EPair(EInt,EPair(EInt,EInt)) -> {mkPair: (EInt,EPair(EInt,EInt)) => EPair(EInt,EPair(EInt,EInt))}
+EPair(EPair(EInt,EInt),EVect(EVect(EPair(EInt,EInt)))) -> {mkPair: (EPair(EInt,EInt),EVect(EVect(EPair(EInt,EInt)))) => EPair(EPair(EInt,EInt),EVect(EVect(EPair(EInt,EInt))))}
+EPair(EPair(EInt,EInt),EPair(EInt,EInt)) -> {mkPair: (EPair(EInt,EInt),EPair(EInt,EInt)) => EPair(EPair(EInt,EInt),EPair(EInt,EInt))}
+EPair(EPair(EInt,EInt),EInt) -> {mkPair: (EPair(EInt,EInt),EInt) => EPair(EPair(EInt,EInt),EInt)}
+[End of Function map]
+
+Evaluation timed out!
+[O0: EInt] -> pair1(access(prepend(#5, #3), #0, #5))
+[O1: EInt] -> length(concat([], #6))
+[O2: EVect(EVect(EPair(EInt,EInt)))] -> prepend(concat(append(#3, #5), access(#7, #1, [])), #7)
+*
+[S0: EInt]{ seed: 0 ; iter: plus(plus(4, #0), neg(#4)); seedExpr: 0 }
+[S1: EInt]{ seed: 3 ; iter: #4; seedExpr: 3 }
+[S2: EPair(EInt,EInt)]{ seed: PairValue((9,6)) ; iter: #2; seedExpr: PairValue((9,6)) }
+[S3: EVect(EPair(EInt,EInt))]{ seed: [] ; iter: prepend(mkPair(neg(#1), divide(#0, #4)), #3); seedExpr: [] }
+[S4: EInt]{ seed: 6 ; iter: minus(1, #0); seedExpr: minus(inc(7), plus(1, 1)) }
+[S5: EPair(EInt,EInt)]{ seed: PairValue((7,0)) ; iter: mkPair(#1, pair1(PairValue((10,6)))); seedExpr: mkPair(7, times(2, length([]))) }
+[S6: EVect(EPair(EInt,EInt))]{ seed: [] ; iter: #3; seedExpr: [] }
+[S7: EVect(EVect(EPair(EInt,EInt)))]{ seed: [] ; iter: append(#7, #6); seedExpr: [] }
+Individual Pattern: Vector(7, 0, [[PairValue((7,0))]]), Vector(3, 0, [[PairValue((-3,0)),PairValue((3,10))],[]]), Vector(-6, 1, [[PairValue((-6,-2)),PairValue((-3,0)),PairValue((6,10))],[],[]]), Vector(-6, 2, [[PairValue((-1,0)),PairValue((-6,-2)),PairValue((-3,0)),PairValue((1,10))],[],[],[PairValue((-3,0))]]), Vector(-3, 3, [[PairValue((-3,1)),PairValue((-1,0)),PairValue((-6,-2)),PairValue((-3,0)),PairValue((3,10))],[],[],[PairValue((-3,0))],[PairValue((-6,-2)),PairValue((-3,0))]]), Vector(-3, 4, [[PairValue((0,-6)),PairValue((-3,1)),PairValue((-1,0)),PairValue((-6,-2)),PairValue((-3,0)),PairValue((0,10)),PairValue((-1,0)),PairValue((-6,-2)),PairValue((-3,0))],[],[],[PairValue((-3,0))],[PairValue((-6,-2)),PairValue((-3,0))],[PairValue((-1,0)),PairValue((-6,-2)),PairValue((-3,0))]]), Vector(-3, 5, [[PairValue((1,-2)),PairValue((0,-6)),PairValue((-3,1)),PairValue((-1,0)),PairValue((-6,-2)),PairValue((-3,0)),PairValue((-1,10))],[],[],[PairValue((-3,0))],[PairValue((-6,-2)),PairValue((-3,0))],[PairValue((-1,0)),PairValue((-6,-2)),PairValue((-3,0))],[PairValue((-3,1)),PairValue((-1,0)),PairValue((-6,-2)),PairValue((-3,0))]]), ...

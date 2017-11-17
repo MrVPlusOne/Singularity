@@ -65,7 +65,8 @@ object Runner {
     val workingDir = s"workingDir$ioId"
     FileInteraction.mkDirsAlongPath(workingDir)
 
-    runExample(FuzzingTaskProvider.linearAlgebraExample(10, workingDir), Seq(ioId), useGUI = true)
+    runExample(FuzzingTaskProvider.airplan1Example(workingDir), Seq(ioId), useGUI = true, config = RunConfig.default
+      .copy(totalSizeTolerance = 100))
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
