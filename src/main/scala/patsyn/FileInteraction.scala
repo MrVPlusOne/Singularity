@@ -27,9 +27,9 @@ class FileLogger(fileName: String, printToConsole: Boolean, writer: FileWriter) 
 }
 
 object FileInteraction{
-  def writeToFile(filePath: String)(content: String): Unit = {
+  def writeToFile(filePath: String, append: Boolean = false)(content: String): Unit = {
     import java.io._
-    val fw = new FileWriter(filePath)
+    val fw = new FileWriter(filePath, append)
     try {
       fw.write(content)
     }finally{

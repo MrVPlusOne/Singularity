@@ -123,7 +123,12 @@ object Runner {
           val monitor = createMonitor(populationSize)
           (monitor.evalProgressCallback, monitor.monitorCallback)
         } else {
-          ((_: Int) => Unit, (_: MonitoringData) => Unit)
+          val monitorDataPath = s"$recordDirPath/monitorData.txt"
+          ((_: Int) => Unit, (data: MonitoringData) => {
+            FileInteraction.writeToFile(monitorDataPath, append = true){
+              s"${data.bestPerformance}, ${data.bestFitness}, ${data.averageFitness}\n"
+            }
+          })
         }
       }
 
