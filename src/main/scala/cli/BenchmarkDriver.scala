@@ -25,6 +25,8 @@ object BenchmarkDriver {
       "stac/linearAlgebra" -> (opt => linearAlgebraExample(10, getWorkingDir(opt))),
       "stac/airplan1" -> (opt => airplan1Example(getWorkingDir(opt))),
       "stac/airplan2" -> (opt => airplan2Example(getWorkingDir(opt))),
+      "stac/airplan3" -> (opt => airplan3Example(getWorkingDir(opt))),
+      "stac/airplan5" -> (opt => airplan5Example(getWorkingDir(opt))),
 //      "stac/gabfeed2" -> (opt => gabFeed2Example(opt.ioId, getWorkingDir(opt)))
     )
   }
