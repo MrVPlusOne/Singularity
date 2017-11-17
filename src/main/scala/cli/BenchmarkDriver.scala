@@ -24,6 +24,7 @@ object BenchmarkDriver {
       "stac/textCrunchr" -> (opt => textCrunchrExample(getWorkingDir(opt))),
       "stac/linearAlgebra" -> (opt => linearAlgebraExample(10, getWorkingDir(opt))),
       "stac/airplan1" -> (opt => airplan1Example(getWorkingDir(opt))),
+      "stac/airplan2" -> (opt => airplan2Example(getWorkingDir(opt))),
 //      "stac/gabfeed2" -> (opt => gabFeed2Example(opt.ioId, getWorkingDir(opt)))
     )
   }

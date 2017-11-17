@@ -615,50 +615,9 @@ object FuzzingTaskProvider{
     GPEnvironment(constMap, functions, stateTypes)
   }
 
-  def airplan1Example(workingDir: String) = new FuzzingTaskProvider {
-    import java.lang.Math
-
-    override def sizeF: PartialFunction[IS[EValue], Int] = {
-      case IS(IntValue(_), IntValue(_), VectValue(graph)) =>
-        val numEdges = graph.map(g => g.asInstanceOf[VectValue].value.length).sum
-//        val numNodes = graph.size
-        numEdges
-    }
+  abstract class AirplanFuzzingTaskProvider extends FuzzingTaskProvider {
 
     type WeightedGraph = IS[IS[(Int, Int)]]
-
-    def airportsToString(numAirports: Int): String = {
-      val airportNames = (0 until numAirports).map(i => s"$i").mkString("\n")
-      s"$numAirports\n$airportNames\n"
-    }
-
-    def edgesToString(graph: WeightedGraph): String = {
-      val numEdges = graph.map(l => l.length).sum
-      val edgeLines = graph.zipWithIndex.map {
-        case (adjList, srcIdx) =>
-          adjList.map(edgePair =>
-            s"$srcIdx ${edgePair._1} ${edgePair._2} 0 0 0 0 0"
-          ).mkString("\n")
-      }.mkString("\n")
-      s"$numEdges\n$edgeLines"
-    }
-
-    def routeMapToString(graph: WeightedGraph, fileName: String) = {
-      airportsToString(graph.length) + edgesToString(graph)
-    }
-
-    def writeRouteMapToFile(graph: WeightedGraph, fileName: String) = {
-      FileInteraction.writeToFile(fileName)(routeMapToString(graph, fileName))
-    }
-
-    def prepareRouteMap(origin: Int, dest: Int, graph: WeightedGraph, routeMapFileName: String) = {
-      val numNodes = graph.length
-      val originName = if (numNodes == 0) "0" else s"${Math.floorMod(origin, numNodes)}"
-      val destName = if (numNodes == 0) "0" else s"${Math.floorMod(dest, numNodes)}"
-
-      writeRouteMapToFile(graph, routeMapFileName)
-      (originName, destName)
-    }
 
     def valueToGraph(graphValue: IS[EValue]): WeightedGraph = {
       val numNodes = graphValue.length
@@ -677,6 +636,60 @@ object FuzzingTaskProvider{
       graphValue.zipWithIndex.map {
         case (l, srcIdx) => toAdjList(srcIdx, l.asInstanceOf[VectValue].value)
       }
+    }
+
+    def airportsToString(numAirports: Int): String = {
+      val airportNames = (0 until numAirports).map(i => s"$i").mkString("\n")
+      s"$numAirports\n$airportNames\n"
+    }
+
+    def writeRouteMapToFile(graph: WeightedGraph, fileName: String) = {
+      FileInteraction.writeToFile(fileName)(routeMapToString(graph, fileName))
+    }
+
+    def prepareRouteMap(origin: Int, dest: Int, graph: WeightedGraph, routeMapFileName: String) = {
+      val numNodes = graph.length
+      val originName = if (numNodes == 0) "0" else s"${Math.floorMod(origin, numNodes)}"
+      val destName = if (numNodes == 0) "0" else s"${Math.floorMod(dest, numNodes)}"
+
+      writeRouteMapToFile(graph, routeMapFileName)
+      (originName, destName)
+    }
+
+    override def sizeF: PartialFunction[IS[EValue], Int] = {
+      case IS(IntValue(_), IntValue(_), VectValue(graph)) =>
+        val numEdges = graph.map(g => g.asInstanceOf[VectValue].value.length).sum
+        val numNodes = graph.size
+        numNodes + numEdges
+    }
+
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      super.saveValueWithName(value, name)
+
+      value match {
+        case IS(_, _, VectValue(graph)) =>
+          writeRouteMapToFile(valueToGraph(graph), s"$name.routemap.txt")
+      }
+    }
+
+    def routeMapToString(graph: WeightedGraph, fileName: String): String
+  }
+
+  def airplan1Example(workingDir: String) = new AirplanFuzzingTaskProvider {
+
+    def edgesToString(graph: WeightedGraph): String = {
+      val numEdges = graph.map(l => l.length).sum
+      val edgeLines = graph.zipWithIndex.map {
+        case (adjList, srcIdx) =>
+          adjList.map(edgePair =>
+            s"$srcIdx ${edgePair._1} ${edgePair._2} 0 0 0 0 0"
+          ).mkString("\n")
+      }.mkString("\n")
+      s"$numEdges\n$edgeLines"
+    }
+
+    override def routeMapToString(graph: WeightedGraph, fileName: String) = {
+      airportsToString(graph.length) + edgesToString(graph)
     }
 
     override protected def task: RunningFuzzingTask = {
@@ -701,15 +714,46 @@ object FuzzingTaskProvider{
         gpEnv = airplanEnv
       )
     }
+  }
 
-    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
-      super.saveValueWithName(value, name)
+  def airplan2Example(workingDir: String) = new AirplanFuzzingTaskProvider {
 
-      value match {
-        case IS(_, _, VectValue(graph)) =>
-          writeRouteMapToFile(valueToGraph(graph), s"$name.routemap.txt")
-      }
+    def edgesToString(graph: WeightedGraph): String = {
+      val numEdges = graph.map(l => l.length).sum
+      val edgeLines = graph.zipWithIndex.map {
+        case (adjList, srcIdx) =>
+          adjList.map(edgePair =>
+            s"$srcIdx ${edgePair._1} ${math.abs(edgePair._2)} 0 0 0 0 0"
+          ).mkString("\n")
+      }.mkString("\n")
+      s"$numEdges\n$edgeLines"
+    }
 
+    override def routeMapToString(graph: WeightedGraph, fileName: String) = {
+      airportsToString(graph.length) + edgesToString(graph)
+    }
+
+    override protected def task: RunningFuzzingTask = {
+      RunningFuzzingTask(
+        outputTypes = IS(EInt, EInt, EVect(EVect(EPair(EInt, EInt)))),
+        sizeOfInterest = 100,
+        resourceUsage = {
+          case IS(origin: IntValue, dest: IntValue, VectValue(graph)) =>
+            import patbench.airplan2.edu.utexas.stac.AirplanNoServer
+
+            val routeMapFileName = s"$workingDir/routemap.txt"
+            val (originName, destName) = prepareRouteMap(
+              origin.value,
+              dest.value,
+              valueToGraph(graph),
+              routeMapFileName)
+
+            Cost.reset()
+            AirplanNoServer.run(workingDir, routeMapFileName, originName, destName)
+            Cost.read()
+        },
+        gpEnv = airplanEnv
+      )
     }
   }
 

@@ -65,7 +65,7 @@ object Runner {
     val workingDir = s"workingDir$ioId"
     FileInteraction.mkDirsAlongPath(workingDir)
 
-    runExample(FuzzingTaskProvider.airplan1Example(workingDir), Seq(ioId), useGUI = true, config = RunConfig.default
+    runExample(FuzzingTaskProvider.airplan2Example(workingDir), Seq(ioId), useGUI = true, config = RunConfig.default
       .copy(totalSizeTolerance = 100))
   }
 
