@@ -11,6 +11,20 @@ import cli.BenchmarkDriver
 
 object Runner {
 
+  def main(args: Array[String]): Unit = {
+    val ioId = if(args.isEmpty) 0 else args.head.toInt
+    val workingDir = s"workingDir$ioId"
+    FileInteraction.mkDirsAlongPath(workingDir)
+
+    runExample(FuzzingTaskProvider.airplan5Example(workingDir), Seq(ioId), useGUI = true, config = RunConfig.default.copy(timeLimitInMillis = 120000))
+  }
+
+  case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
+
+  def makeXY(ys: IS[Double]): IS[(Double, Double)] = {
+    ys.indices.map { i => (i + 1).toDouble -> ys(i) }
+  }
+
   case class MonitorManager(monitorCallback: MonitoringData => Unit, evalProgressCallback: Int => Unit)
 
   def createMonitor(populationSize: Int): MonitorManager = {
@@ -58,20 +72,6 @@ object Runner {
         progressLabel.setText(s"progress: $p/$populationSize")
       }
     )
-  }
-
-  def main(args: Array[String]): Unit = {
-    val ioId = if(args.isEmpty) 0 else args.head.toInt
-    val workingDir = s"workingDir$ioId"
-    FileInteraction.mkDirsAlongPath(workingDir)
-
-    runExample(FuzzingTaskProvider.airplan5Example(workingDir), Seq(ioId), useGUI = true, config = RunConfig.default.copy(timeLimitInMillis = 120000))
-  }
-
-  case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
-
-  def makeXY(ys: IS[Double]): IS[(Double, Double)] = {
-    ys.indices.map { i => (i + 1).toDouble -> ys(i) }
   }
 
   case class RunConfig(populationSize: Int = 500,
