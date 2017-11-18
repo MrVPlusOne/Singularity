@@ -31,7 +31,7 @@ trait FuzzingTaskProvider{
   }
 }
 ```
-### quickSortExample
+### The quickSort example
 where: `FuzzingTaskProvider.quickSortExample`
 
 ```scala
@@ -103,7 +103,9 @@ def runExample(taskProvider: FuzzingTaskProvider, seeds: Seq[Int], config: RunCo
 runExample(FuzzingTaskProvider.quickSortExample, Seq(ioId))
 ```
 
-`runExample` takes a `RunConfig` to overwrite the default parameters used by our GP algorithm.
+`runExample` takes a `RunConfig` and uses it to adjust our GP algorithm's parameters.
+
+The default parameters are shown below:
 
 ```scala
 case class RunConfig(populationSize: Int = 500,
@@ -116,7 +118,7 @@ case class RunConfig(populationSize: Int = 500,
                        maxNonIncreaseTime: Int = 150
                       ){
 ```
-Some parameters whose meaning requires extra explanations:
+Some parameters that require extra explanations:
 
 - `evaluationTrials`: The "window size" used for pattern evaluation. The last `evaluationTrials` ones are used to evaluate the performance of a pattern by taking their max.
 
@@ -129,4 +131,80 @@ Some parameters whose meaning requires extra explanations:
 - `maxNonIncreaseTime`: The GP process is also terminated once there hasn't been seen any performance increase after this number of generations.
 
 
-See more examples in `object FuzzingTaskProvider`.
+### How to extend the DSL: Introduce pairs
+
+Let's see how pairs are introduced as a new data type in our DSL.
+
+(The code snippets in this example are taken from [StandardSystem.scala](src/main/scala/patsyn/StandardSystem.scala))
+
+First, we introduce `EPair` as the type of generic pairs.
+```scala
+case class EPair(t1: EType, t2: EType) extends EType
+```
+
+
+Then, we also need a data structure to represent the values of pairs in our DSL. Here we just define `PairValue` as a wrapper of a (Scala) pair of `EValue`s.
+
+```scala
+case class PairValue(value: (EValue, EValue)) extends EValue{
+    def hasType(ty: EType): Boolean = ty match {
+      case EPair(t1, t2) => value._1.hasType(t1) && value._2.hasType(t2)
+      case _ => false
+    }
+
+    def size: Long = value._1.size + value._2.size
+  }
+```
+
+Note that extending `EValue` requires us to implement `hasType` and `size`.
+`hasType` is used for performing polymorphic type checking. And `size` here is some task-independent size metric and it should be a **positive** `Long`. For example, for `VectorValue(v)`, we choose `v.length+1` as this size instead of just `v.length`. (this size metric is used to limit our generated program's memory consumption; without this limit, a recurrent computation graph can easily use out all of our machines' memory during pattern generation)
+
+Next (this step is entirely optional), we use Scala's implicits feature to define a implicit conversion from a Scala pair to `PairValue`. In the future, wherever we need `PairValue`, we can just use a Scala pair instead. We also have implicit conversions for other `EValue`s types.
+```scala
+implicit def pairValue[A,B](p: (A, B))(implicit convA: A => EValue, convB: B => EValue): PairValue = {
+    (PairValue(convA(p._1), convB(p._2)))
+  }
+```
+
+Finally, we define some pair-related components for pair creation and accessing.
+```scala
+object PairComponents {
+    val pair1 = EAbstractFunc("pair1", tyVarNum = 2,
+      typeInstantiation = {
+        case IS(t1,t2) => IS(EPair(t1,t2)) -> t1
+      }, eval = {
+        case IS(PairValue(value)) => value._1
+      }
+    )
+
+    val pair2 = EAbstractFunc("pair2", tyVarNum = 2,
+      typeInstantiation = {
+        case IS(t1,t2) => IS(EPair(t1,t2)) -> t2
+      }, eval = {
+        case IS(PairValue(value)) => value._2
+      }
+    )
+
+    val mkPair = EAbstractFunc("mkPair", tyVarNum = 2,
+      typeInstantiation = {
+        case IS(t1,t2) => IS(t1,t2) -> EPair(t1,t2)
+      }, eval = {
+        case IS(v1,v2) => (v1,v2)
+      }
+    )
+
+    val collection: IndexedSeq[EFunction] = IS(pair1, pair2, mkPair)
+
+    // examples on how to make a concrete version
+    val mkIntPair: EConcreteFunc = mkPair.concretize(IS(EInt, EInt))
+  }
+```
+Note that because those three components are all generic functions, we use `EAbstractfunc` and provide each of them a name, a type variable number, a type instantiation rule for calculating the type signature from type arguments, and finally an evaluation rule.
+
+As the last line in the above code snippet demonstrates, an abstract function can be instantiated into an `EConcreteFunc` by calling the concretize method.
+
+Actually, our GP only works on concrete components, and all abstract components are automatically concretized before GP starts. So you can use both `EConcreteFunc`s and `EAbstractFunc`s to construct `GPEnvironment`s.
+
+
+### Further reading
+You can see more examples in [ExampleAlgorithms.scala](src/main/scala/patsyn/ExampleAlgorithms.scala).
