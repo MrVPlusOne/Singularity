@@ -1,10 +1,12 @@
 ### Where to find all solved benchmarks
 
 
-object BenchmarkDriver in `cli.BenchmarkDriver`
-
+- [cli.BenchmarkDriver](src/main/scala/cli/BenchmarkDriver.scala) is a command-line entry point for all solved benchmarks.
 
 <img src="tutorial/Driver.png" alt="Driver.png" width="700">
+
+- [patsyn.Runner](src/main/scala/patsyn/Runner.scala) is another frequently-used entry point for testing new examples.
+
 
 
 In order to define a new fuzzing task (referred to as "problem configuration" in our paper), we need a `FuzzingTaskProvider`, which is a trait (similar to an abstract class in Java) that defines the following methods. Only `task` and `sizeF` are required to be implemented, the other methods can be overwritten as needed.
