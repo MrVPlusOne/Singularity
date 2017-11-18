@@ -159,7 +159,7 @@ case class PairValue(value: (EValue, EValue)) extends EValue{
 ```
 
 Note that extending `EValue` requires us to implement `hasType` and `size`.
-`hasType` is used for performing polymorphic type checking. And `size` here is some task-independent size metric and it should be a **positive** `Long`. For example, for `VectorValue(v)`, we choose `v.length+1` as this size instead of just `v.length`. (this size metric is used to limit our generated program's memory consumption; without this limit, a recurrent computation graph can easily use out all of our machines' memory during pattern generation)
+`hasType` is used for performing polymorphic type checking. And `size` here is some task-independent size metric and it should be a **positive** `Long`. For example, for `VectValue(v)`, we choose `v.length+1` as this size instead of just `v.length`. (this size metric is used to limit our generated program's memory consumption; without this limit, a recurrent computation graph can easily use out all of our machines' memory during pattern generation)
 
 Next (this step is entirely optional), we use Scala's implicits feature to define a implicit conversion from a Scala pair to `PairValue`. In the future, wherever we need `PairValue`, we can just use a Scala pair instead. We also have implicit conversions for other `EValue`s types.
 ```scala
