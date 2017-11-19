@@ -16,7 +16,7 @@ object Runner {
     val workingDir = s"workingDir$ioId"
     FileInteraction.mkDirsAlongPath(workingDir)
 
-    runExample(FuzzingTaskProvider.airplan5Example(workingDir), Seq(ioId), useGUI = true, config = RunConfig.default.copy(timeLimitInMillis = 120000))
+    runExample(FuzzingTaskProvider.gabfeed4Example(workingDir), Seq(ioId), useGUI = true)
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
