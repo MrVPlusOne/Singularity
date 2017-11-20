@@ -1,7 +1,7 @@
 package patsyn
 
 import java.io._
-import java.nio.file.Path
+import java.nio.file.{Files, Paths}
 
 import patsyn.EvolutionRepresentation.IndividualData
 
@@ -35,6 +35,10 @@ object FileInteraction{
     }finally{
       fw.close()
     }
+  }
+
+  def deleteIfExist(filePath: String): Unit = {
+    Files.deleteIfExists(Paths.get(filePath))
   }
 
   def runWithAFileLogger[T](fileName: String, printToConsole: Boolean = true)(f: FileLogger => T): T = {
