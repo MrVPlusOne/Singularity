@@ -698,6 +698,9 @@ object FuzzingTaskProvider {
           case IS(origin: IntValue, dest: IntValue, VectValue(graph)) =>
             import patbench.airplan1.edu.utexas.stac.AirplanNoServer
 
+            val dbFileName = s"$workingDir/airplan.db"
+            FileInteraction.deleteIfExist(dbFileName)
+
             val routeMapFileName = s"$workingDir/routemap.txt"
             val (originName, destName) = prepareRouteMap(
               origin.value,
@@ -739,6 +742,9 @@ object FuzzingTaskProvider {
           case IS(origin: IntValue, dest: IntValue, VectValue(graph)) =>
             import patbench.airplan2.edu.utexas.stac.AirplanNoServer
 
+            val dbFileName = s"$workingDir/airplan.db"
+            FileInteraction.deleteIfExist(dbFileName)
+
             val routeMapFileName = s"$workingDir/routemap.txt"
             val (originName, destName) = prepareRouteMap(
               origin.value,
@@ -779,6 +785,9 @@ object FuzzingTaskProvider {
         resourceUsage = {
           case IS(origin: IntValue, dest: IntValue, VectValue(graph)) =>
             import patbench.airplan3.edu.utexas.stac.AirplanNoServer
+
+            val dbFileName = s"$workingDir/airplan.db"
+            FileInteraction.deleteIfExist(dbFileName)
 
             val routeMapFileName = s"$workingDir/routemap.txt"
             val (originName, destName) = prepareRouteMap(
@@ -862,6 +871,9 @@ object FuzzingTaskProvider {
           case IS(VectValue(graph)) =>
             import patbench.airplan5.edu.utexas.stac.AirplanNoServer
 
+            val dbFileName = s"$workingDir/airplan.db"
+            FileInteraction.deleteIfExist(dbFileName)
+
             val routeMapFileName = s"$workingDir/routemap.xml"
             writeRouteMapToFile(valueToGraph(graph), routeMapFileName)
 
@@ -883,7 +895,7 @@ object FuzzingTaskProvider {
     }
   }
 
-  def gabfeed4Example(workDir: String) = new FuzzingTaskProvider {
+  def gabfeed4Example(workingDir: String) = new FuzzingTaskProvider {
 
     override def sizeF: PartialFunction[IS[EValue], Int] = {
       case IS(VectValue(chars)) => chars.length
@@ -899,6 +911,9 @@ object FuzzingTaskProvider {
 
           case IS(chars:VectValue) =>
             val content = vectIntToString(chars)
+
+            val dbFileName = s"$workingDir/gabfeed.db"
+            FileInteraction.deleteIfExist(dbFileName)
 
             Cost.reset()
             GabfeedNoServer.run("benchmarks/gabfeed/data", content);
