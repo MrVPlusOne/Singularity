@@ -258,8 +258,6 @@ object FuzzingTaskProvider {
     }
 
     protected def task: RunningFuzzingTask = {
-      import java.io.FileWriter
-
       import edu.utexas.stac.Cost
       import patbench.graphanalyzer.user.commands.CommandProcessor
 
@@ -275,30 +273,17 @@ object FuzzingTaskProvider {
                 intVectorToGraph(i, vec)
             }.mkString("\n")
 
-            val fw = new FileWriter(s"$workingDir/genGraph.dot")
-            fw.write(fileContent)
-            fw.close()
+            FileInteraction.writeToFile(s"$workingDir/genGraph.dot")(fileContent)
 
             Cost.reset()
 
-            val timeLimit = 10 * 1000
             try {
-              import scala.concurrent.ExecutionContext.Implicits.global
-              import scala.concurrent._
-              import scala.concurrent.duration._
-
-              Await.result(Future(
-                CommandProcessor.main(s"dot $workingDir/genGraph.dot xy diagram png output-files/PNG_output.png".split(" "))
-              ), timeLimit.milliseconds)
+              CommandProcessor.main(s"dot $workingDir/genGraph.dot xy diagram png output-files/PNG_output.png".split(" "))
 
               Cost.read().toDouble
             } catch {
               case _: NullPointerException =>
                 Cost.read().toDouble
-              case _: TimeoutException =>
-                println("Timed out!")
-                System.exit(1)
-                throw new Exception("Timed out!")
             }
         },
         gpEnv = phpHashEnv
@@ -308,13 +293,13 @@ object FuzzingTaskProvider {
 
 
   /** Http request example */
-  def bloggerExample = new FuzzingTaskProvider {
+  def bloggerExample(ioId: Int) = new FuzzingTaskProvider {
 
     import patbench.blogger.fi.iki.elonen.JavaWebServer
 
     import sys.process._
 
-    val server = new JavaWebServer(8080)
+    val server = new JavaWebServer(8080+ioId)
 
     override def setupTask(task: RunningFuzzingTask): Unit = {
       new Thread(() => server.start()).start()

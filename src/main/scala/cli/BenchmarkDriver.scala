@@ -17,7 +17,7 @@ object BenchmarkDriver {
       "slowfuzz/quickSort" -> (_ => quickSortExample),
       "slowfuzz/phpHash" -> (_ => phpHashCollision),
       "stac/graphAnalyzer" -> (opt => graphAnalyzerExample(getWorkingDir(opt))),
-      "stac/blogger" -> (_ => bloggerExample),
+      "stac/blogger" -> (opt => bloggerExample(opt.ioId)),
       "stac/imageProcessor" -> (opt => imageExample(10, 10, getWorkingDir(opt))),
       "stac/textCrunchr" -> (opt => textCrunchrExample(getWorkingDir(opt))),
       "stac/gabfeed4" -> (opt => gabfeed4Example(getWorkingDir(opt))),
@@ -79,7 +79,8 @@ object BenchmarkDriver {
             }
           case Some(extraArg) =>
             val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
-            saveExtrapolation(taskProvider, ind, extraArg.size, extraArg.memoryLimit, extraArg.outputName)
+            MultiStateRepresentation.saveExtrapolation(
+              taskProvider, ind, extraArg.size, extraArg.memoryLimit, extraArg.outputName)
         }
     }
   }
@@ -145,29 +146,5 @@ object BenchmarkDriver {
     }
   }
 
-  def saveExtrapolation(taskProvider: FuzzingTaskProvider, individual: MultiStateInd,
-                        sizeLimit: Int, memoryLimit: Long, name: String): Unit = {
-    import EvolutionRepresentation.MemoryUsage
 
-    println(s"Calculating extrapolation at size = $sizeLimit ...")
-    var lastSize = Int.MinValue
-    var progress = 0
-
-    val valueOfInterest = MultiStateRepresentation.individualToPattern(individual).takeWhile{
-      case (MemoryUsage(memory), value) =>
-        val newSize = taskProvider.sizeF(value)
-        if(newSize <= lastSize){
-          println("Warning: Can't reach specified size using this individual")
-          false
-        }else{
-          progress += 1
-
-          lastSize = newSize
-          newSize <= sizeLimit && memory <= memoryLimit
-        }
-    }.last._2
-
-    println(s"Extrapolation calculated. Now save results to $name")
-    taskProvider.saveValueWithName(valueOfInterest, name)
-  }
 }

@@ -46,6 +46,32 @@ object MultiStateRepresentation{
       MemoryUsage(totalSize) -> ind.outputs.map(f => Expr.evaluateWithCheck(f, xs))
     })
   }
+
+  def saveExtrapolation(taskProvider: FuzzingTaskProvider, individual: MultiStateInd,
+                        sizeLimit: Int, memoryLimit: Long, name: String): Unit = {
+    import EvolutionRepresentation.MemoryUsage
+
+    println(s"Calculating extrapolation at size = $sizeLimit ...")
+    var lastSize = Int.MinValue
+    var progress = 0
+
+    val valueOfInterest = individualToPattern(individual).takeWhile{
+      case (MemoryUsage(memory), value) =>
+        val newSize = taskProvider.sizeF(value)
+        if(newSize <= lastSize){
+          println("Warning: Can't reach specified size using this individual")
+          false
+        }else{
+          progress += 1
+
+          lastSize = newSize
+          newSize <= sizeLimit && memory <= memoryLimit
+        }
+    }.last._2
+
+    println(s"Extrapolation calculated. Now save results to $name")
+    taskProvider.saveValueWithName(valueOfInterest, name)
+  }
 }
 
 case class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType],

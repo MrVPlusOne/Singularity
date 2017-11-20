@@ -165,9 +165,10 @@ object Runner {
         }
 
         val sizeOfInterest = task.sizeOfInterest
+        val memoryLimit = sizeOfInterest * 10
         val evaluation = new SimplePerformanceEvaluation(
           sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
-          resourceUsage = timeLimitedResourceUsage(timeLimitInMillis), sizeF = taskProvider.sizeF, breakingMemoryUsage = sizeOfInterest * 10
+          resourceUsage = timeLimitedResourceUsage(timeLimitInMillis), sizeF = taskProvider.sizeF, breakingMemoryUsage = memoryLimit
         )
         val representation = MultiStateRepresentation(totalSizeTolerance = totalSizeTolerance,
           singleSizeTolerance = singleSizeTolerance,
@@ -197,7 +198,7 @@ object Runner {
                 FileInteraction.saveObjectToFile(s"$recordDirPath/timeoutIndividual[seed=$seed].serialized")(ind)
 
                 // We might also be interested in the value
-                BenchmarkDriver.saveExtrapolation(taskProvider, ind, task.sizeOfInterest, Long.MaxValue,
+                MultiStateRepresentation.saveExtrapolation(taskProvider, ind, task.sizeOfInterest, Long.MaxValue,
                   s"$recordDirPath/timeoutValue")
 
                 System.exit(0)
@@ -215,18 +216,27 @@ object Runner {
         var bestSoFar: Option[IndividualData[MultiStateInd]] = None
         var nonIncreasingTime = 0
 
+        def setBestInd(indData: IndividualData[MultiStateInd]): Unit ={
+          bestSoFar = Some(indData)
+          FileInteraction.saveObjectToFile(s"$recordDirPath/bestIndividual[seed=$seed].serialized")(indData.ind)
+          MultiStateRepresentation.saveExtrapolation(taskProvider, indData.ind,
+            task.sizeOfInterest, memoryLimit, s"bestInput[seed=$seed]")
+        }
+
         generations.takeWhile(pop => {
-          val r = bestSoFar match {
+          val shouldContinue = bestSoFar match {
             case Some(previousBest) =>
               if (pop.bestIndividual.evaluation.fitness > previousBest.evaluation.fitness) {
                 nonIncreasingTime = 0
+                setBestInd(pop.bestIndividual)
               }
               nonIncreasingTime <= maxNonIncreaseTime
-            case None => true
+            case None =>
+              setBestInd(pop.bestIndividual)
+              true
           }
-          bestSoFar = Some(pop.bestIndividual)
           nonIncreasingTime += 1
-          r
+          shouldContinue
         }).zipWithIndex.foreach { case (pop, i) =>
           val best = pop.bestIndividual
           val data = MonitoringData(pop.averageFitness, best.evaluation.fitness, best.evaluation.performance)
@@ -251,7 +261,6 @@ object Runner {
               case (s, f) => s"$s -> ${"%.3f".format(f)}"
             }.mkString(", ")
           }
-          FileInteraction.saveObjectToFile(s"$recordDirPath/bestIndividual[seed=$seed].serialized")(best.ind)
         }
 
         println("Evolution Finished!")
