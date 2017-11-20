@@ -916,13 +916,21 @@ object FuzzingTaskProvider {
             FileInteraction.deleteIfExist(dbFileName)
 
             Cost.reset()
-            GabfeedNoServer.run("benchmarks/gabfeed/data", content);
+            GabfeedNoServer.run("benchmarks/gabfeed/data", workingDir, content);
             Cost.read()
         },
         gpEnv = abcRegexEnv.copy(stateTypes = abcRegexEnv.stateTypes ++ IS(EInt, EVect(EInt)))
       )
     }
 
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      value match {
+        case IS(VectValue(chars)) =>
+          val str = vectIntToString(chars)
+          val fileName = s"$name.txt"
+          FileInteraction.writeToFile(fileName)(str)
+      }
+    }
   }
 
   /*def sendCommand(cmd: String): Unit = {
