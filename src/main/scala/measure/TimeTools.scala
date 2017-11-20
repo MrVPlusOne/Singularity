@@ -1,5 +1,6 @@
 package measure
 
+
 /**
   * Running time related tools
   */
@@ -77,6 +78,15 @@ object TimeTools {
       System.currentTimeMillis() - startTime
     }
     f(timer)
+  }
+
+  def numericalDateTime(): String = {
+    import java.util.Calendar
+    import java.text.SimpleDateFormat
+
+    val date = Calendar.getInstance().getTime
+    val format = new SimpleDateFormat("yy-MM-dd-HH:mm:ss")
+    format.format(date)
   }
 
 }

@@ -112,7 +112,7 @@ object Runner {
     for (seed <- seeds) {
       val recordDirPath = {
         import java.util.Calendar
-        val dateTime = Calendar.getInstance().getTime
+        val dateTime = TimeTools.numericalDateTime()
         s"results/$dateTime[seed=$seed]"
       }
 
