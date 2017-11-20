@@ -63,10 +63,12 @@ object GeneticOperator{
 
 case class GPEnvironment(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[EFunction], stateTypes: IS[EType]) {
   require(constMap.forall{case (_, gens) => gens.nonEmpty}, "For each type in constMap, there should be at least one ExprGen.")
-  /** type set used to concretize abstract functions */
+
+  /** type set used to concretize abstract functions, all function argument types and
+    * return types must be in this typeUniverse */
   val typeUniverse: Set[EType] = constMap.keySet
 
-  private def argTypesInTheUniverse(sourceName: String, types: Set[EType]): Boolean = {
+  private def signatureTypesInUniverse(sourceName: String, types: Set[EType]): Boolean = {
     types.foreach{t =>
       if(!typeUniverse.contains(t)){
         System.err.println(s"[Warning] $sourceName will not be used, because type $t is not within the type universe.")
@@ -78,12 +80,12 @@ case class GPEnvironment(constMap: Map[EType, IS[ExprGen[EConst]]], functions: I
 
   val functionMap: Map[EType, IndexedSeq[EConcreteFunc]] = functions.flatMap{
     case cf: EConcreteFunc =>
-      if(argTypesInTheUniverse(cf.name, cf.argTypes.toSet)) IS(cf)
+      if(signatureTypesInUniverse(cf.name, cf.argTypes.toSet+cf.returnType)) IS(cf)
       else IS()
     case af: EAbstractFunc =>
       val instantiations = for(
         ts <- cartesianProduct(IS.fill(af.tyVarNum)(typeUniverse)).toIndexedSeq;
-        cf = af.concretize(ts) if cf.argTypes.toSet.subsetOf(typeUniverse)
+        cf = af.concretize(ts) if (cf.argTypes.toSet+cf.returnType).subsetOf(typeUniverse)
       ) yield {
         cf
       }
@@ -93,7 +95,7 @@ case class GPEnvironment(constMap: Map[EType, IS[ExprGen[EConst]]], functions: I
       instantiations
   }.groupBy(_.returnType)
 
-  require(stateTypes.toSet.subsetOf(typeUniverse), "Some input type is not within the type universe!")
+  require(stateTypes.toSet.subsetOf(typeUniverse), "Some state type is not within the type universe!")
   val args: IndexedSeq[ExprGen[EArg]] = stateTypes.zipWithIndex.map{
     case (t, i) => ExprGen(t, _ =>EArg(i, t))
   }
