@@ -79,6 +79,12 @@ object FileInteraction{
     }
   }
 
+  def getWorkingDir(ioId: Int): String = {
+    val workingDir = s"workingDir$ioId"
+    FileInteraction.mkDirsAlongPath(workingDir)
+    workingDir
+  }
+
   def main(args: Array[String]): Unit = {
     val objFile = "results/Tue Oct 03 17:15:54 CDT 2017/bestIndividual[seed=2].serialized"
 

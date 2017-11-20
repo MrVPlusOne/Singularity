@@ -13,8 +13,7 @@ object Runner {
 
   def main(args: Array[String]): Unit = {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
-    val workingDir = s"workingDir$ioId"
-    FileInteraction.mkDirsAlongPath(workingDir)
+    val workingDir = FileInteraction.getWorkingDir(ioId)
 
     runExample(FuzzingTaskProvider.gabfeed4Example(workingDir), Seq(ioId), useGUI = true)
   }

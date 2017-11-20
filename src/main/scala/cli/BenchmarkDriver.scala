@@ -2,20 +2,18 @@ package cli
 
 import patsyn.Runner.RunConfig
 import patsyn._
+import scopt.OptionParser
 
 object BenchmarkDriver {
 
-  def getWorkingDir(cliOption: CliOption): String = {
-    val ioId = cliOption.ioId
-    val workingDir = s"workingDir$ioId"
-    FileInteraction.mkDirsAlongPath(workingDir)
-    workingDir
+  def getWorkingDir(opt: CliOption): String = {
+    FileInteraction.getWorkingDir(opt.ioId)
   }
 
   val benchmarks = {
     import FuzzingTaskProvider._
     Map[String, CliOption => FuzzingTaskProvider](
-      "slowfuzz/insertionSort" -> (_ =>insertionSortExample),
+      "slowfuzz/insertionSort" -> (_ => insertionSortExample),
       "slowfuzz/quickSort" -> (_ => quickSortExample),
       "slowfuzz/phpHash" -> (_ => phpHashCollision),
       "stac/graphAnalyzer" -> (opt => graphAnalyzerExample(getWorkingDir(opt))),
@@ -56,7 +54,38 @@ object BenchmarkDriver {
   }
 
   def main(args: Array[String]): Unit = {
-    val parser = new scopt.OptionParser[CliOption]("patsyn_cli_driver") {
+    val parser = cliOptParser()
+
+    parser.parse(args, CliOption()).foreach {
+      cliOption =>
+        val taskProvider = benchmarks.getOrElse(cliOption.target,
+          throw new IllegalArgumentException("Cannot find benchmark named " + cliOption.target))(cliOption)
+        cliOption.extrapolatePattern match {
+          case None =>
+            val benchs = getBenchmarks(cliOption.target, cliOption)
+            val config = getRunConfig(cliOption)
+            benchs.foreach { case (name, bench) =>
+              println(s"*** Task $name started ***")
+              try {
+                Runner.runExample(bench, cliOption.seeds, config, useGUI = !cliOption.disableGui)
+                println(s"*** Task $name finished ***")
+
+              } catch {
+                case ex: Exception =>
+                  System.err.println(s"Exception thrown: $ex")
+                  ex.printStackTrace(System.err)
+                  System.err.println(s"Task $name aborted. Continuing to the next task...")
+              }
+            }
+          case Some(extraArg) =>
+            val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
+            saveExtrapolation(taskProvider, ind, extraArg.size, extraArg.memoryLimit, extraArg.outputName)
+        }
+    }
+  }
+
+  def cliOptParser(): OptionParser[CliOption] = {
+    new scopt.OptionParser[CliOption]("patsyn_cli_driver") {
       head("patsyn Command Line Driver", "0.1")
 
       opt[Unit]('n', "no-gui").action( (_, c) =>
@@ -101,7 +130,7 @@ object BenchmarkDriver {
             c.copy(extrapolatePattern = Some(ExtrapolationArgs(input, output, size.toInt, Long.MaxValue)))
           case (Seq(input, output, size, memory), c) =>
             c.copy(extrapolatePattern = Some(ExtrapolationArgs(input, output, size.toInt, memory.toLong)))
-      }).
+        }).
         text("Read a MultiStateIndividual from <indPath> and try to construct an input of size <size>, then save it using name <outName>. Optionally, you can specify a memory limit for large input construction.")
 
       help("help").text("Prints this usage text")
@@ -113,33 +142,6 @@ object BenchmarkDriver {
         c.copy(target=x)).text("Benchmark target to run.")
 
       note("\nBenchmark target list:\n" + benchmarks.keys.map(s => "  " + s).mkString("\n") + "\n")
-    }
-
-    parser.parse(args, CliOption()).foreach {
-      cliOption =>
-        val taskProvider = benchmarks.getOrElse(cliOption.target,
-          throw new IllegalArgumentException("Cannot find benchmark named " + cliOption.target))(cliOption)
-        cliOption.extrapolatePattern match {
-          case None =>
-            val benchs = getBenchmarks(cliOption.target, cliOption)
-            val config = getRunConfig(cliOption)
-            benchs.foreach { case (name, bench) =>
-              println(s"*** Task $name started ***")
-              try {
-                Runner.runExample(bench, cliOption.seeds, config, useGUI = !cliOption.disableGui)
-                println(s"*** Task $name finished ***")
-
-              } catch {
-                case ex: Exception =>
-                  System.err.println(s"Exception thrown: $ex")
-                  ex.printStackTrace(System.err)
-                  System.err.println(s"Task $name aborted. Continuing to the next task...")
-              }
-            }
-          case Some(extraArg) =>
-            val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
-            saveExtrapolation(taskProvider, ind, extraArg.size, extraArg.memoryLimit, extraArg.outputName)
-        }
     }
   }
 
