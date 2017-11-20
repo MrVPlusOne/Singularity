@@ -22,6 +22,7 @@ object BenchmarkDriver {
       "stac/blogger" -> (_ => bloggerExample),
       "stac/imageProcessor" -> (opt => imageExample(10, 10, getWorkingDir(opt))),
       "stac/textCrunchr" -> (opt => textCrunchrExample(getWorkingDir(opt))),
+      "stac/gabfeed4" -> (opt => gabfeed4Example(getWorkingDir(opt))),
       "stac/linearAlgebra" -> (opt => linearAlgebraExample(10, getWorkingDir(opt))),
       "stac/airplan1" -> (opt => airplan1Example(getWorkingDir(opt))),
       "stac/airplan2" -> (opt => airplan2Example(getWorkingDir(opt))),

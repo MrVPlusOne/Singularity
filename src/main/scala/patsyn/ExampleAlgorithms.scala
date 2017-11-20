@@ -898,6 +898,33 @@ object FuzzingTaskProvider {
     }
   }
 
+  def gabfeed4Example(workDir: String) = new FuzzingTaskProvider {
+
+    override def sizeF: PartialFunction[IS[EValue], Int] = {
+      case IS(VectValue(chars)) => chars.length
+    }
+
+    override protected def task: RunningFuzzingTask = {
+      import patbench.gabfeed4.edu.utexas.stac.GabfeedNoServer
+
+      RunningFuzzingTask(
+        outputTypes = IS(EVect(EInt)),
+        sizeOfInterest = 500,
+        resourceUsage = {
+
+          case IS(chars:VectValue) =>
+            val content = vectIntToString(chars)
+
+            Cost.reset()
+            GabfeedNoServer.run("benchmarks/gabfeed/data", content);
+            Cost.read()
+        },
+        gpEnv = abcRegexEnv.copy(stateTypes = abcRegexEnv.stateTypes ++ IS(EInt, EVect(EInt)))
+      )
+    }
+
+  }
+
   /*def sendCommand(cmd: String): Unit = {
     import sys.process._
 
