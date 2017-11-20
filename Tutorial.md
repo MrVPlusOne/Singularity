@@ -111,14 +111,13 @@ The default parameters are shown below:
 
 ```scala
 case class RunConfig(populationSize: Int = 500,
-                       tournamentSize: Int = 7,
-                       evaluationTrials: Int = 1,
-                       totalSizeTolerance: Int = 60,
-                       singleSizeTolerance: Int = 30,
-                       threadNum: Int = 1,
-                       timeLimitInMillis: Int = 20000,
-                       maxNonIncreaseTime: Int = 150
-                      ){
+                     tournamentSize: Int = 7,
+                     evaluationTrials: Int = 1,
+                     totalSizeTolerance: Int = 60,
+                     singleSizeTolerance: Int = 30,
+                     threadNum: Int = 1,
+                     timeLimitInMillis: Int = 20000,
+                     maxNonIncreaseTime: Int = 150)
 ```
 Some parameters that require extra explanations:
 
@@ -133,7 +132,7 @@ Some parameters that require extra explanations:
 - `maxNonIncreaseTime`: The GP process is also terminated once there hasn't been seen any performance increase after this number of generations.
 
 
-### How to extend the DSL: Introduce pairs
+### Example on how to extend the DSL: Introducing pairs
 
 Let's see how pairs are introduced as a new data type in our DSL.
 
@@ -209,4 +208,4 @@ Actually, our GP only works on concrete components, and all abstract components 
 
 
 ### Further reading
-You can see more examples in [ExampleAlgorithms.scala](src/main/scala/patsyn/ExampleAlgorithms.scala).
+See more examples in [ExampleAlgorithms.scala](src/main/scala/patsyn/ExampleAlgorithms.scala).
