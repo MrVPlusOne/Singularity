@@ -165,7 +165,7 @@ object Runner {
         }
 
         val sizeOfInterest = task.sizeOfInterest
-        val memoryLimit = sizeOfInterest * 10
+        val memoryLimit = sizeOfInterest * 4 * task.gpEnv.stateTypes.length
         val evaluation = new SimplePerformanceEvaluation(
           sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
           resourceUsage = timeLimitedResourceUsage(timeLimitInMillis), sizeF = taskProvider.sizeF, breakingMemoryUsage = memoryLimit
