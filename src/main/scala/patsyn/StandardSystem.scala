@@ -118,6 +118,25 @@ object StandardSystem {
     val shiftByteLeft = EConcreteFunc("shiftBL", IS(EInt), EInt, {
       case IS(IntValue(a)) => a << 8
     })
+
+    val bitAnd = EConcreteFunc("bitAnd", IS(EInt, EInt), EInt, {
+      case IS(IntValue(a), IntValue(b)) => a & b
+    })
+    val bitOr = EConcreteFunc("bitOr", IS(EInt, EInt), EInt, {
+      case IS(IntValue(a), IntValue(b)) => a | b
+    })
+    val bitXor = EConcreteFunc("bitXor", IS(EInt, EInt), EInt, {
+      case IS(IntValue(a), IntValue(b)) => a ^ b
+    })
+    val bitShift = EConcreteFunc("bitShift", IS(EInt, EInt), EInt, {
+      case IS(IntValue(a), IntValue(b)) =>
+        if (b >= 0)
+          a << b
+        else
+          a >>> (-b)
+    })
+
+    val bitCollection: IndexedSeq[EFunction] = IS(bitAnd, bitOr, bitXor, bitShift)
   }
 
   object VectComponents {

@@ -140,10 +140,10 @@ object FuzzingTaskProvider {
       EVect(EVect(EInt)) -> IS(_ => Vector())
     )
 
-    val functions = IntComponents.collection ++ VectComponents.collection
+    val functions = IntComponents.collection ++ VectComponents.collection ++ IntComponents.bitCollection
 
     val stateTypes = constMap.keys.toIndexedSeq
-    GPEnvironment(constMap, functions, stateTypes)
+    GPEnvironment(constMap, functions, stateTypes ++ stateTypes)
   }
 
   def hashCollisionExample(hashFunc: Seq[Char] => Int) = new FuzzingTaskProvider {

@@ -68,23 +68,20 @@ object HashFunc {
     if (hash == 0) 27 else hash
   }
 
-  def murmur2(ls: Seq[Char], seed: Int) = {
+  def murmur2(seed: Int)(ls: Seq[Char]) = {
     val cs = ls.toArray
-    var len = cs.length
+    val len = cs.length
     val m = (0xc6a4a793 << 32) | 0x5bd1e995
     val r = 24
 
     var h = seed ^ len
-    var i = 0
-    while (len >= 8) {
-      var k = cs(i).toInt
+    for (c <- cs) {
+      var k = c.toInt
       k *= m
       k ^= k >> r
       k *= m
       h *= m
       h ^= k
-      i = i + 1
-      len = len - 8
     }
 
     // Assume the input len is a multiple of 8, the switch block will not be executed
