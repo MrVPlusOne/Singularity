@@ -61,6 +61,10 @@ object StandardSystem {
     }
 
     def size: Long = nodeNum + edges.map(_._3.size).sum + 1
+
+    def shiftIndex(offset: Int): GraphValue = {
+      this.copy(edges = edges.map{ case (n1, n2, v) => (n1+offset, n2+offset, v)})
+    }
   }
 
   implicit def intValue(v: Int): IntValue = IntValue(v)
@@ -312,6 +316,14 @@ object StandardSystem {
             val newEdges = edges.patch(e, IS(), e+1)
             GraphValue(nodeNum, newEdges)
           }
+      })
+
+    val mergeGraph = EAbstractFunc("mergeGraph", tyVarNum = 1,
+      typeInstantiation = {
+        case IS(eT) => IS(EGraph(eT), EGraph(eT)) -> EGraph(eT)
+      }, eval = {
+        case IS(g1: GraphValue, g2: GraphValue) =>
+          GraphValue(g1.nodeNum + g2.nodeNum, g2.shiftIndex(g1.nodeNum).edges)
       })
 
     val collection = IS(emptyGraph, addNode, addEdge, growEdge, growSelfLoop, bridgeEdge, deleteEdge)
