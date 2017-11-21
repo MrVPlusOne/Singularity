@@ -13,6 +13,7 @@ object BenchmarkDriver {
   val benchmarks = {
     import FuzzingTaskProvider._
     Map[String, CliOption => FuzzingTaskProvider](
+      // These benchmarks have already been solved
       "slowfuzz/insertionSort" -> (_ => insertionSortExample),
       "slowfuzz/quickSort" -> (_ => quickSortExample),
       "slowfuzz/phpHash" -> (_ => hashCollisionExample(HashFunc.php)),
@@ -20,14 +21,17 @@ object BenchmarkDriver {
       "stac/graphAnalyzer" -> (opt => graphAnalyzerExample(getWorkingDir(opt))),
       "stac/blogger" -> (opt => bloggerExample(opt.ioId)),
       "stac/imageProcessor" -> (opt => imageExample(10, 10, getWorkingDir(opt))),
-      "stac/textCrunchr" -> (opt => textCrunchrExample(getWorkingDir(opt))),
-      "stac/gabfeed4" -> (opt => gabfeed4Example(getWorkingDir(opt))),
       "stac/linearAlgebra" -> (opt => linearAlgebraExample(10, getWorkingDir(opt))),
       "stac/airplan1" -> (opt => airplan1Example(getWorkingDir(opt))),
+
+      // These benchmarks are yet to be solved
+      "stac/textCrunchr" -> (opt => textCrunchrExample(getWorkingDir(opt))),
+      "stac/gabfeed4" -> (opt => gabfeed4Example(getWorkingDir(opt))),
       "stac/airplan2" -> (opt => airplan2Example(getWorkingDir(opt))),
       "stac/airplan3" -> (opt => airplan3Example(getWorkingDir(opt))),
+
+      // We cheated in these benchmark and therefore it is debatable whether to include them
       "stac/airplan5" -> (opt => airplan5Example(getWorkingDir(opt))),
-//      "stac/gabfeed2" -> (opt => gabFeed2Example(opt.ioId, getWorkingDir(opt)))
     )
   }
 
