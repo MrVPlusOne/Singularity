@@ -26,12 +26,12 @@ object Runner {
 
   case class MonitorManager(monitorCallback: MonitoringData => Unit, evalProgressCallback: Int => Unit)
 
-  def createMonitor(populationSize: Int): MonitorManager = {
+  def createMonitor(populationSize: Int, ioId: Int): MonitorManager = {
     import javax.swing._
 
     import gui._
 
-    val frame = new JFrame("GP Monitor") {
+    val frame = new JFrame(s"GP Monitor [ioId=$ioId]") {
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
       setVisible(true)
     }
@@ -117,10 +117,10 @@ object Runner {
 
       val (evalProgressCallback, monitorCallback): (Int => Unit, MonitoringData => Unit) = {
         if (useGUI) {
-          val monitor = createMonitor(populationSize)
+          val monitor = createMonitor(populationSize, ioId)
           (monitor.evalProgressCallback, monitor.monitorCallback)
         } else {
-          val monitorDataPath = s"$recordDirPath/monitorData.txt"
+          val monitorDataPath = s"$recordDirPath/monitorData[seed=$seed].txt"
           ((_: Int) => Unit, (data: MonitoringData) => {
             FileInteraction.writeToFile(monitorDataPath, append = true){
               s"${data.bestPerformance}, ${data.bestFitness}, ${data.averageFitness}\n"
