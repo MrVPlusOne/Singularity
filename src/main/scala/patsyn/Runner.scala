@@ -15,7 +15,7 @@ object Runner {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
     val workingDir = FileInteraction.getWorkingDir(ioId)
 
-    runExample(FuzzingTaskProvider.gabfeed4Example(workingDir), Seq(ioId), useGUI = true)
+    runExample(FuzzingTaskProvider.airplan2Example(workingDir), ioId, Seq(ioId), useGUI = true)
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -100,7 +100,7 @@ object Runner {
     def default = RunConfig()
   }
 
-  def runExample(taskProvider: FuzzingTaskProvider, seeds: Seq[Int], config: RunConfig = RunConfig.default,
+  def runExample(taskProvider: FuzzingTaskProvider, ioId: Int, seeds: Seq[Int], config: RunConfig = RunConfig.default,
                  useGUI: Boolean = true)
   : Unit = taskProvider
     .run{ task =>
@@ -112,7 +112,7 @@ object Runner {
     for (seed <- seeds) {
       val recordDirPath = {
         val dateTime = TimeTools.numericalDateTime()
-        s"results/$dateTime[seed=$seed]"
+        s"results/$dateTime[ioId=$ioId]"
       }
 
       val (evalProgressCallback, monitorCallback): (Int => Unit, MonitoringData => Unit) = {
@@ -219,7 +219,7 @@ object Runner {
           bestSoFar = Some(indData)
           FileInteraction.saveObjectToFile(s"$recordDirPath/bestIndividual[seed=$seed].serialized")(indData.ind)
           MultiStateRepresentation.saveExtrapolation(taskProvider, indData.ind,
-            task.sizeOfInterest, memoryLimit, s"bestInput[seed=$seed]")
+            task.sizeOfInterest, memoryLimit, s"$recordDirPath/bestInput[seed=$seed]")
         }
 
         generations.takeWhile(pop => {

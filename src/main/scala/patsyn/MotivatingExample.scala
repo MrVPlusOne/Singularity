@@ -8,9 +8,6 @@ object MotivatingExample {
     val workingDir = s"workingDir$ioId"
     FileInteraction.mkDirsAlongPath(workingDir)
 
-//    runExample(FuzzingTaskProvider.gabFeed2Example(ioId ,workingDir), Seq(ioId), useGUI = true)
-//    runExample(FuzzingTaskProvider.textCrunchrExample(workingDir), Seq(ioId), useGUI = true)
-    runExample(FuzzingTaskProvider.quickSortExample, Seq(ioId), RunConfig.default.copy(populationSize = 300))
-//    runExample(FuzzingTaskProvider.regexExample("^abc*!"))
+    runExample(FuzzingTaskProvider.quickSortExample, ioId, Seq(ioId), RunConfig.default.copy(populationSize = 300))
   }
 }
