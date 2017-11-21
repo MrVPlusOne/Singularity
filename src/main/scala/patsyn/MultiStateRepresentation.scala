@@ -48,7 +48,7 @@ object MultiStateRepresentation{
   }
 
   def saveExtrapolation(taskProvider: FuzzingTaskProvider, individual: MultiStateInd,
-                        sizeLimit: Int, memoryLimit: Long, name: String): Unit = {
+                        sizeLimit: Int, memoryLimit: Long, name: String, evaluatePerformance: Boolean = false): Unit = {
     import EvolutionRepresentation.MemoryUsage
 
     println(s"Calculating extrapolation at size = $sizeLimit ...")
@@ -71,6 +71,14 @@ object MultiStateRepresentation{
 
     println(s"Extrapolation calculated. Now save results to $name")
     taskProvider.saveValueWithName(valueOfInterest, name)
+
+    if(evaluatePerformance){
+      println("Performance evaluation started...")
+      taskProvider.run{ task =>
+        val performance = task.resourceUsage(valueOfInterest)
+        println(s"Performance: $performance")
+      }
+    }
   }
 }
 

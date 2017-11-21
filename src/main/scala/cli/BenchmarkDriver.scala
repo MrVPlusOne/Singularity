@@ -81,7 +81,7 @@ object BenchmarkDriver {
           case Some(extraArg) =>
             val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
             MultiStateRepresentation.saveExtrapolation(
-              taskProvider, ind, extraArg.size, extraArg.memoryLimit, extraArg.outputName)
+              taskProvider, ind, extraArg.size, extraArg.memoryLimit, extraArg.outputName, extraArg.evaluatePerformance)
         }
     }
   }
@@ -126,14 +126,20 @@ object BenchmarkDriver {
         c.copy(maxNonIncreaseTime = x)).text("[GP parameter] Stop after this number of generations if the fitness " +
         " for the best individual does not increase. Default to 150.")
 
-      opt[Seq[String]]('e', "extrapolate").valueName("<indPath>,<outName>,<size>[,<memory>]").
+      def parseBool(s: String): Boolean = {
+        Set("t", "true","yes").contains(s.trim.toLowerCase())
+      }
+
+      opt[Seq[String]]('e', "extrapolate").valueName("<indPath>,<outName>,<size>,<eval>[,<memory>]").
         action({
-          case (Seq(input, output, size), c) =>
-            c.copy(extrapolatePattern = Some(ExtrapolationArgs(input, output, size.toInt, Long.MaxValue)))
-          case (Seq(input, output, size, memory), c) =>
-            c.copy(extrapolatePattern = Some(ExtrapolationArgs(input, output, size.toInt, memory.toLong)))
+          case (Seq(input, output, size, eval), c) =>
+            val shouldEval = parseBool(eval)
+            c.copy(extrapolatePattern = Some(ExtrapolationArgs(input, output, size.toInt, Long.MaxValue, shouldEval)))
+          case (Seq(input, output, size, eval, memory), c) =>
+            val shouldEval = parseBool(eval)
+            c.copy(extrapolatePattern = Some(ExtrapolationArgs(input, output, size.toInt, memory.toLong, shouldEval)))
         }).
-        text("Read a MultiStateIndividual from <indPath> and try to construct an input of size <size>, then save it using name <outName>. Optionally, you can specify a memory limit for large input construction.")
+        text("Read a MultiStateIndividual from <indPath> and try to construct an input of size <size>, then save it using name <outName>. If <eval> = \"t\", the extrapolated value is also evaluated. Optionally, you can specify a memory limit for large input construction.")
 
       help("help").text("Prints this usage text")
       version("version").text("Prints the version info")

@@ -16,4 +16,4 @@ case class CliOption(target: String = "",
                     )
 
 
-case class ExtrapolationArgs(indPath: String, outputName: String, size: Int, memoryLimit: Long)
+case class ExtrapolationArgs(indPath: String, outputName: String, size: Int, memoryLimit: Long, evaluatePerformance: Boolean)
