@@ -15,7 +15,7 @@ object BenchmarkDriver {
     Map[String, CliOption => FuzzingTaskProvider](
       "slowfuzz/insertionSort" -> (_ => insertionSortExample),
       "slowfuzz/quickSort" -> (_ => quickSortExample),
-      "slowfuzz/phpHash" -> (_ => phpHashCollision),
+      "slowfuzz/phpHash" -> (_ => hashCollisionExample(HashFunc.php)),
       "redos/nodejs" -> (_ => regexExample("^(([^=;]+))\\s*=\\s*([^\\n\\r\\00]*)", defaultRegexDic)),
       "stac/graphAnalyzer" -> (opt => graphAnalyzerExample(getWorkingDir(opt))),
       "stac/blogger" -> (opt => bloggerExample(opt.ioId)),
@@ -68,7 +68,7 @@ object BenchmarkDriver {
             benchs.foreach { case (name, bench) =>
               println(s"*** Task $name started ***")
               try {
-                Runner.runExample(bench, cliOption.seeds, config, useGUI = !cliOption.disableGui)
+                Runner.runExample(bench, cliOption.ioId, cliOption.seeds, config, useGUI = !cliOption.disableGui)
                 println(s"*** Task $name finished ***")
 
               } catch {

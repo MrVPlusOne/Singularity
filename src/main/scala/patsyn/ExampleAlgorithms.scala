@@ -6,7 +6,6 @@ import edu.utexas.stac.Cost
 import patsyn.GeneticOperator.ExprGen
 import patsyn.StandardSystem.{EInt, EVect, IntComponents, IntValue, VectComponents, VectValue, _}
 
-import scala.concurrent.TimeoutException
 import scala.util.Random
 
 
@@ -134,7 +133,7 @@ object FuzzingTaskProvider {
     }.toList
   }
 
-  def phpHashEnv: GPEnvironment = {
+  def hashEnv: GPEnvironment = {
     val constMap = makeConstMap(
       EInt -> IS(r => r.nextInt(12)),
       EVect(EInt) -> IS(_ => Vector()),
@@ -147,20 +146,20 @@ object FuzzingTaskProvider {
     GPEnvironment(constMap, functions, stateTypes)
   }
 
-  def phpHashCollision = new FuzzingTaskProvider {
+  def hashCollisionExample(hashFunc: Seq[Char] => Int) = new FuzzingTaskProvider {
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
       outputTypes = IS(EVect(EVect(EInt))),
       resourceUsage = {
         case IS(VectValue(vec)) =>
           val hashes = vec.map(v => {
             vectIntToCharArray(v.asInstanceOf[VectValue])
-          }).distinct.map(ccs_hashFunc)
+          }).distinct.map(hashFunc)
 
           hashes.groupBy(identity).values.map {
             elems => elems.length - 1
           }.sum
       },
-      gpEnv = phpHashEnv
+      gpEnv = hashEnv
     )
 
     def sizeF = {
@@ -230,15 +229,6 @@ object FuzzingTaskProvider {
     }
   }
 
-  def ccs_hashFunc(ls: Seq[Char]) = {
-    val cs = ls.toArray
-    var hash = 5381
-    for (i <- cs.indices) {
-      hash = ((hash << 5) + hash) + cs(i)
-    }
-    hash
-  }
-
   def intVectorToGraph(graphId: Int, refs: Vector[Int]): String = {
     val graphName = if (graphId == 0) "main" else s"L$graphId"
     val graphBody = refs.zipWithIndex.map { case (ref, i) =>
@@ -288,7 +278,7 @@ object FuzzingTaskProvider {
                 Cost.read().toDouble
             }
         },
-        gpEnv = phpHashEnv
+        gpEnv = hashEnv
       )
     }
   }
@@ -883,7 +873,7 @@ object FuzzingTaskProvider {
             AirplanNoServer.run(workingDir, routeMapFileName)
             Cost.read()
         },
-        gpEnv = phpHashEnv
+        gpEnv = hashEnv
       )
     }
 
