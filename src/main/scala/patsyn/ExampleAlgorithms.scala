@@ -196,6 +196,8 @@ object FuzzingTaskProvider {
     eValue.asInstanceOf[IntValue].value.toChar
   }
 
+  def defaultRegexDic(x: Int): String = (x % 255).toChar.toString
+
   def regexExample(regex: String, regexDic: Int => String) = new FuzzingTaskProvider {
 
     import patbench.slowfuzz.regex._

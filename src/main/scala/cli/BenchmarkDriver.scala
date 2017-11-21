@@ -16,6 +16,7 @@ object BenchmarkDriver {
       "slowfuzz/insertionSort" -> (_ => insertionSortExample),
       "slowfuzz/quickSort" -> (_ => quickSortExample),
       "slowfuzz/phpHash" -> (_ => phpHashCollision),
+      "redos/nodejs" -> (_ => regexExample("^(([^=;]+))\\s*=\\s*([^\\n\\r\\00]*)", defaultRegexDic)),
       "stac/graphAnalyzer" -> (opt => graphAnalyzerExample(getWorkingDir(opt))),
       "stac/blogger" -> (opt => bloggerExample(opt.ioId)),
       "stac/imageProcessor" -> (opt => imageExample(10, 10, getWorkingDir(opt))),
