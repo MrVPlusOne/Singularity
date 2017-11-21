@@ -15,7 +15,7 @@ object Runner {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
     val workingDir = FileInteraction.getWorkingDir(ioId)
 
-    runExample(FuzzingTaskProvider.airplan2Example(workingDir), ioId, Seq(ioId), useGUI = true)
+    runExample(FuzzingTaskProvider.hashCollisionExample(HashFunc.python), ioId, Seq(ioId), useGUI = true, config = RunConfig.default.copy(totalSizeTolerance = 100))
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
