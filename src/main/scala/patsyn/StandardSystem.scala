@@ -13,6 +13,8 @@ object StandardSystem {
 
   case class EPair(t1: EType, t2: EType) extends EType
 
+  case class EGraph(edgeT: EType) extends EType
+
   // Value declarations
   case class IntValue(value: Int) extends EValue {
     def hasType(ty: EType): Boolean = ty == EInt
@@ -37,6 +39,8 @@ object StandardSystem {
     def hasType(ty: EType): Boolean = ty == EBool
 
     def size: Long = 1
+
+    override def toString: String = if(value)"T" else "F"
   }
 
   case class PairValue(value: (EValue, EValue)) extends EValue{
@@ -46,6 +50,17 @@ object StandardSystem {
     }
 
     def size: Long = value._1.size + value._2.size
+
+    override def toString: String = value.toString()
+  }
+
+  case class GraphValue(nodeNum: Int, edges: IS[(Int, Int, EValue)]) extends EValue{
+    def hasType(ty: EType): Boolean = ty match {
+      case EGraph(edgeT) => edges.isEmpty || edges.head._3.hasType(edgeT)
+      case _ => false
+    }
+
+    def size: Long = nodeNum + edges.map(_._3.size).sum + 1
   }
 
   implicit def intValue(v: Int): IntValue = IntValue(v)
@@ -214,5 +229,91 @@ object StandardSystem {
 
     // examples on how to make a concrete version
     val mkIntPair: EConcreteFunc = mkPair.concretize(IS(EInt, EInt))
+  }
+
+  /** add an isolated vertex */
+  object GraphComponents {
+    val emptyGraph = EAbstractFunc("emptyGraph", tyVarNum = 1,
+      typeInstantiation = {
+        case IS(eT) => IS() -> EGraph(eT)
+      }, eval = {
+        case IS() => GraphValue(0, IS())
+      })
+
+    val addNode = EAbstractFunc("addNode", tyVarNum = 1,
+      typeInstantiation = {
+        case IS(eT) => IS(EGraph(eT)) -> EGraph(eT)
+      }, eval = {
+        case IS(gv: GraphValue) => gv.copy(nodeNum = gv.nodeNum+1)
+      })
+
+    /** add an isolated edge */
+    val addEdge = EAbstractFunc("addEdge", tyVarNum = 1,
+      typeInstantiation = {
+        case IS(eT) => IS(EGraph(eT), eT) -> EGraph(eT)
+      }, eval = {
+        case IS(GraphValue(nodeNum, edges), edgeValue) =>
+          val newEdges = edges :+ (nodeNum, nodeNum+1, edgeValue)
+          GraphValue(nodeNum + 2, newEdges)
+      })
+
+    /** add an edge from/to an existing vertex */
+    val growEdge = EAbstractFunc("growEdge", tyVarNum = 1,
+      typeInstantiation = {
+        case IS(eT) => IS(EGraph(eT), EInt, eT) -> EGraph(eT)
+      }, eval = {
+        case IS(g @ GraphValue(nodeNum, edges), IntValue(nodeToGrow), edgeValue) =>
+          if(nodeNum == 0) g
+          else{
+            val n = SimpleMath.wrapInRange(nodeToGrow, nodeNum)
+            val newEdges = edges :+ (n, nodeNum, edgeValue)
+            GraphValue(nodeNum + 1, newEdges)
+          }
+      })
+
+    /** add a self loop to a vertex */
+    val growSelfLoop = EAbstractFunc("growSelfLoop", tyVarNum = 1,
+      typeInstantiation = {
+        case IS(eT) => IS(EGraph(eT), EInt, eT) -> EGraph(eT)
+      }, eval = {
+        case IS(g @ GraphValue(nodeNum, edges), IntValue(nodeToGrow), edgeValue) =>
+          if(nodeNum == 0) g
+          else{
+            val n = SimpleMath.wrapInRange(nodeToGrow, nodeNum)
+            val newEdges = edges :+ (n, n, edgeValue)
+            GraphValue(nodeNum, newEdges)
+          }
+      })
+
+    /** add an edge between two existing vertices */
+    val bridgeEdge = EAbstractFunc("bridgeEdge", tyVarNum = 1,
+      typeInstantiation = {
+        case IS(eT) => IS(EGraph(eT), EInt, EInt, eT) -> EGraph(eT)
+      }, eval = {
+        case IS(g @ GraphValue(nodeNum, edges), IntValue(from), IntValue(to), edgeValue) =>
+          if(nodeNum == 0) g
+          else{
+            val n1 = SimpleMath.wrapInRange(from, nodeNum)
+            val n2 = SimpleMath.wrapInRange(to, nodeNum)
+            val newEdges = edges :+ (n1, n2, edgeValue)
+            GraphValue(nodeNum, newEdges)
+          }
+      })
+
+    /** delete an edge */
+    val deleteEdge = EAbstractFunc("deleteEdge", tyVarNum = 1,
+      typeInstantiation = {
+        case IS(eT) => IS(EGraph(eT), EInt) -> EGraph(eT)
+      }, eval = {
+        case IS(g @ GraphValue(nodeNum, edges), IntValue(edgeIndex)) =>
+          if(edges.isEmpty) g
+          else{
+            val e = SimpleMath.wrapInRange(edgeIndex, nodeNum)
+            val newEdges = edges.patch(e, IS(), e+1)
+            GraphValue(nodeNum, newEdges)
+          }
+      })
+
+    val collection = IS(emptyGraph, addNode, addEdge, growEdge, growSelfLoop, bridgeEdge, deleteEdge)
   }
 }
