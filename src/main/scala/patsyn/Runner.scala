@@ -20,9 +20,6 @@ object Runner {
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
 
-  def makeXY(ys: IS[Double]): IS[(Double, Double)] = {
-    ys.indices.map { i => (i + 1).toDouble -> ys(i) }
-  }
 
   case class MonitorManager(monitorCallback: MonitoringData => Unit, evalProgressCallback: Int => Unit)
 
@@ -50,6 +47,8 @@ object Runner {
 
     MonitorManager(
       monitorCallback = d => {
+        import ListPlot.makeXY
+
         dataCollected :+= d
 
         val avFitLine = dataCollected.map(_.averageFitness)

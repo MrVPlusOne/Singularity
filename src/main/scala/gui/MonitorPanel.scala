@@ -20,12 +20,29 @@ object MonitorPanel{
       setVisible(true)
     }
 
-    for(i <- 0 until 12){
-      val chart = ListPlot.plot(s"x^$i" -> (1 to 10).map(x => x.toDouble -> math.pow(x, i)))("Demo", "x", "y")
-      frame.setContentPane(new MonitorPanel(chart, 10, (600,450)))
-      frame.pack()
-      Thread.sleep(1)
+    val chart = {
+      import io.Source
+      val lines = Source.fromFile("someMonitorFile.txt").getLines()
+      plotFromCSVString(lines)
     }
+
+    frame.setContentPane(new MonitorPanel(chart, margin = 10, plotSize = (600,450)))
+    frame.pack()
+  }
+
+  def plotFromCSVString(lines: Iterator[String]): JFreeChart = {
+    import ListPlot.makeXY
+
+    val data = lines.map{ l => l.split(",\\s*").map(_.toDouble)}.toIndexedSeq
+    val bestPerformance = data.map(_.apply(0))
+    val bestFitness = data.map(_.apply(1))
+    val avFitLine = data.map(_.apply(2))
+
+    val chart = ListPlot.plot(
+      "best performance" -> makeXY(bestPerformance),
+      "best fitness" -> makeXY(bestFitness),
+      "average fitness" -> makeXY(avFitLine))("Performance Curve", "Generations", "Evaluation")
+    chart
   }
 }
 
@@ -63,5 +80,9 @@ object ListPlot {
     })
 
     chart
+  }
+
+  def makeXY(ys: IS[Double]): IS[(Double, Double)] = {
+    ys.indices.map { i => (i + 1).toDouble -> ys(i) }
   }
 }
