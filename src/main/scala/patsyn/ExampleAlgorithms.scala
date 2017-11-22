@@ -166,6 +166,11 @@ object FuzzingTaskProvider {
       case IS(VectValue(strings)) =>
         strings.map(s => s.asInstanceOf[VectValue].value.length).sum
     }
+
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      super.saveValueWithName(value, name)
+      println(s"# of string = ${value(0).asInstanceOf[VectValue].value.length}")
+    }
   }
 
   def toLowercase(i: Int): Char = {
@@ -745,7 +750,7 @@ object FuzzingTaskProvider {
 
     override protected def task: RunningFuzzingTask = {
       RunningFuzzingTask(
-        outputTypes = IS(EInt, EInt, EVect(EVect(EPair(EInt, EInt)))),
+        outputTypes = IS(EInt, EInt, EGraph(EInt)),
         sizeOfInterest = 100,
         resourceUsage = {
           case IS(origin: IntValue, dest: IntValue, graphValue: GraphValue) =>
