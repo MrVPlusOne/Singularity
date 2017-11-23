@@ -129,7 +129,7 @@ object FuzzingTaskProvider {
 
   def vectIntToCharArray(vec: VectValue): List[Char] = {
     vec.value.map { i =>
-      (i.asInstanceOf[IntValue].value % 256).toChar
+      i.asInstanceOf[IntValue].value.toChar
     }.toList
   }
 
@@ -170,7 +170,7 @@ object FuzzingTaskProvider {
       outputTypes = IS(EVect(EVect(EInt))),
       resourceUsage = {
         case IS(VectValue(vec)) =>
-          squareMetric(vec)
+          totalCollisionMetric(vec)
       },
       gpEnv = hashEnv,
       sizeOfInterest = 600
@@ -186,9 +186,107 @@ object FuzzingTaskProvider {
       println(s"# of string = ${value(0).asInstanceOf[VectValue].value.length}")
     }
   }
+  def phpHashCollisionExample = hashCollisionExample(HashFunc.php)
+  def javaHashCollisionExample = hashCollisionExample(HashFunc.java)
+  def rubyHashCollisionExample = hashCollisionExample(HashFunc.ruby)
+  def aspDotNetHashCollisionExample = hashCollisionExample(HashFunc.aspDotNet)
+  def pythonHashCollisionExample = hashCollisionExample(HashFunc.python)
+  def v8HashCollisionExample = hashCollisionExample(HashFunc.v8)
+  def murmur2HashCollisionExample = hashCollisionExample(HashFunc.murmur2(0))
 
-  def toLowercase(i: Int): Char = {
-    ('a' + i % 26).toChar
+  private def hashPerformanceExample(hashFunc: Array[String] => Any) = new FuzzingTaskProvider {
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      outputTypes = IS(EVect(EVect(EInt))),
+      resourceUsage = {
+        case IS(VectValue(vec)) =>
+          val strs = vec.map(v => vectIntToString(v.asInstanceOf[VectValue])).toArray
+
+          Cost.reset()
+          hashFunc(strs)
+          Cost.read()
+      },
+      gpEnv = hashEnv
+    )
+
+    def sizeF = {
+      case IS(VectValue(strings)) =>
+        strings.map(s => s.asInstanceOf[VectValue].value.length + 2).sum
+    }
+
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      super.saveValueWithName(value, name)
+      println(s"# of string = ${value(0).asInstanceOf[VectValue].value.length}")
+    }
+  }
+  def phpHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.phpStringHarness)
+  def javaHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.javaStringHarness)
+  def rubyHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.rubyStringHarness)
+  def aspDotNetHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.aspDotNetStringHarness)
+  def pythonHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness
+    .pythonStringHarness)
+  def v8HashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.v8StringHarness)
+  def murmur2HashPerformanceExample = hashPerformanceExample(arr =>
+    patbench.hash.edu.utexas.stac.HashHarness.murmur2StringHarness(arr, 0)
+  )
+
+  def splayTreeExample = new FuzzingTaskProvider {
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      outputTypes = IS(EVect(EInt)),
+      resourceUsage = {
+        case IS(VectValue(vec)) =>
+          val insertArray = toIntVect(vec).toArray
+
+          Cost.reset()
+          patbench.ds.edu.utexas.stac.DataStructureHarness.splayTreeHarness(insertArray)
+          Cost.read()
+      },
+      gpEnv = sortingEnv.copy(stateTypes = IS(EInt, EInt, EVect(EInt)))
+    )
+
+    def sizeF = {
+      case IS(VectValue(vec)) =>
+        vec.length
+    }
+  }
+
+  def scapegoatTreeExample = new FuzzingTaskProvider {
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      outputTypes = IS(EVect(EInt)),
+      resourceUsage = {
+        case IS(VectValue(vec)) =>
+          val intArray = toIntVect(vec).toArray
+
+          Cost.reset()
+          patbench.ds.edu.utexas.stac.DataStructureHarness.scapegoatHarness(intArray)
+          Cost.read()
+      },
+      gpEnv = sortingEnv
+    )
+
+    def sizeF = {
+      case IS(VectValue(vec)) =>
+        vec.length
+    }
+  }
+
+  def pairingHeapExample = new FuzzingTaskProvider {
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      outputTypes = IS(EVect(EInt)),
+      resourceUsage = {
+        case IS(VectValue(vec)) =>
+          val intArray = toIntVect(vec).toArray
+
+          Cost.reset()
+          patbench.ds.edu.utexas.stac.DataStructureHarness.pairingHeapHarness(intArray)
+          Cost.read()
+      },
+      gpEnv = sortingEnv
+    )
+
+    def sizeF = {
+      case IS(VectValue(vec)) =>
+        vec.length
+    }
   }
 
   def abcRegexEnv: GPEnvironment = {

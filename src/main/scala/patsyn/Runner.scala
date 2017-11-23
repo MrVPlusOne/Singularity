@@ -7,15 +7,14 @@ import java.util.concurrent.TimeoutException
 import measure.TimeTools
 import patsyn.EvolutionRepresentation.IndividualData
 import FuzzingTaskProvider.escapeStrings
-import cli.BenchmarkDriver
 
 object Runner {
 
   def main(args: Array[String]): Unit = {
-    val ioId = if(args.isEmpty) 2 else args.head.toInt
+    val ioId = if(args.isEmpty) 0 else args.head.toInt
     val workingDir = FileInteraction.getWorkingDir(ioId)
 
-    runExample(FuzzingTaskProvider.hashCollisionExample(HashFunc.php), ioId, Seq(ioId), useGUI = true, config = RunConfig.default.copy(totalSizeTolerance = 60))
+     runExample(FuzzingTaskProvider.splayTreeExample, ioId, Seq(ioId), useGUI = true)
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
