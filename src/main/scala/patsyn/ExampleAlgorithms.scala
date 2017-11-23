@@ -147,24 +147,38 @@ object FuzzingTaskProvider {
   }
 
   def hashCollisionExample(hashFunc: Seq[Char] => Int) = new FuzzingTaskProvider {
+    def totalCollisionMetric(vec: Vector[EValue]): Double = {
+      val hashes = vec.map(v => {
+        vectIntToCharArray(v.asInstanceOf[VectValue])
+      }).distinct.map(hashFunc)
+
+      hashes.groupBy(identity).values.map {
+        elems => elems.length - 1
+      }.sum
+    }
+
+    def squareMetric(vec: Vector[EValue]): Double = {
+      val hashes = vec.map(v => {
+        vectIntToCharArray(v.asInstanceOf[VectValue])
+      }).distinct.map(hashFunc)
+      val updateNum = vec.length - hashes.length
+
+      hashes.groupBy(identity).values.map(e => 3*e.length*e.length).sum + updateNum
+    }
+
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
       outputTypes = IS(EVect(EVect(EInt))),
       resourceUsage = {
         case IS(VectValue(vec)) =>
-          val hashes = vec.map(v => {
-            vectIntToCharArray(v.asInstanceOf[VectValue])
-          }).distinct.map(hashFunc)
-
-          hashes.groupBy(identity).values.map {
-            elems => elems.length - 1
-          }.sum
+          squareMetric(vec)
       },
-      gpEnv = hashEnv
+      gpEnv = hashEnv,
+      sizeOfInterest = 600
     )
 
     def sizeF = {
       case IS(VectValue(strings)) =>
-        strings.map(s => s.asInstanceOf[VectValue].value.length).sum
+        strings.map(s => s.asInstanceOf[VectValue].value.length+1).sum
     }
 
     override def saveValueWithName(value: IS[EValue], name: String): Unit = {

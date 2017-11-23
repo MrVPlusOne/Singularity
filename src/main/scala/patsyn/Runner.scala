@@ -12,10 +12,10 @@ import cli.BenchmarkDriver
 object Runner {
 
   def main(args: Array[String]): Unit = {
-    val ioId = if(args.isEmpty) 0 else args.head.toInt
+    val ioId = if(args.isEmpty) 2 else args.head.toInt
     val workingDir = FileInteraction.getWorkingDir(ioId)
 
-    runExample(FuzzingTaskProvider.hashCollisionExample(HashFunc.python), ioId, Seq(ioId), useGUI = true, config = RunConfig.default.copy(totalSizeTolerance = 100))
+    runExample(FuzzingTaskProvider.hashCollisionExample(HashFunc.php), ioId, Seq(ioId), useGUI = true, config = RunConfig.default.copy(totalSizeTolerance = 60))
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
