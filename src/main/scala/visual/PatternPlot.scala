@@ -1,5 +1,8 @@
 package visual
 
+import java.awt.Dimension
+import javax.swing.JFrame
+
 import org.jfree.chart.JFreeChart
 import patsyn.MultiStateRepresentation.individualToPattern
 import patsyn.{EvolutionRepresentation, FileInteraction, FuzzingTaskProvider, MultiStateInd}
@@ -8,7 +11,7 @@ import scala.util.Random
 
 object PatternPlot {
   def plotPatternPerformance(taskProvider: FuzzingTaskProvider, individual: MultiStateInd,
-                             sizeLimit: Int, patternName: String, maxPoints: Int = 10, memoryLimit: Long = Long.MaxValue, seed: Int = 0): JFreeChart = {
+                             sizeLimit: Int, maxPoints: Int = 10, memoryLimit: Long = Long.MaxValue, seed: Int = 0): Stream[(Double, Double)] = {
     import EvolutionRepresentation.MemoryUsage
 
     var lastSize = Int.MinValue
@@ -40,20 +43,33 @@ object PatternPlot {
     }
 
     taskProvider.run { task =>
-      val line = valuesToUse.map(v => {
+      valuesToUse.toStream.map(v => {
         val x = taskProvider.sizeF(v).toDouble
         println(s"Evaluating at size $x")
         val y = task.resourceUsage(v)
         (x, y)
       })
-
-
-      ListPlot.plot(patternName -> line)("Resource Usage Chart", xLabel = "size", yLabel = "R")
     }
   }
 
   def main(args: Array[String]): Unit = {
-    val ind = FileInteraction.readObjectFromFile[MultiStateInd]("someIndividual.serialized")
-    plotPatternPerformance(???, ind, sizeLimit = ???, patternName = ???)
+    val frame = new JFrame("Monitor") {
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+      setVisible(true)
+    }
+
+    val workDir = FileInteraction.getWorkingDir(0)
+    val ind = FileInteraction.readObjectFromFile[MultiStateInd]("InterestingResults/airplan2/bestIndividual[seed=1].serialized")
+    val xys = plotPatternPerformance(FuzzingTaskProvider.airplan2Example(workDir), ind, sizeLimit = 150)
+
+    var data = IndexedSeq[(Double, Double)]()
+    xys.foreach{ xy =>
+      data :+= xy
+      val chart = ListPlot.plot("pattern[seed=1]" -> data)("Resource Usage Chart", xLabel = "size", yLabel = "R")
+      frame.setContentPane(new MonitorPanel(chart, margin = 10, plotSize = (600,450)))
+      frame.pack()
+    }
+
+    println("Evaluation finished.")
   }
 }
