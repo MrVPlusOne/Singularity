@@ -31,6 +31,7 @@ object BenchmarkDriver {
       "stac/imageProcessor" -> (opt => imageExample(10, 10, getWorkingDir(opt))),
       "stac/linearAlgebra" -> (opt => linearAlgebraExample(10, getWorkingDir(opt))),
       "stac/airplan1" -> (opt => airplan1Example(getWorkingDir(opt))),
+      "stac/airplan2" -> (opt => airplan2Example(getWorkingDir(opt))),
       "redos/cookie" -> (_ => regexExample("^(([^=;]+))\\s*=\\s*([^\\n\\r\\00]*)", defaultRegexDic)),
       "hashperf/php" -> (_ => phpHashPerformanceExample),
 
@@ -43,7 +44,6 @@ object BenchmarkDriver {
       "hashcol/murmur2s0" -> (_ => murmur2HashCollisionExample),
       "stac/textCrunchr" -> (opt => textCrunchrExample(getWorkingDir(opt))),
       "stac/gabfeed4" -> (opt => gabfeed4Example(getWorkingDir(opt))),
-      "stac/airplan2" -> (opt => airplan2Example(getWorkingDir(opt))),
       "stac/airplan3" -> (opt => airplan3Example(getWorkingDir(opt))),
       "hashperf/java" -> (_ => javaHashPerformanceExample),
       "hashperf/ruby" -> (_ => rubyHashPerformanceExample),
