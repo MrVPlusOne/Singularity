@@ -25,7 +25,7 @@ object Runner {
   def createMonitor(populationSize: Int, ioId: Int): MonitorManager = {
     import javax.swing._
 
-    import gui._
+    import visual._
 
     val frame = new JFrame(s"GP Monitor [ioId=$ioId]") {
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)

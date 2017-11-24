@@ -1,4 +1,4 @@
-package gui
+package visual
 
 import java.awt.geom.Rectangle2D
 import java.awt.{Dimension, Graphics, Graphics2D}
