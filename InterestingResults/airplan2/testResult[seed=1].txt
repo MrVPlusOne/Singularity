@@ -1,0 +1,1784 @@
+[Configuration]
+sizeOfInterest = 100
+
+populationSize: 500
+tournamentSize: 7
+evaluationTrials：3
+totalSizeTolerance：50
+singleSizeTolerance：30
+threadNum：1
+timeLimitInMillis：120000
+maxNonIncreaseTime：150
+       
+[End of Configuration]
+
+[Function map]
+EGraph(EInt) -> {emptyGraph: () => EGraph(EInt), addNode: (EGraph(EInt)) => EGraph(EInt), addEdge: (EGraph(EInt),EInt) => EGraph(EInt), growEdge: (EGraph(EInt),EInt,EInt) => EGraph(EInt), growSelfLoop: (EGraph(EInt),EInt,EInt) => EGraph(EInt), bridgeEdge: (EGraph(EInt),EInt,EInt,EInt) => EGraph(EInt), deleteEdge: (EGraph(EInt),EInt) => EGraph(EInt)}
+EVect(EInt) -> {append: (EVect(EInt),EInt) => EVect(EInt), prepend: (EInt,EVect(EInt)) => EVect(EInt), concat: (EVect(EInt),EVect(EInt)) => EVect(EInt)}
+EInt -> {inc: (EInt) => EInt, dec: (EInt) => EInt, neg: (EInt) => EInt, plus: (EInt,EInt) => EInt, minus: (EInt,EInt) => EInt, times: (EInt,EInt) => EInt, divide: (EInt,EInt) => EInt, modular: (EInt,EInt) => EInt, access: (EVect(EInt),EInt,EInt) => EInt, length: (EVect(EInt)) => EInt}
+[End of Function map]
+
+------------
+[0.174s]Generation 1
+Best Result: (fitness: 101673009.8, performance: 168610589.0), Created by Init
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #0))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: minus(#2, #2); seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 1 ; iter: #0; seedExpr: inc(modular(length([]), 7)) }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(neg(#0), #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(#4, 0, #0)); seedExpr: growEdge(GraphValue(0,Vector()), times(10, 7), divide(6, length([]))) }
+Best Individual Pattern: Vector(0, 0, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 500
+Average Size: 45.398
+Average Fitness: 205376.56170089272
+Fitness Variation: 4542338.950404088
+Distribution: [] -> 0.105, #1 -> 0.075, #2 -> 0.074, #0 -> 0.071, #3 -> 0.041, GraphValue(0,Vector()) -> 0.029, length -> 0.025, 0 -> 0.024, neg -> 0.024, 7 -> 0.023
+------------
+[78.106s]Generation 2
+Best Result: (fitness: 101673009.8, performance: 168610589.0), Created by Copy
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #0))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: minus(#2, #2); seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 1 ; iter: #0; seedExpr: inc(modular(length([]), 7)) }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(neg(#0), #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(#4, 0, #0)); seedExpr: growEdge(GraphValue(0,Vector()), times(10, 7), divide(6, length([]))) }
+Best Individual Pattern: Vector(0, 0, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 466
+Average Size: 62.208
+Average Fitness: 1388519.7334667188
+Fitness Variation: 1.1573402770905957E7
+Distribution: [] -> 0.107, #1 -> 0.074, #2 -> 0.070, #0 -> 0.069, #3 -> 0.040, access -> 0.027, 0 -> 0.027, length -> 0.027, 7 -> 0.026, divide -> 0.026
+------------
+[397.861s]Generation 3
+Best Result: (fitness: 122644304.1, performance: 168434010.0), Created by Crossover
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #0))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: minus(#2, #2); seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 1 ; iter: #0; seedExpr: inc(modular(length([]), 7)) }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(neg(#0), #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(3,Vector((1,2,9))) ; iter: addNode(growSelfLoop(#4, 0, #0)); seedExpr: addEdge(addNode(GraphValue(0,Vector())), 9) }
+Best Individual Pattern: Vector(0, 0, GraphValue(3,Vector((1,2,9)))), Vector(0, 1, GraphValue(4,Vector((1,2,9), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((1,2,9), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((1,2,9), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(7,Vector((1,2,9), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(8,Vector((1,2,9), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(9,Vector((1,2,9), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 456
+Average Size: 59.13
+Average Fitness: 6075276.570308345
+Fitness Variation: 2.335906135658223E7
+Distribution: [] -> 0.121, #0 -> 0.083, #1 -> 0.068, #2 -> 0.056, length -> 0.033, #3 -> 0.033, 6 -> 0.031, access -> 0.029, 7 -> 0.028, 0 -> 0.028
+------------
+[887.777s]Generation 4
+Best Result: (fitness: 122644310.0, performance: 168434018.0), Created by Mutate
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #0))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: minus(#2, #2); seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 1 ; iter: #0; seedExpr: inc(modular(length([]), 7)) }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(neg(#0), #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(3,Vector((1,2,9))) ; iter: addNode(growSelfLoop(#4, 0, #0)); seedExpr: addEdge(addNode(emptyGraph()), 9) }
+Best Individual Pattern: Vector(0, 0, GraphValue(3,Vector((1,2,9)))), Vector(0, 1, GraphValue(4,Vector((1,2,9), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((1,2,9), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((1,2,9), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(7,Vector((1,2,9), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(8,Vector((1,2,9), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(9,Vector((1,2,9), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 445
+Average Size: 40.474
+Average Fitness: 2.892713793085766E7
+Fitness Variation: 4.387616083559511E7
+Distribution: #0 -> 0.126, [] -> 0.109, #1 -> 0.074, #2 -> 0.063, length -> 0.050, 6 -> 0.047, neg -> 0.046, #4 -> 0.040, divide -> 0.035, 7 -> 0.033
+------------
+[1451.497s]Generation 5
+Best Result: (fitness: 144932898.6, performance: 168610592.0), Created by Crossover
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #0))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: minus(#2, #2); seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(neg(#0), #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(#4, 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 0, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 463
+Average Size: 45.166
+Average Fitness: 7.469801247631408E7
+Fitness Variation: 4.710191253518522E7
+Distribution: #0 -> 0.124, [] -> 0.092, #2 -> 0.083, #1 -> 0.070, 6 -> 0.062, neg -> 0.061, length -> 0.055, divide -> 0.054, 7 -> 0.047, #4 -> 0.038
+------------
+[1888.519s]Generation 6
+Best Result: (fitness: 175934739.5, performance: 337540159.0), Created by Crossover
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #2))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: minus(#2, #2); seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 1 ; iter: #0; seedExpr: inc(modular(length([]), 7)) }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(neg(#0), #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(#4, 0, #0), 0, #0)); seedExpr: growEdge(GraphValue(0,Vector()), times(10, 7), divide(6, length([]))) }
+Best Individual Pattern: Vector(0, 1, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 461
+Average Size: 42.422
+Average Fitness: 8.658446673048599E7
+Fitness Variation: 5.215722628385637E7
+Distribution: #0 -> 0.131, #2 -> 0.094, #1 -> 0.075, [] -> 0.074, neg -> 0.064, 6 -> 0.056, divide -> 0.051, length -> 0.044, #4 -> 0.042, 7 -> 0.041
+------------
+[2255.797s]Generation 7
+Best Result: (fitness: 175934739.5, performance: 337540159.0), Created by Copy
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #2))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: minus(#2, #2); seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 1 ; iter: #0; seedExpr: inc(modular(length([]), 7)) }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(neg(#0), #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(#4, 0, #0), 0, #0)); seedExpr: growEdge(GraphValue(0,Vector()), times(10, 7), divide(6, length([]))) }
+Best Individual Pattern: Vector(0, 1, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 440
+Average Size: 39.672
+Average Fitness: 9.871087895144594E7
+Fitness Variation: 5.523395299632738E7
+Distribution: #0 -> 0.136, #2 -> 0.100, #1 -> 0.079, [] -> 0.066, neg -> 0.066, 6 -> 0.054, divide -> 0.047, #4 -> 0.046, 0 -> 0.039, 9 -> 0.038
+------------
+[2619.154s]Generation 8
+Best Result: (fitness: 251574822.3, performance: 337540157.0), Created by Crossover
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(length(#3), #1)
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: -4 ; iter: minus(#2, #2); seedExpr: neg(4) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 4 ; iter: #0; seedExpr: 4 }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(#2, #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(#4, 0, #0), 0, #0)); seedExpr: growEdge(GraphValue(0,Vector()), times(10, 7), divide(6, length([]))) }
+Best Individual Pattern: Vector(0, 0, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 2, GraphValue(2,Vector((0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 451
+Average Size: 37.448
+Average Fitness: 1.0748627272658671E8
+Fitness Variation: 6.038180437977439E7
+Distribution: #0 -> 0.141, #2 -> 0.102, #1 -> 0.077, [] -> 0.063, neg -> 0.063, 6 -> 0.054, #4 -> 0.050, 0 -> 0.045, divide -> 0.043, 7 -> 0.035
+------------
+[3108.365s]Generation 9
+Best Result: (fitness: 312986752.9, performance: 675595483.0), Created by Crossover
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #2))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: minus(#2, #2); seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 1 ; iter: #0; seedExpr: inc(modular(length([]), 7)) }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(neg(#0), #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #0), 0, #0), 0, #0)); seedExpr: growEdge(GraphValue(0,Vector()), times(10, 7), divide(6, 9)) }
+Best Individual Pattern: Vector(0, 1, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 457
+Average Size: 38.408
+Average Fitness: 1.2317588798913826E8
+Fitness Variation: 6.5638486663714394E7
+Distribution: #0 -> 0.132, #2 -> 0.100, #1 -> 0.070, [] -> 0.069, neg -> 0.056, 0 -> 0.055, 6 -> 0.055, #4 -> 0.051, divide -> 0.041, 7 -> 0.041
+------------
+[3795.991s]Generation 10
+Best Result: (fitness: 367288659.2, performance: 675595480.0), Created by Crossover
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #2))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: minus(#2, #2); seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(neg(#0), #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #0), 0, #0), 0, #0)); seedExpr: growEdge(GraphValue(0,Vector()), times(10, 7), divide(6, length([]))) }
+Best Individual Pattern: Vector(0, 1, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 448
+Average Size: 44.662
+Average Fitness: 1.476289538841051E8
+Fitness Variation: 8.076784921705851E7
+Distribution: #0 -> 0.126, #2 -> 0.101, [] -> 0.069, #1 -> 0.065, 0 -> 0.063, neg -> 0.058, 6 -> 0.058, divide -> 0.049, #4 -> 0.046, 7 -> 0.042
+------------
+[4657.404s]Generation 11
+Best Result: (fitness: 367948033.5, performance: 675595489.0), Created by Mutate
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #2))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 5 ; iter: minus(#2, #2); seedExpr: 5 }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 1 ; iter: #0; seedExpr: inc(modular(length([]), 7)) }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(neg(#0), #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #0), 0, #0), 0, #0)); seedExpr: growEdge(GraphValue(0,Vector()), times(10, 7), divide(6, 0)) }
+Best Individual Pattern: Vector(0, 1, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 464
+Average Size: 44.238
+Average Fitness: 1.7877433328529868E8
+Fitness Variation: 9.802105966366087E7
+Distribution: #0 -> 0.132, #2 -> 0.100, 0 -> 0.074, #1 -> 0.066, [] -> 0.060, 6 -> 0.054, neg -> 0.053, growSelfLoop -> 0.050, #4 -> 0.048, divide -> 0.047
+------------
+[5918.523s]Generation 12
+Best Result: (fitness: 471416389.7, performance: 675595490.0), Created by Crossover
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> divide(6, length([]))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: minus(#2, #2); seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 1 ; iter: #0; seedExpr: inc(modular(length([]), 7)) }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(neg(#0), #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 1, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 459
+Average Size: 41.316
+Average Fitness: 2.0378379344657484E8
+Fitness Variation: 1.2505417010224082E8
+Distribution: #0 -> 0.143, #2 -> 0.105, 0 -> 0.089, #1 -> 0.068, growSelfLoop -> 0.062, #4 -> 0.054, [] -> 0.048, neg -> 0.046, 6 -> 0.043, divide -> 0.041
+------------
+[8527.607s]Generation 13
+Best Result: (fitness: 554873184.1, performance: 1351526039.0), Created by Crossover
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #2))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: #0; seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 1 ; iter: #0; seedExpr: inc(modular(length([]), 7)) }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(neg(#0), #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #0), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 1, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 467
+Average Size: 43.956
+Average Fitness: 2.4983693240955135E8
+Fitness Variation: 1.489406254158305E8
+Distribution: #0 -> 0.149, 0 -> 0.105, #2 -> 0.096, growSelfLoop -> 0.071, #1 -> 0.062, #4 -> 0.053, 6 -> 0.047, [] -> 0.046, neg -> 0.044, divide -> 0.040
+------------
+[11923.633s]Generation 14
+Best Result: (fitness: 564063845.0, performance: 675595492.0), Created by Mutate
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #2))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: minus(#2, #2); seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 1, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 460
+Average Size: 46.122
+Average Fitness: 3.05328848051526E8
+Fitness Variation: 1.7410341950321168E8
+Distribution: #0 -> 0.157, 0 -> 0.114, #2 -> 0.088, growSelfLoop -> 0.078, #1 -> 0.057, #4 -> 0.051, 6 -> 0.048, [] -> 0.047, neg -> 0.044, divide -> 0.039
+------------
+[15564.867s]Generation 15
+Best Result: (fitness: 652508063.1, performance: 1351526222.0), Created by Crossover
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #2))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: #0; seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 1 ; iter: #0; seedExpr: inc(0) }
+[S3: EVect(EInt)]{ seed: [] ; iter: append(#3, divide(neg(#0), #1)); seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 1, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 458
+Average Size: 43.066
+Average Fitness: 3.661676120419428E8
+Fitness Variation: 1.9104457224923405E8
+Distribution: #0 -> 0.170, 0 -> 0.127, growSelfLoop -> 0.093, #2 -> 0.079, #1 -> 0.057, #4 -> 0.056, [] -> 0.051, 6 -> 0.047, neg -> 0.040, divide -> 0.034
+------------
+[19694.457s]Generation 16
+Best Result: (fitness: 776596627.7, performance: 1351526217.0), Created by Crossover
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #2))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: minus(#2, #2); seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 1, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 468
+Average Size: 41.296
+Average Fitness: 3.910444521937128E8
+Fitness Variation: 2.2292975556197536E8
+Distribution: #0 -> 0.181, 0 -> 0.150, growSelfLoop -> 0.114, #2 -> 0.071, #4 -> 0.058, #1 -> 0.055, [] -> 0.050, 6 -> 0.040, neg -> 0.036, divide -> 0.028
+------------
+[23945.069s]Generation 17
+Best Result: (fitness: 833445696.9, performance: 1351526213.0), Created by Crossover
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #2))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: #0; seedExpr: neg(divide(6, 9)) }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 1, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 448
+Average Size: 42.36
+Average Fitness: 4.293680050662766E8
+Fitness Variation: 2.5099283383990416E8
+Distribution: #0 -> 0.194, 0 -> 0.176, growSelfLoop -> 0.139, #2 -> 0.070, #4 -> 0.058, #1 -> 0.051, [] -> 0.039, neg -> 0.035, 6 -> 0.031, divide -> 0.022
+------------
+[28815.836s]Generation 18
+Best Result: (fitness: 860427635.6, performance: 1351526222.0), Created by Mutate
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #2))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 10 ; iter: minus(#2, #2); seedExpr: 10 }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 1, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 445
+Average Size: 44.754
+Average Fitness: 4.7443266338700515E8
+Fitness Variation: 2.868298811223513E8
+Distribution: 0 -> 0.201, #0 -> 0.196, growSelfLoop -> 0.162, #2 -> 0.067, #4 -> 0.057, #1 -> 0.049, neg -> 0.034, 5 -> 0.031, [] -> 0.028, 6 -> 0.025
+------------
+[34316.450s]Generation 19
+Best Result: (fitness: 910793390.2, performance: 1351526216.0), Created by Crossover
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, plus(neg(#2), #2))
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 0 ; iter: #0; seedExpr: 0 }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 0 ; iter: #0; seedExpr: 0 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, #1, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 1, GraphValue(0,Vector())), Vector(0, 1, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 457
+Average Size: 44.608
+Average Fitness: 5.259105997573443E8
+Fitness Variation: 3.1017288626354045E8
+Distribution: 0 -> 0.209, #0 -> 0.193, growSelfLoop -> 0.173, #2 -> 0.070, #4 -> 0.057, #1 -> 0.045, 5 -> 0.038, neg -> 0.030, 6 -> 0.027, [] -> 0.022
+------------
+[38835.442s]Generation 20
+Best Result: (fitness: 935056708.2, performance: 1351526222.0), Created by Mutate
+[O0: EInt] -> minus(#1, #1)
+[O1: EInt] -> modular(#0, #2)
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: minus(#2, #2); seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 0, GraphValue(0,Vector())), Vector(0, 0, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 440
+Average Size: 42.898
+Average Fitness: 5.486706204209582E8
+Fitness Variation: 3.424956350061431E8
+Distribution: 0 -> 0.215, #0 -> 0.197, growSelfLoop -> 0.181, #2 -> 0.075, #4 -> 0.059, 5 -> 0.047, #1 -> 0.037, neg -> 0.027, 6 -> 0.025, [] -> 0.019
+------------
+[43680.853s]Generation 21
+Best Result: (fitness: 978136513.0, performance: 1351526222.0), Created by Crossover
+[O0: EInt] -> #0
+[O1: EInt] -> modular(#0, #2)
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: minus(#2, #2); seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(2, 0, GraphValue(0,Vector())), Vector(0, 0, GraphValue(1,Vector())), Vector(0, 1, GraphValue(2,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(3,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(4,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(5,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 1, GraphValue(6,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 453
+Average Size: 41.27
+Average Fitness: 5.768677597703017E8
+Fitness Variation: 3.639703780665019E8
+Distribution: 0 -> 0.224, #0 -> 0.200, growSelfLoop -> 0.186, #2 -> 0.069, #4 -> 0.061, 5 -> 0.049, #1 -> 0.040, neg -> 0.021, [] -> 0.020, 6 -> 0.020
+------------
+[48381.077s]Generation 22
+Best Result: (fitness: 997802756.7, performance: 1351526241.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 5
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: minus(#2, #2); seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: neg(#2); seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 5, GraphValue(0,Vector())), Vector(0, 5, GraphValue(1,Vector())), Vector(0, 5, GraphValue(2,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 5, GraphValue(3,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 5, GraphValue(4,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 5, GraphValue(5,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 5, GraphValue(6,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 454
+Average Size: 39.016
+Average Fitness: 5.835840614400092E8
+Fitness Variation: 3.8838351106789225E8
+Distribution: 0 -> 0.229, #0 -> 0.210, growSelfLoop -> 0.191, #4 -> 0.063, #2 -> 0.059, 5 -> 0.051, #1 -> 0.038, [] -> 0.021, 6 -> 0.017, neg -> 0.015
+------------
+[53031.933s]Generation 23
+Best Result: (fitness: 1016162648.3, performance: 1351526261.0), Created by Mutate
+[O0: EInt] -> #1
+[O1: EInt] -> 7
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 10 ; iter: minus(#2, #2); seedExpr: 10 }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: #3; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, #1, 5), 0, #0), 0, #0), 0, #0), 0, #0), #0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(6, 7, GraphValue(0,Vector())), Vector(2, 7, GraphValue(1,Vector())), Vector(10, 7, GraphValue(2,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 7, GraphValue(3,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 7, GraphValue(4,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 7, GraphValue(5,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 7, GraphValue(6,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 450
+Average Size: 37.85
+Average Fitness: 6.215819534773775E8
+Fitness Variation: 4.019525361342719E8
+Distribution: 0 -> 0.239, #0 -> 0.213, growSelfLoop -> 0.200, #4 -> 0.066, #2 -> 0.054, 5 -> 0.053, #1 -> 0.038, [] -> 0.022, 6 -> 0.013, minus -> 0.012
+------------
+[57167.997s]Generation 24
+Best Result: (fitness: 1049186891.2, performance: 1351526244.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 5
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: 10; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 5, GraphValue(0,Vector())), Vector(0, 5, GraphValue(1,Vector())), Vector(0, 5, GraphValue(2,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(3,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(4,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(5,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(6,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), ...
+Diversity: 435
+Average Size: 36.532
+Average Fitness: 6.39424755183519E8
+Fitness Variation: 4.0691114137780803E8
+Distribution: 0 -> 0.248, #0 -> 0.214, growSelfLoop -> 0.208, #4 -> 0.068, #2 -> 0.058, 5 -> 0.056, #1 -> 0.030, [] -> 0.021, 2 -> 0.013, minus -> 0.013
+------------
+[61599.574s]Generation 25
+Best Result: (fitness: 1049186891.2, performance: 1351526244.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 5
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: 10; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: #2; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 5, GraphValue(0,Vector())), Vector(0, 5, GraphValue(1,Vector())), Vector(0, 5, GraphValue(2,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(3,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(4,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(5,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(6,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), ...
+Diversity: 435
+Average Size: 35.604
+Average Fitness: 6.571763331918198E8
+Fitness Variation: 4.1213413145592993E8
+Distribution: 0 -> 0.249, growSelfLoop -> 0.208, #0 -> 0.206, #4 -> 0.068, #2 -> 0.059, 5 -> 0.059, #1 -> 0.030, [] -> 0.019, 2 -> 0.013, minus -> 0.012
+------------
+[65801.530s]Generation 26
+Best Result: (fitness: 1049186895.9, performance: 1351526250.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 5
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 5, GraphValue(0,Vector())), Vector(0, 5, GraphValue(1,Vector())), Vector(0, 5, GraphValue(2,Vector((0,0,5), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 5, GraphValue(3,Vector((0,0,5), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 5, GraphValue(4,Vector((0,0,5), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 5, GraphValue(5,Vector((0,0,5), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 5, GraphValue(6,Vector((0,0,5), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 441
+Average Size: 34.38
+Average Fitness: 6.47028576939863E8
+Fitness Variation: 4.248155222525041E8
+Distribution: 0 -> 0.255, growSelfLoop -> 0.210, #0 -> 0.205, #4 -> 0.069, 5 -> 0.062, #2 -> 0.053, #1 -> 0.024, [] -> 0.020, 2 -> 0.014, minus -> 0.011
+------------
+[69977.524s]Generation 27
+Best Result: (fitness: 1049186905.2, performance: 1351526262.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 5
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: 10; seedExpr: 2 }
+[S1: EInt]{ seed: 4 ; iter: #2; seedExpr: 4 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #2)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 5, GraphValue(0,Vector())), Vector(0, 5, GraphValue(1,Vector())), Vector(0, 5, GraphValue(2,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,2)))), Vector(0, 5, GraphValue(3,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,2), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(4,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,2), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(5,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,2), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(6,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,2), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), ...
+Diversity: 436
+Average Size: 34.034
+Average Fitness: 6.728637442407886E8
+Fitness Variation: 4.2329706270938253E8
+Distribution: 0 -> 0.264, growSelfLoop -> 0.216, #0 -> 0.212, #4 -> 0.071, 5 -> 0.063, #2 -> 0.045, [] -> 0.019, #1 -> 0.017, 2 -> 0.016, GraphValue(0,Vector()) -> 0.011
+------------
+[74725.930s]Generation 28
+Best Result: (fitness: 1049187496.7, performance: 1351527024.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 5
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: 0; seedExpr: 2 }
+[S1: EInt]{ seed: 0 ; iter: #2; seedExpr: 0 }
+[S2: EInt]{ seed: 0 ; iter: #0; seedExpr: 0 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 5, GraphValue(0,Vector())), Vector(0, 5, GraphValue(1,Vector())), Vector(0, 5, GraphValue(2,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 5, GraphValue(3,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 5, GraphValue(4,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 5, GraphValue(5,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 5, GraphValue(6,Vector((0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,5), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 446
+Average Size: 32.868
+Average Fitness: 6.970982421448178E8
+Fitness Variation: 4.170494554355137E8
+Distribution: 0 -> 0.267, growSelfLoop -> 0.214, #0 -> 0.207, #4 -> 0.071, 5 -> 0.061, #2 -> 0.037, [] -> 0.021, #1 -> 0.019, 2 -> 0.016, GraphValue(0,Vector()) -> 0.011
+------------
+[79208.860s]Generation 29
+Best Result: (fitness: 1049187906.6, performance: 1351527552.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 5
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: 10; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: #1; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, 5), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 5, GraphValue(0,Vector())), Vector(0, 5, GraphValue(1,Vector())), Vector(0, 5, GraphValue(2,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(3,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(4,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(5,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), Vector(0, 5, GraphValue(6,Vector((0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,5), (0,0,10), (0,0,10), (0,0,10), (0,0,10), (0,0,10)))), ...
+Diversity: 424
+Average Size: 32.16
+Average Fitness: 7.282927368306135E8
+Fitness Variation: 4.060875274146153E8
+Distribution: 0 -> 0.283, growSelfLoop -> 0.221, #0 -> 0.208, #4 -> 0.072, 5 -> 0.063, #2 -> 0.025, [] -> 0.020, 2 -> 0.016, #1 -> 0.015, GraphValue(0,Vector()) -> 0.012
+------------
+[83647.665s]Generation 30
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 408
+Average Size: 32.0
+Average Fitness: 7.263046115130397E8
+Fitness Variation: 4.201067585214548E8
+Distribution: 0 -> 0.285, growSelfLoop -> 0.223, #0 -> 0.207, #4 -> 0.072, 5 -> 0.067, [] -> 0.022, #2 -> 0.020, 2 -> 0.016, #1 -> 0.015, GraphValue(0,Vector()) -> 0.012
+------------
+[87485.237s]Generation 31
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 413
+Average Size: 32.032
+Average Fitness: 6.805907016974795E8
+Fitness Variation: 4.3414740306934327E8
+Distribution: 0 -> 0.278, growSelfLoop -> 0.218, #0 -> 0.214, #4 -> 0.071, 5 -> 0.064, [] -> 0.021, #2 -> 0.020, 2 -> 0.017, #1 -> 0.017, GraphValue(0,Vector()) -> 0.012
+------------
+[91126.771s]Generation 32
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 400
+Average Size: 31.948
+Average Fitness: 7.130765127892216E8
+Fitness Variation: 4.2387611585996395E8
+Distribution: 0 -> 0.281, growSelfLoop -> 0.217, #0 -> 0.209, #4 -> 0.071, 5 -> 0.065, #2 -> 0.021, [] -> 0.021, #1 -> 0.017, 2 -> 0.016, GraphValue(0,Vector()) -> 0.012
+------------
+[95203.801s]Generation 33
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 400
+Average Size: 31.804
+Average Fitness: 7.305965074178551E8
+Fitness Variation: 4.197221757716917E8
+Distribution: 0 -> 0.291, growSelfLoop -> 0.222, #0 -> 0.207, #4 -> 0.073, 5 -> 0.066, [] -> 0.021, #2 -> 0.018, 2 -> 0.016, #1 -> 0.015, GraphValue(0,Vector()) -> 0.012
+------------
+[99070.027s]Generation 34
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 369
+Average Size: 31.39
+Average Fitness: 7.407737794065654E8
+Fitness Variation: 4.22154994617807E8
+Distribution: 0 -> 0.300, growSelfLoop -> 0.221, #0 -> 0.205, #4 -> 0.073, 5 -> 0.064, [] -> 0.022, #2 -> 0.020, 2 -> 0.015, GraphValue(0,Vector()) -> 0.013, #1 -> 0.012
+------------
+[102581.563s]Generation 35
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 379
+Average Size: 31.868
+Average Fitness: 6.840532291526932E8
+Fitness Variation: 4.509928810156945E8
+Distribution: 0 -> 0.300, growSelfLoop -> 0.218, #0 -> 0.199, #4 -> 0.072, 5 -> 0.059, [] -> 0.022, #2 -> 0.021, #1 -> 0.016, 2 -> 0.016, GraphValue(0,Vector()) -> 0.012
+------------
+[102953.613s]Generation 36
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 380
+Average Size: 32.138
+Average Fitness: 3.293487039427655E8
+Fitness Variation: 4.8292516559761834E8
+Distribution: 0 -> 0.302, growSelfLoop -> 0.221, #0 -> 0.202, #4 -> 0.073, 5 -> 0.055, #2 -> 0.024, [] -> 0.022, #1 -> 0.016, 2 -> 0.015, GraphValue(0,Vector()) -> 0.011
+------------
+[103317.308s]Generation 37
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 369
+Average Size: 32.048
+Average Fitness: 2.865425589826031E8
+Fitness Variation: 4.657097505231291E8
+Distribution: 0 -> 0.297, growSelfLoop -> 0.218, #0 -> 0.200, #4 -> 0.071, 5 -> 0.042, #2 -> 0.035, [] -> 0.021, #1 -> 0.020, 2 -> 0.017, GraphValue(0,Vector()) -> 0.012
+------------
+[103654.663s]Generation 38
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 358
+Average Size: 31.206
+Average Fitness: 2.5716765090357167E8
+Fitness Variation: 4.5070835912652045E8
+Distribution: 0 -> 0.301, growSelfLoop -> 0.220, #0 -> 0.201, #4 -> 0.074, #2 -> 0.043, 5 -> 0.030, [] -> 0.022, 2 -> 0.022, #1 -> 0.019, GraphValue(0,Vector()) -> 0.013
+------------
+[104035.761s]Generation 39
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 354
+Average Size: 30.674
+Average Fitness: 2.3921508041781604E8
+Fitness Variation: 4.401788299301907E8
+Distribution: 0 -> 0.287, growSelfLoop -> 0.216, #0 -> 0.205, #4 -> 0.074, #2 -> 0.052, [] -> 0.022, 2 -> 0.022, 5 -> 0.021, #1 -> 0.021, 6 -> 0.016
+------------
+[104355.215s]Generation 40
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 314
+Average Size: 30.984
+Average Fitness: 2.5180534291984156E8
+Fitness Variation: 4.480902650592293E8
+Distribution: 0 -> 0.286, growSelfLoop -> 0.218, #0 -> 0.210, #4 -> 0.074, #2 -> 0.059, [] -> 0.022, 2 -> 0.020, #1 -> 0.019, 6 -> 0.017, GraphValue(0,Vector()) -> 0.012
+------------
+[104638.432s]Generation 41
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 300
+Average Size: 31.018
+Average Fitness: 2.3501809007428867E8
+Fitness Variation: 4.374295555121897E8
+Distribution: 0 -> 0.282, growSelfLoop -> 0.217, #0 -> 0.213, #4 -> 0.074, #2 -> 0.063, [] -> 0.023, #1 -> 0.020, 2 -> 0.019, 6 -> 0.017, GraphValue(0,Vector()) -> 0.012
+------------
+[104890.245s]Generation 42
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 279
+Average Size: 30.746
+Average Fitness: 2.3711646832073355E8
+Fitness Variation: 4.3881145775282854E8
+Distribution: 0 -> 0.278, #0 -> 0.214, growSelfLoop -> 0.214, #4 -> 0.074, #2 -> 0.067, [] -> 0.025, 2 -> 0.021, #1 -> 0.020, 6 -> 0.019, GraphValue(0,Vector()) -> 0.013
+------------
+[105260.206s]Generation 43
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 285
+Average Size: 30.804
+Average Fitness: 2.371164644902429E8
+Fitness Variation: 4.3881145119177055E8
+Distribution: 0 -> 0.280, growSelfLoop -> 0.217, #0 -> 0.217, #4 -> 0.073, #2 -> 0.066, [] -> 0.023, #1 -> 0.020, 6 -> 0.020, 2 -> 0.019, GraphValue(0,Vector()) -> 0.013
+------------
+[105588.077s]Generation 44
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 288
+Average Size: 30.946
+Average Fitness: 2.5810022928010985E8
+Fitness Variation: 4.518626980353054E8
+Distribution: 0 -> 0.278, #0 -> 0.215, growSelfLoop -> 0.215, #4 -> 0.074, #2 -> 0.065, [] -> 0.024, 2 -> 0.020, #1 -> 0.020, 6 -> 0.019, GraphValue(0,Vector()) -> 0.012
+------------
+[105868.110s]Generation 45
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 288
+Average Size: 30.628
+Average Fitness: 2.434115962427556E8
+Fitness Variation: 4.428716332630276E8
+Distribution: 0 -> 0.278, #0 -> 0.216, growSelfLoop -> 0.216, #4 -> 0.073, #2 -> 0.067, [] -> 0.023, 2 -> 0.020, 6 -> 0.020, #1 -> 0.019, GraphValue(0,Vector()) -> 0.014
+------------
+[106115.413s]Generation 46
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 264
+Average Size: 30.522
+Average Fitness: 2.4131322692895916E8
+Fitness Variation: 4.4153237436799395E8
+Distribution: 0 -> 0.279, growSelfLoop -> 0.216, #0 -> 0.215, #4 -> 0.074, #2 -> 0.069, [] -> 0.024, 6 -> 0.021, 2 -> 0.020, #1 -> 0.018, GraphValue(0,Vector()) -> 0.013
+------------
+[106383.295s]Generation 47
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 278
+Average Size: 31.402
+Average Fitness: 2.560018556897179E8
+Fitness Variation: 4.5061856454388803E8
+Distribution: 0 -> 0.278, #0 -> 0.218, growSelfLoop -> 0.216, #4 -> 0.073, #2 -> 0.067, [] -> 0.023, 6 -> 0.020, 2 -> 0.020, #1 -> 0.018, GraphValue(0,Vector()) -> 0.013
+------------
+[106579.086s]Generation 48
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 281
+Average Size: 30.618
+Average Fitness: 2.2242783610532936E8
+Fitness Variation: 4.2882914610229546E8
+Distribution: 0 -> 0.280, #0 -> 0.220, growSelfLoop -> 0.217, #4 -> 0.073, #2 -> 0.064, [] -> 0.024, 6 -> 0.020, 2 -> 0.020, #1 -> 0.017, GraphValue(0,Vector()) -> 0.013
+------------
+[106795.865s]Generation 49
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 290
+Average Size: 30.658
+Average Fitness: 2.3921484111460248E8
+Fitness Variation: 4.4017900775037265E8
+Distribution: 0 -> 0.275, #0 -> 0.219, growSelfLoop -> 0.215, #4 -> 0.074, #2 -> 0.069, [] -> 0.022, 2 -> 0.020, 6 -> 0.020, #1 -> 0.019, GraphValue(0,Vector()) -> 0.013
+------------
+[106991.721s]Generation 50
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 278
+Average Size: 30.452
+Average Fitness: 2.7908398314556193E8
+Fitness Variation: 4.635985920366764E8
+Distribution: 0 -> 0.279, #0 -> 0.220, growSelfLoop -> 0.216, #4 -> 0.073, #2 -> 0.066, [] -> 0.023, 6 -> 0.020, 2 -> 0.020, #1 -> 0.018, GraphValue(0,Vector()) -> 0.014
+------------
+[107183.689s]Generation 51
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 258
+Average Size: 30.534
+Average Fitness: 2.6019860051091492E8
+Fitness Variation: 4.530936960024085E8
+Distribution: 0 -> 0.277, #0 -> 0.222, growSelfLoop -> 0.216, #4 -> 0.073, #2 -> 0.066, [] -> 0.022, 2 -> 0.020, 6 -> 0.020, #1 -> 0.018, GraphValue(0,Vector()) -> 0.013
+------------
+[107383.263s]Generation 52
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 266
+Average Size: 30.884
+Average Fitness: 2.622969830584372E8
+Fitness Variation: 4.543116828939004E8
+Distribution: 0 -> 0.279, growSelfLoop -> 0.219, #0 -> 0.218, #4 -> 0.074, #2 -> 0.070, [] -> 0.022, 2 -> 0.021, 6 -> 0.020, #1 -> 0.018, GraphValue(0,Vector()) -> 0.012
+------------
+[107624.444s]Generation 53
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 260
+Average Size: 30.352
+Average Fitness: 2.413132289708212E8
+Fitness Variation: 4.4153237816624606E8
+Distribution: 0 -> 0.281, growSelfLoop -> 0.218, #0 -> 0.218, #4 -> 0.075, #2 -> 0.067, [] -> 0.024, 2 -> 0.021, 6 -> 0.020, #1 -> 0.017, GraphValue(0,Vector()) -> 0.012
+------------
+[107806.233s]Generation 54
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 265
+Average Size: 30.426
+Average Fitness: 2.4131322922671813E8
+Fitness Variation: 4.4153237802638906E8
+Distribution: 0 -> 0.282, #0 -> 0.220, growSelfLoop -> 0.219, #4 -> 0.075, #2 -> 0.068, [] -> 0.022, 6 -> 0.021, 2 -> 0.020, #1 -> 0.018, GraphValue(0,Vector()) -> 0.012
+------------
+[108010.684s]Generation 55
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 260
+Average Size: 30.176
+Average Fitness: 2.413132291277542E8
+Fitness Variation: 4.415323780804765E8
+Distribution: 0 -> 0.283, growSelfLoop -> 0.218, #0 -> 0.218, #4 -> 0.076, #2 -> 0.068, [] -> 0.022, 2 -> 0.021, 6 -> 0.020, #1 -> 0.017, GraphValue(0,Vector()) -> 0.012
+------------
+[108334.751s]Generation 56
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 260
+Average Size: 30.602
+Average Fitness: 2.6439536244270846E8
+Fitness Variation: 4.555167439559771E8
+Distribution: 0 -> 0.277, #0 -> 0.220, growSelfLoop -> 0.215, #4 -> 0.073, #2 -> 0.069, [] -> 0.023, 2 -> 0.021, 6 -> 0.020, #1 -> 0.018, GraphValue(0,Vector()) -> 0.013
+------------
+[108571.264s]Generation 57
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 271
+Average Size: 30.852
+Average Fitness: 2.2872297395675868E8
+Fitness Variation: 4.3319646029866797E8
+Distribution: 0 -> 0.279, #0 -> 0.220, growSelfLoop -> 0.219, #4 -> 0.073, #2 -> 0.069, [] -> 0.022, 6 -> 0.020, 2 -> 0.020, #1 -> 0.016, GraphValue(0,Vector()) -> 0.013
+------------
+[108778.089s]Generation 58
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 272
+Average Size: 30.476
+Average Fitness: 2.4970673229843923E8
+Fitness Variation: 4.468062505904148E8
+Distribution: 0 -> 0.280, growSelfLoop -> 0.216, #0 -> 0.216, #4 -> 0.074, #2 -> 0.067, [] -> 0.023, 6 -> 0.021, 2 -> 0.020, #1 -> 0.020, GraphValue(0,Vector()) -> 0.013
+------------
+[108940.413s]Generation 59
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 279
+Average Size: 30.908
+Average Fitness: 2.3921485314198515E8
+Fitness Variation: 4.401790305235266E8
+Distribution: 0 -> 0.278, #0 -> 0.218, growSelfLoop -> 0.217, #4 -> 0.074, #2 -> 0.071, [] -> 0.023, 6 -> 0.020, 2 -> 0.019, #1 -> 0.018, GraphValue(0,Vector()) -> 0.012
+------------
+[109133.942s]Generation 60
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 290
+Average Size: 31.342
+Average Fitness: 2.4341160461158866E8
+Fitness Variation: 4.428716481724331E8
+Distribution: 0 -> 0.276, growSelfLoop -> 0.216, #0 -> 0.216, #4 -> 0.072, #2 -> 0.071, [] -> 0.023, 2 -> 0.020, 6 -> 0.019, #1 -> 0.019, GraphValue(0,Vector()) -> 0.013
+------------
+[109320.961s]Generation 61
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 279
+Average Size: 30.68
+Average Fitness: 2.329197258043303E8
+Fitness Variation: 4.3603320343792295E8
+Distribution: 0 -> 0.276, growSelfLoop -> 0.214, #0 -> 0.214, #4 -> 0.075, #2 -> 0.069, [] -> 0.023, 2 -> 0.021, 6 -> 0.020, #1 -> 0.019, GraphValue(0,Vector()) -> 0.012
+------------
+[109511.472s]Generation 62
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 281
+Average Size: 30.152
+Average Fitness: 1.993457126438456E8
+Fitness Variation: 4.11597365047643E8
+Distribution: 0 -> 0.276, #0 -> 0.219, growSelfLoop -> 0.214, #4 -> 0.074, #2 -> 0.067, [] -> 0.024, 2 -> 0.021, 6 -> 0.020, #1 -> 0.019, GraphValue(0,Vector()) -> 0.014
+------------
+[109700.025s]Generation 63
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 293
+Average Size: 29.548
+Average Fitness: 2.0773921643610594E8
+Fitness Variation: 4.180931526520389E8
+Distribution: 0 -> 0.269, #0 -> 0.213, growSelfLoop -> 0.208, #4 -> 0.076, #2 -> 0.069, [] -> 0.025, 2 -> 0.022, #1 -> 0.022, 6 -> 0.021, GraphValue(0,Vector()) -> 0.013
+------------
+[109856.446s]Generation 64
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 271
+Average Size: 29.612
+Average Fitness: 2.0144408822911295E8
+Fitness Variation: 4.132468680465434E8
+Distribution: 0 -> 0.277, #0 -> 0.217, growSelfLoop -> 0.215, #4 -> 0.074, #2 -> 0.067, [] -> 0.023, 6 -> 0.021, 2 -> 0.021, #1 -> 0.020, GraphValue(0,Vector()) -> 0.014
+------------
+[110092.585s]Generation 65
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 281
+Average Size: 29.88
+Average Fitness: 2.3711647720231822E8
+Fitness Variation: 4.388114749484624E8
+Distribution: 0 -> 0.272, #0 -> 0.218, growSelfLoop -> 0.211, #4 -> 0.073, #2 -> 0.066, [] -> 0.024, #1 -> 0.022, 6 -> 0.022, 2 -> 0.022, GraphValue(0,Vector()) -> 0.015
+------------
+[110304.715s]Generation 66
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 272
+Average Size: 30.35
+Average Fitness: 2.2872297446159652E8
+Fitness Variation: 4.3319646003211766E8
+Distribution: 0 -> 0.283, growSelfLoop -> 0.220, #0 -> 0.219, #4 -> 0.076, #2 -> 0.068, [] -> 0.024, 2 -> 0.020, 6 -> 0.020, #1 -> 0.018, GraphValue(0,Vector()) -> 0.012
+------------
+[110492.904s]Generation 67
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 287
+Average Size: 30.196
+Average Fitness: 2.0983759173337784E8
+Fitness Variation: 4.196751624824085E8
+Distribution: 0 -> 0.278, #0 -> 0.218, growSelfLoop -> 0.218, #4 -> 0.074, #2 -> 0.067, [] -> 0.022, 6 -> 0.021, 2 -> 0.020, #1 -> 0.019, GraphValue(0,Vector()) -> 0.013
+------------
+[110661.865s]Generation 68
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 274
+Average Size: 30.138
+Average Fitness: 2.3082135016323626E8
+Fitness Variation: 4.3462221170670795E8
+Distribution: 0 -> 0.275, #0 -> 0.219, growSelfLoop -> 0.214, #4 -> 0.075, #2 -> 0.065, [] -> 0.023, #1 -> 0.021, 2 -> 0.021, 6 -> 0.021, GraphValue(0,Vector()) -> 0.012
+------------
+[110817.173s]Generation 69
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 266
+Average Size: 29.868
+Average Fitness: 2.413132287661529E8
+Fitness Variation: 4.415323782781038E8
+Distribution: 0 -> 0.280, #0 -> 0.221, growSelfLoop -> 0.218, #4 -> 0.075, #2 -> 0.067, [] -> 0.023, 2 -> 0.021, 6 -> 0.021, #1 -> 0.018, GraphValue(0,Vector()) -> 0.013
+------------
+[111071.116s]Generation 70
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 277
+Average Size: 30.636
+Average Fitness: 2.455099807968713E8
+Fitness Variation: 4.44196967473628E8
+Distribution: 0 -> 0.274, #0 -> 0.218, growSelfLoop -> 0.214, #4 -> 0.074, #2 -> 0.069, [] -> 0.023, 2 -> 0.021, 6 -> 0.020, #1 -> 0.019, GraphValue(0,Vector()) -> 0.012
+------------
+[111457.174s]Generation 71
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 288
+Average Size: 30.64
+Average Fitness: 2.664937389066239E8
+Fitness Variation: 4.5670897669974166E8
+Distribution: 0 -> 0.277, #0 -> 0.216, growSelfLoop -> 0.215, #4 -> 0.074, #2 -> 0.069, [] -> 0.023, 2 -> 0.020, 6 -> 0.020, #1 -> 0.020, GraphValue(0,Vector()) -> 0.012
+------------
+[111768.106s]Generation 72
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 254
+Average Size: 29.94
+Average Fitness: 2.5390348370529652E8
+Fitness Variation: 4.493611908279625E8
+Distribution: 0 -> 0.278, #0 -> 0.218, growSelfLoop -> 0.215, #4 -> 0.075, #2 -> 0.066, [] -> 0.026, 2 -> 0.021, 6 -> 0.021, #1 -> 0.018, GraphValue(0,Vector()) -> 0.013
+------------
+[111937.898s]Generation 73
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 252
+Average Size: 30.55
+Average Fitness: 2.6859211468538016E8
+Fitness Variation: 4.5788848945183575E8
+Distribution: 0 -> 0.282, growSelfLoop -> 0.219, #0 -> 0.217, #4 -> 0.075, #2 -> 0.067, [] -> 0.022, 6 -> 0.020, 2 -> 0.020, #1 -> 0.018, GraphValue(0,Vector()) -> 0.013
+------------
+[112132.412s]Generation 74
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 271
+Average Size: 30.992
+Average Fitness: 2.4760835686999837E8
+Fitness Variation: 4.45508460930741E8
+Distribution: 0 -> 0.278, #0 -> 0.219, growSelfLoop -> 0.218, #4 -> 0.075, #2 -> 0.069, [] -> 0.022, 6 -> 0.020, 2 -> 0.020, #1 -> 0.019, GraphValue(0,Vector()) -> 0.012
+------------
+[112305.190s]Generation 75
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 260
+Average Size: 30.324
+Average Fitness: 2.601986113046839E8
+Fitness Variation: 4.530937135321989E8
+Distribution: 0 -> 0.281, growSelfLoop -> 0.217, #0 -> 0.216, #4 -> 0.075, #2 -> 0.070, [] -> 0.022, 2 -> 0.021, 6 -> 0.020, #1 -> 0.019, GraphValue(0,Vector()) -> 0.013
+------------
+[112498.327s]Generation 76
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 268
+Average Size: 30.754
+Average Fitness: 2.685921145503181E8
+Fitness Variation: 4.578884895310607E8
+Distribution: 0 -> 0.276, #0 -> 0.215, growSelfLoop -> 0.215, #4 -> 0.074, #2 -> 0.070, [] -> 0.023, 2 -> 0.020, 6 -> 0.020, #1 -> 0.019, GraphValue(0,Vector()) -> 0.012
+------------
+[112696.062s]Generation 77
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 285
+Average Size: 30.576
+Average Fitness: 2.3082135019009402E8
+Fitness Variation: 4.346222116924449E8
+Distribution: 0 -> 0.276, #0 -> 0.216, growSelfLoop -> 0.214, #4 -> 0.075, #2 -> 0.068, [] -> 0.024, 6 -> 0.021, 2 -> 0.021, #1 -> 0.019, GraphValue(0,Vector()) -> 0.012
+------------
+[112897.784s]Generation 78
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 284
+Average Size: 30.25
+Average Fitness: 2.2872297404143578E8
+Fitness Variation: 4.3319646025395805E8
+Distribution: 0 -> 0.273, #0 -> 0.216, growSelfLoop -> 0.212, #4 -> 0.073, #2 -> 0.065, [] -> 0.023, 2 -> 0.022, #1 -> 0.021, 6 -> 0.021, GraphValue(0,Vector()) -> 0.014
+------------
+[113115.699s]Generation 79
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 281
+Average Size: 30.21
+Average Fitness: 2.4131322896585077E8
+Fitness Variation: 4.415323781689624E8
+Distribution: 0 -> 0.273, #0 -> 0.214, growSelfLoop -> 0.212, #4 -> 0.074, #2 -> 0.069, [] -> 0.025, 6 -> 0.021, 2 -> 0.020, #1 -> 0.019, GraphValue(0,Vector()) -> 0.012
+------------
+[113318.086s]Generation 80
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 280
+Average Size: 30.776
+Average Fitness: 2.329197255158816E8
+Fitness Variation: 4.360332035920062E8
+Distribution: 0 -> 0.273, #0 -> 0.221, growSelfLoop -> 0.213, #4 -> 0.072, #2 -> 0.066, [] -> 0.023, 2 -> 0.021, 6 -> 0.021, #1 -> 0.019, GraphValue(0,Vector()) -> 0.013
+------------
+[113509.170s]Generation 81
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 272
+Average Size: 30.374
+Average Fitness: 2.4550998095190158E8
+Fitness Variation: 4.4419696738794225E8
+Distribution: 0 -> 0.281, #0 -> 0.218, growSelfLoop -> 0.216, #4 -> 0.076, #2 -> 0.066, [] -> 0.022, 2 -> 0.021, 6 -> 0.021, #1 -> 0.019, GraphValue(0,Vector()) -> 0.012
+------------
+[113720.684s]Generation 82
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 286
+Average Size: 30.72
+Average Fitness: 2.287229740405391E8
+Fitness Variation: 4.3319646025443214E8
+Distribution: 0 -> 0.278, #0 -> 0.217, growSelfLoop -> 0.215, #4 -> 0.074, #2 -> 0.067, [] -> 0.023, 2 -> 0.020, 6 -> 0.020, #1 -> 0.018, GraphValue(0,Vector()) -> 0.013
+------------
+[113912.643s]Generation 83
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 283
+Average Size: 30.152
+Average Fitness: 1.993457128305488E8
+Fitness Variation: 4.11597364957218E8
+Distribution: 0 -> 0.278, #0 -> 0.214, growSelfLoop -> 0.214, #4 -> 0.075, #2 -> 0.067, [] -> 0.025, 2 -> 0.021, 6 -> 0.020, #1 -> 0.020, GraphValue(0,Vector()) -> 0.013
+------------
+[114104.814s]Generation 84
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 286
+Average Size: 30.576
+Average Fitness: 2.308213499125619E8
+Fitness Variation: 4.3462221183983755E8
+Distribution: 0 -> 0.275, #0 -> 0.217, growSelfLoop -> 0.214, #4 -> 0.074, #2 -> 0.066, [] -> 0.024, 2 -> 0.020, 6 -> 0.020, #1 -> 0.020, GraphValue(0,Vector()) -> 0.013
+------------
+[114338.539s]Generation 85
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 284
+Average Size: 30.162
+Average Fitness: 2.0983759205056074E8
+Fitness Variation: 4.196751623238175E8
+Distribution: 0 -> 0.275, #0 -> 0.214, growSelfLoop -> 0.211, #4 -> 0.075, #2 -> 0.066, [] -> 0.024, 6 -> 0.022, #1 -> 0.022, 2 -> 0.020, GraphValue(0,Vector()) -> 0.013
+------------
+[114530.291s]Generation 86
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 280
+Average Size: 29.804
+Average Fitness: 2.245262222383168E8
+Fitness Variation: 4.3030008879865086E8
+Distribution: 0 -> 0.272, #0 -> 0.217, growSelfLoop -> 0.212, #4 -> 0.074, #2 -> 0.065, [] -> 0.024, 6 -> 0.022, 2 -> 0.022, #1 -> 0.021, GraphValue(0,Vector()) -> 0.014
+------------
+[114724.458s]Generation 87
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 273
+Average Size: 29.904
+Average Fitness: 2.3291972571887207E8
+Fitness Variation: 4.360332034835716E8
+Distribution: 0 -> 0.277, #0 -> 0.218, growSelfLoop -> 0.214, #4 -> 0.075, #2 -> 0.064, [] -> 0.024, 6 -> 0.022, 2 -> 0.021, #1 -> 0.018, GraphValue(0,Vector()) -> 0.013
+------------
+[114930.830s]Generation 88
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 287
+Average Size: 30.472
+Average Fitness: 2.4550998094988552E8
+Fitness Variation: 4.4419696738905555E8
+Distribution: 0 -> 0.273, #0 -> 0.214, growSelfLoop -> 0.211, #4 -> 0.075, #2 -> 0.068, [] -> 0.024, 2 -> 0.021, 6 -> 0.021, #1 -> 0.020, GraphValue(0,Vector()) -> 0.012
+------------
+[115185.498s]Generation 89
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 271
+Average Size: 30.596
+Average Fitness: 2.5600185975531796E8
+Fitness Variation: 4.5061857177764E8
+Distribution: 0 -> 0.277, growSelfLoop -> 0.215, #0 -> 0.215, #4 -> 0.075, #2 -> 0.068, [] -> 0.022, 6 -> 0.021, #1 -> 0.021, 2 -> 0.020, GraphValue(0,Vector()) -> 0.013
+------------
+[115451.802s]Generation 90
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 283
+Average Size: 30.45
+Average Fitness: 2.5810023527058563E8
+Fitness Variation: 4.518627098483134E8
+Distribution: 0 -> 0.272, #0 -> 0.215, growSelfLoop -> 0.212, #4 -> 0.073, #2 -> 0.070, [] -> 0.025, #1 -> 0.021, 2 -> 0.021, 6 -> 0.020, GraphValue(0,Vector()) -> 0.013
+------------
+[115693.162s]Generation 91
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 273
+Average Size: 30.814
+Average Fitness: 2.3921485309344503E8
+Fitness Variation: 4.4017903054990715E8
+Distribution: 0 -> 0.276, #0 -> 0.214, growSelfLoop -> 0.214, #4 -> 0.074, #2 -> 0.068, [] -> 0.023, 6 -> 0.021, #1 -> 0.021, 2 -> 0.020, GraphValue(0,Vector()) -> 0.013
+------------
+[115886.094s]Generation 92
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 266
+Average Size: 30.542
+Average Fitness: 2.4131322900853774E8
+Fitness Variation: 4.4153237814563286E8
+Distribution: 0 -> 0.278, #0 -> 0.219, growSelfLoop -> 0.216, #4 -> 0.074, #2 -> 0.067, [] -> 0.023, 6 -> 0.021, 2 -> 0.020, #1 -> 0.018, GraphValue(0,Vector()) -> 0.013
+------------
+[116089.478s]Generation 93
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 285
+Average Size: 30.838
+Average Fitness: 1.972473369216587E8
+Fitness Variation: 4.099304838284995E8
+Distribution: 0 -> 0.272, #0 -> 0.217, growSelfLoop -> 0.214, #4 -> 0.074, #2 -> 0.069, [] -> 0.023, #1 -> 0.021, 2 -> 0.021, 6 -> 0.020, GraphValue(0,Vector()) -> 0.012
+------------
+[116316.545s]Generation 94
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Mutate
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 300
+Average Size: 30.678
+Average Fitness: 2.0773921635532132E8
+Fitness Variation: 4.180931526921799E8
+Distribution: 0 -> 0.271, #0 -> 0.215, growSelfLoop -> 0.211, #4 -> 0.075, #2 -> 0.067, [] -> 0.025, 2 -> 0.022, 6 -> 0.020, #1 -> 0.020, GraphValue(0,Vector()) -> 0.012
+------------
+[116497.883s]Generation 95
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 284
+Average Size: 29.97
+Average Fitness: 2.056408402091267E8
+Fitness Variation: 4.1649456252033234E8
+Distribution: 0 -> 0.272, #0 -> 0.217, growSelfLoop -> 0.212, #4 -> 0.074, #2 -> 0.065, [] -> 0.024, #1 -> 0.022, 2 -> 0.022, 6 -> 0.022, GraphValue(0,Vector()) -> 0.014
+------------
+[116752.766s]Generation 96
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Copy
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 273
+Average Size: 30.256
+Average Fitness: 2.1613271961248177E8
+Fitness Variation: 4.243235512309981E8
+Distribution: 0 -> 0.279, #0 -> 0.215, growSelfLoop -> 0.215, #4 -> 0.074, #2 -> 0.066, [] -> 0.025, 2 -> 0.021, 6 -> 0.020, #1 -> 0.018, GraphValue(0,Vector()) -> 0.014
+------------
+[116952.265s]Generation 97
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 274
+Average Size: 30.136
+Average Fitness: 2.4760835640054208E8
+Fitness Variation: 4.455084611916599E8
+Distribution: 0 -> 0.277, #0 -> 0.218, growSelfLoop -> 0.214, #4 -> 0.074, #2 -> 0.067, [] -> 0.023, 2 -> 0.021, 6 -> 0.020, #1 -> 0.018, GraphValue(0,Vector()) -> 0.014
+------------
+[117141.500s]Generation 98
+Best Result: (fitness: 1049187916.7, performance: 1351527565.0), Created by Crossover
+[O0: EInt] -> 0
+[O1: EInt] -> 6
+[O2: EGraph(EInt)] -> #4
+*
+[S0: EInt]{ seed: 2 ; iter: #1; seedExpr: 2 }
+[S1: EInt]{ seed: 6 ; iter: 0; seedExpr: 6 }
+[S2: EInt]{ seed: 2 ; iter: #0; seedExpr: 2 }
+[S3: EVect(EInt)]{ seed: [] ; iter: []; seedExpr: [] }
+[S4: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addNode(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(growSelfLoop(#4, 0, #2), 0, #0), 0, #0), 0, #0), 0, #0), 0, #0)); seedExpr: GraphValue(0,Vector()) }
+Best Individual Pattern: Vector(0, 6, GraphValue(0,Vector())), Vector(0, 6, GraphValue(1,Vector())), Vector(0, 6, GraphValue(2,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6)))), Vector(0, 6, GraphValue(3,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(4,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(5,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), Vector(0, 6, GraphValue(6,Vector((0,0,2), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,6), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0)))), ...
+Diversity: 282
+Average Size: 30.592
+Average Fitness: 2.4760835635155165E8
+Fitness Variation: 4.455084612188874E8
+Distribution: 0 -> 0.275, #0 -> 0.217, growSelfLoop -> 0.213, #4 -> 0.073, #2 -> 0.066, [] -> 0.024, 2 -> 0.021, 6 -> 0.020, #1 -> 0.020, GraphValue(0,Vector()) -> 0.014
