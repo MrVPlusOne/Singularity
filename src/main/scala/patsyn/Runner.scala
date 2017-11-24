@@ -14,7 +14,7 @@ object Runner {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
     val workingDir = FileInteraction.getWorkingDir(ioId)
 
-     runExample(FuzzingTaskProvider.splayTreeExample, ioId, Seq(ioId), useGUI = true)
+     runExample(FuzzingTaskProvider.fordFulkersonExample(false), ioId, Seq(ioId), useGUI = true)
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)

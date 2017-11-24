@@ -52,6 +52,8 @@ object BenchmarkDriver {
       "hashperf/v8" -> (_ => v8HashCollisionExample),
       "hashperf/murmur2s0" -> (_ => murmur2HashPerformanceExample),
       "ds/splaytree" -> (_ => splayTreeExample),
+      "ds/fordFulkersonDFS" -> (_ => fordFulkersonExample(false)),
+      "ds/fordFulkersonBFS" -> (_ => fordFulkersonExample(true)),
 
       // We cheated in these benchmark and therefore it is debatable whether to include them
       "stac/airplan5" -> (opt => airplan5Example(getWorkingDir(opt))),
