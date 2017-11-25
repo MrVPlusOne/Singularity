@@ -3,6 +3,7 @@ package cli
 import patsyn.Runner.RunConfig
 import patsyn._
 import scopt.OptionParser
+import visual.PatternPlot
 
 object BenchmarkDriver {
 
@@ -88,20 +89,27 @@ object BenchmarkDriver {
       cliOption =>
         cliOption.extrapolatePattern match {
           case None =>
-            val benchs = getBenchmarksFromTarget(cliOption.target, cliOption)
-            val config = getRunConfig(cliOption)
-            benchs.foreach { case (name, bench) =>
-              println(s"*** Task $name started ***")
-              try {
-                Runner.runExample(bench, cliOption.ioId, cliOption.seeds, config, useGUI = !cliOption.disableGui)
-                println(s"*** Task $name finished ***")
+            cliOption.plotPattern match {
+              case None =>
+                val benchs = getBenchmarksFromTarget(cliOption.target, cliOption)
+                val config = getRunConfig(cliOption)
+                benchs.foreach { case (name, bench) =>
+                  println(s"*** Task $name started ***")
+                  try {
+                    Runner.runExample(bench, cliOption.ioId, cliOption.seeds, config, useGUI = !cliOption.disableGui)
+                    println(s"*** Task $name finished ***")
 
-              } catch {
-                case ex: Exception =>
-                  System.err.println(s"Exception thrown: $ex")
-                  ex.printStackTrace(System.err)
-                  System.err.println(s"Task $name aborted. Continuing to the next task...")
-              }
+                  } catch {
+                    case ex: Exception =>
+                      System.err.println(s"Exception thrown: $ex")
+                      ex.printStackTrace(System.err)
+                      System.err.println(s"Task $name aborted. Continuing to the next task...")
+                  }
+                }
+              case Some(plotArg) =>
+                val taskProvider = benchmarks(cliOption).getOrElse(cliOption.target,
+                  throw new IllegalArgumentException("Cannot find benchmark named " + cliOption.target))
+                PatternPlot.showResourceUsageChart(taskProvider, plotArg.indPath, plotArg.sizeLimit, plotArg.density)
             }
           case Some(extraArg) =>
             val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
@@ -167,6 +175,15 @@ object BenchmarkDriver {
             c.copy(extrapolatePattern = Some(ExtrapolationArgs(input, output, size.toInt, memory.toLong, shouldEval)))
         }).
         text("Read a MultiStateIndividual from <indPath> and try to construct an input of size <size>, then save it using name <outName>. If <eval> = \"t\", the extrapolated value is also evaluated. Optionally, you can specify a memory limit for large input construction.")
+
+      opt[Seq[String]]('p', "plot").valueName("<indPath>,<sizeLimit>,[,<density>]").
+        action({
+          case (Seq(input, size), c) =>
+            c.copy(plotPattern = Some(PlotArgs(input, size.toInt, 10)))
+          case (Seq(input, size, density), c) =>
+            c.copy(plotPattern = Some(PlotArgs(input, size.toInt, density.toInt)))
+        }).
+        text("Read a MultiStateIndividual from <indPath> and try to plot a graph showing the resource usage from inputs of size 0 to <sizeLimit>. The optional <density> parameter controls how many points will be plotted.")
 
       help("help").text("Prints this usage text")
       version("version").text("Prints the version info")
