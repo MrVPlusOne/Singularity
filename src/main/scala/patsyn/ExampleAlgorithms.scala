@@ -6,7 +6,6 @@ import edu.utexas.stac.Cost
 import patsyn.GeneticOperator.ExprGen
 import patsyn.StandardSystem.{EInt, EVect, IntComponents, IntValue, VectComponents, VectValue, _}
 
-import scala.collection.GenTraversable
 import scala.util.Random
 
 
@@ -713,11 +712,11 @@ object FuzzingTaskProvider {
       val numEdges = graphValue.edges.length
       val edgeLines = graphValue.edges.map{
         case (src: Int, dst: Int, capacityValue: EValue) =>
-          val srcInt = Math.floorMod(src, numNodes)
-          val dstInt = Math.floorMod(dst, numNodes)
-          s"$srcInt $dstInt ${capacityValue.asInstanceOf[IntValue].value}"
+          s"$src $dst ${capacityValue.asInstanceOf[IntValue].value}"
       }.mkString("\n")
-      s"$numNodes $numEdges\n$src $snk\n$edgeLines\n"
+      val srcInt = Math.floorMod(src, numNodes)
+      val snkInt = Math.floorMod(snk, numNodes)
+      s"$numNodes $numEdges\n$srcInt $snkInt\n$edgeLines\n"
     }
 
     def writeGraphToFile(src: Int, snk: Int, graphValue: GraphValue, fileName: String): Unit = {
