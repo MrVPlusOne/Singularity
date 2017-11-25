@@ -10,22 +10,16 @@ object BenchmarkDriver {
     FileInteraction.getWorkingDir(opt.ioId)
   }
 
-  private val SLOWFUZZ_REGEX1 = "(?i:(j|(&#x?0*((74)|(4A)|(106)|(6A));?))\n([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|\n" +
-    "(tab;)|(newline;))))*(a|(&#x?0*((65)|\n(41)|(97)|(61));?))([\\t]|(&((#x?0*(9|\n(13)|(10)|A|D);?)|(tab;)|(newline;))\n))*(v|(&#x?0*((86)|(56)|(118)|(76));?)\n)([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|\n(tab;)|(newline;))))*(a|(&#x?0*((65)|\n(41)|(97)|(61));?))([\\t]|(&((#x?0*(9|\n(13)|(10)|A|D);?)|(tab;)|(newline;))))*\n(s|(&#x?0*((83)|(53)|(115)|(73));?))(\n[\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|\n(tab;)|(newline;))))*(c|(&#x?0*((67)|\n(43)|(99)|(63));?))([\\t]|(&((#x?0*(9|\n(13)|(10)|A|D);?)|(tab;)|(newline;))))*\n(r|(&#x?0*((82)|(52)|(114)|(72));?))\n([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|\n(tab;)|(newline;))))*(i|(&#x?0*((73)|\n(49)|(105)|(69));?))([\\t]|(&((#x?0*(9|\n(13)|(10)|A|D);?)|(tab;)|(newline;))))*\n(p|(&#x?0*((80)|(50)|(112)|(70));?))\n([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|\n(tab;)|(newline;))))*(t|(&#x?0*((84)|\n(54)|(116)|(74));?))([\\t]|(&((#x?0*(9|\n(13)|(10)|A|D);?)|(tab;)|(newline;))))\n*(:|(&((#x?0*((58)|(3A));?)|(colon;)\n))).)"
-  private val SLOWFUZZ_REGEX2 = "<(a|abbr|acronym|address|applet|area|\naudioscope|b|base|basefront|bdo|\nbgsound|big" +
-    "|blackface|blink|\nblockquote|body|bq|br|button|caption|\ncenter|cite|code|col|colgroup|comment|dd|del|dfn|dir|div|dl|\ndt|em|embed|fieldset|fn|font|\nform|frame|frameset|h1|head|hr|\nhtml|i|iframe|ilayer|img|input|ins|\nisindex|kdb|keygen|label|layer|\nlegend|li|limittext|link|listing|\nmap|marquee|menu|meta|multicol|\nnobr|noembed|noframes|noscript|\nnosmartquotes|object|ol|optgroup|\noption|p|param|plaintext|pre|q|\nrt|ruby|s|samp|script|select|\nserver|shadow|sidebar|small|\nspacer|span|strike|strong|style|\nsub|sup|table|tbody|td|textarea|\ntfoot|th|thead|title|tr|tt|u|ul|\nvar|wbr|xml|xmp)\\\\W"
-  private val SLOWFUZZ_REGEX3 = "(?i:<.*[:]vmlframe.*?[ /+\\t]*?src[\n/+\\t]*=)"
-
-  def benchmarks(opt: CliOption) = {
+  def benchmarks(opt: CliOption): Map[String, FuzzingTaskProvider] = {
     import FuzzingTaskProvider._
     Map[String, FuzzingTaskProvider](
       // These benchmarks have already been solved
       "slowfuzz/insertionSort" -> insertionSortExample,
       "slowfuzz/quickSort" -> quickSortExample,
       "slowfuzz/phpHash" -> phpHashCollisionExample,
-      "slowfuzz/regex1" -> regexExample(SLOWFUZZ_REGEX1, defaultRegexDic),
-      "slowfuzz/regex2" -> regexExample(SLOWFUZZ_REGEX2, defaultRegexDic),
-      "slowfuzz/regex3" -> regexExample(SLOWFUZZ_REGEX3, defaultRegexDic),
+      "slowfuzz/regex1" -> slowFuzzRegexExample1,
+      "slowfuzz/regex2" -> slowFuzzRegexExample2,
+      "slowfuzz/regex3" -> slowFuzzRegexExample3,
       "stac/graphAnalyzer" -> graphAnalyzerExample(getWorkingDir(opt)),
       "stac/blogger" -> bloggerExample(opt.ioId),
       "stac/imageProcessor" -> imageExample(10, 10, getWorkingDir(opt)),
@@ -182,7 +176,7 @@ object BenchmarkDriver {
       arg[String]("<target>").required().action((x, c) =>
         c.copy(target = x)).text("Benchmark target to run.")
 
-      note("\nBenchmark target list:\n" + benchmarks(CliOption()).keys.map(s => "  " + s).mkString("\n") + "\n")
+      note("\nBenchmark target list:\n" + benchmarkNames.map(s => "  " + s).mkString("\n") + "\n")
     }
   }
 
