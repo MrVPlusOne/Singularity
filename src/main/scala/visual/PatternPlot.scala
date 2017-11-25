@@ -59,6 +59,7 @@ object PatternPlot {
     }
 
     val workDir = FileInteraction.getWorkingDir(0)
+
     val ind = FileInteraction.readObjectFromFile[MultiStateInd]("InterestingResults/airplan2/bestIndividual[seed=1].serialized")
     val xys = plotPatternPerformance(FuzzingTaskProvider.airplan2Example(workDir), ind, sizeLimit = 150)
 

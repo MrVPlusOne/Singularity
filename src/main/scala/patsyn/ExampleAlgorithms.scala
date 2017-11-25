@@ -140,7 +140,7 @@ object FuzzingTaskProvider {
       EVect(EVect(EInt)) -> IS(_ => Vector())
     )
 
-    val functions = IntComponents.collection ++ VectComponents.collection ++ IntComponents.bitCollection
+    val functions = IntComponents.collection ++ VectComponents.collection ++ BitComponents.collection
 
     val stateTypes = constMap.keys.toIndexedSeq
     GPEnvironment(constMap, functions, stateTypes ++ stateTypes)
@@ -454,7 +454,7 @@ object FuzzingTaskProvider {
       EVect(EInt) -> IS(_ => Vector())
     )
 
-    val functions = IntComponents.collection ++ VectComponents.collection ++ IS(IntComponents.shiftByteLeft)
+    val functions = IntComponents.collection ++ VectComponents.collection ++ IS(BitComponents.shiftByteLeft)
 
     val stateTypes = constMap.keys.toIndexedSeq ++ IS(EInt, EInt)
     GPEnvironment(constMap, functions, stateTypes)
@@ -577,8 +577,7 @@ object FuzzingTaskProvider {
         },
         gpEnv = abcRegexEnv.copy(
           stateTypes = abcRegexEnv.stateTypes ++ IS(EInt, EVect(EInt)),
-          functions = IntComponents.collection ++ VectComponents.collection ++
-            IS(VectComponents.shift, VectComponents.intToString)
+          functions = IntComponents.collection ++ VectComponents.collection ++ AdvancedVectComponents.collection
         )
       )
     }
