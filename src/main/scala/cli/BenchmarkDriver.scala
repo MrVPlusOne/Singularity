@@ -16,57 +16,61 @@ object BenchmarkDriver {
     "|blackface|blink|\nblockquote|body|bq|br|button|caption|\ncenter|cite|code|col|colgroup|comment|dd|del|dfn|dir|div|dl|\ndt|em|embed|fieldset|fn|font|\nform|frame|frameset|h1|head|hr|\nhtml|i|iframe|ilayer|img|input|ins|\nisindex|kdb|keygen|label|layer|\nlegend|li|limittext|link|listing|\nmap|marquee|menu|meta|multicol|\nnobr|noembed|noframes|noscript|\nnosmartquotes|object|ol|optgroup|\noption|p|param|plaintext|pre|q|\nrt|ruby|s|samp|script|select|\nserver|shadow|sidebar|small|\nspacer|span|strike|strong|style|\nsub|sup|table|tbody|td|textarea|\ntfoot|th|thead|title|tr|tt|u|ul|\nvar|wbr|xml|xmp)\\\\W"
   private val SLOWFUZZ_REGEX3 = "(?i:<.*[:]vmlframe.*?[ /+\\t]*?src[\n/+\\t]*=)"
 
-  val benchmarks = {
+  def benchmarks(opt: CliOption) = {
     import FuzzingTaskProvider._
-    Map[String, CliOption => FuzzingTaskProvider](
+    Map[String, FuzzingTaskProvider](
       // These benchmarks have already been solved
-      "slowfuzz/insertionSort" -> (_ => insertionSortExample),
-      "slowfuzz/quickSort" -> (_ => quickSortExample),
-      "slowfuzz/phpHash" -> (_ => phpHashCollisionExample),
-      "slowfuzz/regex1" -> (_ => regexExample(SLOWFUZZ_REGEX1, defaultRegexDic)),
-      "slowfuzz/regex2" -> (_ => regexExample(SLOWFUZZ_REGEX2, defaultRegexDic)),
-      "slowfuzz/regex3" -> (_ => regexExample(SLOWFUZZ_REGEX3, defaultRegexDic)),
-      "stac/graphAnalyzer" -> (opt => graphAnalyzerExample(getWorkingDir(opt))),
-      "stac/blogger" -> (opt => bloggerExample(opt.ioId)),
-      "stac/imageProcessor" -> (opt => imageExample(10, 10, getWorkingDir(opt))),
-      "stac/linearAlgebra" -> (opt => linearAlgebraExample(10, getWorkingDir(opt))),
-      "stac/airplan1" -> (opt => airplan1Example(getWorkingDir(opt))),
-      "stac/airplan2" -> (opt => airplan2Example(getWorkingDir(opt))),
-      "redos/cookie" -> (_ => regexExample("^(([^=;]+))\\s*=\\s*([^\\n\\r\\00]*)", defaultRegexDic)),
-      "hashperf/php" -> (_ => phpHashPerformanceExample),
+      "slowfuzz/insertionSort" -> insertionSortExample,
+      "slowfuzz/quickSort" -> quickSortExample,
+      "slowfuzz/phpHash" -> phpHashCollisionExample,
+      "slowfuzz/regex1" -> regexExample(SLOWFUZZ_REGEX1, defaultRegexDic),
+      "slowfuzz/regex2" -> regexExample(SLOWFUZZ_REGEX2, defaultRegexDic),
+      "slowfuzz/regex3" -> regexExample(SLOWFUZZ_REGEX3, defaultRegexDic),
+      "stac/graphAnalyzer" -> graphAnalyzerExample(getWorkingDir(opt)),
+      "stac/blogger" -> bloggerExample(opt.ioId),
+      "stac/imageProcessor" -> imageExample(10, 10, getWorkingDir(opt)),
+      "stac/linearAlgebra" -> linearAlgebraExample(10, getWorkingDir(opt)),
+      "stac/airplan1" -> airplan1Example(getWorkingDir(opt)),
+      "stac/airplan2" -> airplan2Example(getWorkingDir(opt)),
+      "redos/cookie" -> regexExample("^(([^=;]+))\\s*=\\s*([^\\n\\r\\00]*)", defaultRegexDic),
+      "hashperf/php" -> phpHashPerformanceExample,
 
       // These benchmarks are yet to be solved
-      "hashcol/java" -> (_ => javaHashCollisionExample),
-      "hashcol/ruby" -> (_ => rubyHashCollisionExample),
-      "hashcol/asp.net" -> (_ => aspDotNetHashCollisionExample),
-      "hashcol/python" -> (_ => pythonHashCollisionExample),
-      "hashcol/v8" -> (_ => v8HashCollisionExample),
-      "hashcol/murmur2s0" -> (_ => murmur2HashCollisionExample),
-      "stac/textCrunchr" -> (opt => textCrunchrExample(getWorkingDir(opt))),
-      "stac/gabfeed4" -> (opt => gabfeed4Example(getWorkingDir(opt))),
-      "stac/airplan3" -> (opt => airplan3Example(getWorkingDir(opt))),
-      "hashperf/java" -> (_ => javaHashPerformanceExample),
-      "hashperf/ruby" -> (_ => rubyHashPerformanceExample),
-      "hashperf/asp.net" -> (_ => aspDotNetHashPerformanceExample),
-      "hashperf/python" -> (_ => pythonHashPerformanceExample),
-      "hashperf/v8" -> (_ => v8HashCollisionExample),
-      "hashperf/murmur2s0" -> (_ => murmur2HashPerformanceExample),
-      "ds/splaytree" -> (_ => splayTreeExample),
-      "ds/fordFulkersonDFS" -> (_ => fordFulkersonExample(false)),
-      "ds/fordFulkersonBFS" -> (_ => fordFulkersonExample(true)),
+      "hashcol/java" -> javaHashCollisionExample,
+      "hashcol/ruby" -> rubyHashCollisionExample,
+      "hashcol/asp.net" -> aspDotNetHashCollisionExample,
+      "hashcol/python" -> pythonHashCollisionExample,
+      "hashcol/v8" -> v8HashCollisionExample,
+      "hashcol/murmur2s0" -> murmur2HashCollisionExample,
+      "stac/textCrunchr" -> textCrunchrExample(getWorkingDir(opt)),
+      "stac/gabfeed4" -> gabfeed4Example(getWorkingDir(opt)),
+      "stac/airplan3" -> airplan3Example(getWorkingDir(opt)),
+      "hashperf/java" -> javaHashPerformanceExample,
+      "hashperf/ruby" -> rubyHashPerformanceExample,
+      "hashperf/asp.net" -> aspDotNetHashPerformanceExample,
+      "hashperf/python" -> pythonHashPerformanceExample,
+      "hashperf/v8" -> v8HashCollisionExample,
+      "hashperf/murmur2s0" -> murmur2HashPerformanceExample,
+      "ds/splaytree" -> splayTreeExample,
+      "ds/fordFulkersonDFS" -> fordFulkersonExample(false),
+      "ds/fordFulkersonBFS" -> fordFulkersonExample(true),
 
       // We cheated in these benchmark and therefore it is debatable whether to include them
-      "stac/airplan5" -> (opt => airplan5Example(getWorkingDir(opt))),
+      "stac/airplan5" -> airplan5Example(getWorkingDir(opt)),
     )
   }
 
-  def getBenchmarks(target: String, cliOption: CliOption): Iterator[(String, FuzzingTaskProvider)] = {
+  val benchmarkNames: Seq[String] = {
+    val names = benchmarks(CliOption()).keys
+    require(names.size == names.toSet.size, "benchmark name collision detected!")
+    names.toSeq
+  }
+
+  def getBenchmarksFromTarget(target: String, cliOption: CliOption): Seq[(String, FuzzingTaskProvider)] = {
     target match {
-      case "all" => benchmarks.toIterator.map {
-        case (name, p) => name -> p(cliOption)
-      }
-      case name => Iterator(name -> benchmarks.getOrElse(name,
-        throw new IllegalArgumentException("Cannot find benchmark named " + name)).apply(cliOption))
+      case "all" => benchmarks(cliOption).toSeq
+      case name => Seq(name -> benchmarks(cliOption).getOrElse(name,
+        throw new IllegalArgumentException("Cannot find benchmark named " + name)))
     }
   }
 
@@ -88,11 +92,9 @@ object BenchmarkDriver {
 
     parser.parse(args, CliOption()).foreach {
       cliOption =>
-        val taskProvider = benchmarks.getOrElse(cliOption.target,
-          throw new IllegalArgumentException("Cannot find benchmark named " + cliOption.target))(cliOption)
         cliOption.extrapolatePattern match {
           case None =>
-            val benchs = getBenchmarks(cliOption.target, cliOption)
+            val benchs = getBenchmarksFromTarget(cliOption.target, cliOption)
             val config = getRunConfig(cliOption)
             benchs.foreach { case (name, bench) =>
               println(s"*** Task $name started ***")
@@ -109,6 +111,8 @@ object BenchmarkDriver {
             }
           case Some(extraArg) =>
             val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
+            val taskProvider = benchmarks(cliOption).getOrElse(cliOption.target,
+              throw new IllegalArgumentException("Cannot find benchmark named " + cliOption.target))
             MultiStateRepresentation.saveExtrapolation(
               taskProvider, ind, extraArg.size, extraArg.memoryLimit, extraArg.outputName, extraArg.evaluatePerformance)
         }
@@ -178,7 +182,7 @@ object BenchmarkDriver {
       arg[String]("<target>").required().action((x, c) =>
         c.copy(target = x)).text("Benchmark target to run.")
 
-      note("\nBenchmark target list:\n" + benchmarks.keys.map(s => "  " + s).mkString("\n") + "\n")
+      note("\nBenchmark target list:\n" + benchmarks(CliOption()).keys.map(s => "  " + s).mkString("\n") + "\n")
     }
   }
 
