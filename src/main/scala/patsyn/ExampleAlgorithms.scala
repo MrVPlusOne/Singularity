@@ -81,8 +81,6 @@ object FuzzingTaskProvider {
 
   def insertionSortExample = new FuzzingTaskProvider {
 
-    import patbench.slowfuzz.InsertionSort
-
     def sizeF = {
       case IS(VectValue(v)) => v.length
     }
@@ -90,11 +88,11 @@ object FuzzingTaskProvider {
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
       outputTypes = IS(EVect(EInt)),
       resourceUsage = {
-
-
         case IS(VectValue(v)) =>
+          val intArray = toIntVect(v).toArray
+
           Cost.reset()
-          InsertionSort.main(toIntVect(v).map(i => i.toString).toArray)
+          patbench.slowfuzz.InsertionSort.sortPublic(intArray)
           Cost.read()
       },
       gpEnv = sortingEnv
@@ -103,15 +101,13 @@ object FuzzingTaskProvider {
 
   def quickSortExample = new FuzzingTaskProvider {
 
-    import patbench.slowfuzz.QuickSort
-
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
       outputTypes = IS(EVect(EInt)),
       resourceUsage = {
-        case IS(VectValue(vec)) =>
+        case IS(VectValue(v)) =>
+          val intArray = toIntVect(v).toArray
           Cost.reset()
-          val args = toIntVect(vec).map(i => i.toString).toArray
-          QuickSort.main(args)
+          patbench.slowfuzz.QuickSort.sortPublic(intArray)
           Cost.read()
       },
       gpEnv = sortingEnv
@@ -241,46 +237,6 @@ object FuzzingTaskProvider {
           Cost.read()
       },
       gpEnv = sortingEnv.copy(stateTypes = IS(EInt, EInt, EVect(EInt)))
-    )
-
-    def sizeF = {
-      case IS(VectValue(vec)) =>
-        vec.length
-    }
-  }
-
-  def scapegoatTreeExample = new FuzzingTaskProvider {
-    protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EVect(EInt)),
-      resourceUsage = {
-        case IS(VectValue(vec)) =>
-          val intArray = toIntVect(vec).toArray
-
-          Cost.reset()
-          patbench.ds.edu.utexas.stac.DataStructureHarness.scapegoatHarness(intArray)
-          Cost.read()
-      },
-      gpEnv = sortingEnv
-    )
-
-    def sizeF = {
-      case IS(VectValue(vec)) =>
-        vec.length
-    }
-  }
-
-  def pairingHeapExample = new FuzzingTaskProvider {
-    protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EVect(EInt)),
-      resourceUsage = {
-        case IS(VectValue(vec)) =>
-          val intArray = toIntVect(vec).toArray
-
-          Cost.reset()
-          patbench.ds.edu.utexas.stac.DataStructureHarness.pairingHeapHarness(intArray)
-          Cost.read()
-      },
-      gpEnv = sortingEnv
     )
 
     def sizeF = {
@@ -717,6 +673,63 @@ object FuzzingTaskProvider {
 
     val stateTypes = IS(EInt, EInt) ++ constMap.keys.toIndexedSeq
     GPEnvironment(constMap, functions, stateTypes)
+  }
+
+  def fordFulkersonExample(useBFS: Boolean) = new FuzzingTaskProvider {
+
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      outputTypes = IS(EInt, EInt, EGraph(EInt)),
+      sizeOfInterest = 100,
+      resourceUsage = {
+        case IS(IntValue(src), IntValue(dst), GraphValue(nodeNum, edges)) =>
+          if (nodeNum == 0 || nodeNum == 1)
+            0
+          else {
+            val srcInt = Math.floorMod(src, nodeNum)
+            val dstInt = Math.floorMod(dst, nodeNum)
+            val edgeArray = edges.flatMap {
+              case (s, t, value) =>
+                Seq(s, t, value.asInstanceOf[IntValue].value)
+            }.toArray
+
+            Cost.reset()
+            patbench.ds.edu.utexas.stac.DataStructureHarness.fordFulkersonHarness(nodeNum, srcInt, dstInt, edgeArray,
+              useBFS)
+            Cost.read()
+          }
+      },
+      gpEnv = airplanEnv
+    )
+
+    def sizeF = {
+      case IS(IntValue(_), IntValue(_), graph: GraphValue) =>
+        graph.size.toInt
+    }
+
+    def graphToString(src: Int, snk: Int, graphValue: GraphValue): String = {
+      val numNodes = graphValue.nodeNum
+      val numEdges = graphValue.edges.length
+      val edgeLines = graphValue.edges.map{
+        case (src: Int, dst: Int, capacityValue: EValue) =>
+          s"$src $dst ${capacityValue.asInstanceOf[IntValue].value}"
+      }.mkString("\n")
+      val srcInt = Math.floorMod(src, numNodes)
+      val snkInt = Math.floorMod(snk, numNodes)
+      s"$numNodes $numEdges\n$srcInt $snkInt\n$edgeLines\n"
+    }
+
+    def writeGraphToFile(src: Int, snk: Int, graphValue: GraphValue, fileName: String): Unit = {
+      FileInteraction.writeToFile(fileName)(graphToString(src, snk, graphValue))
+    }
+
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      super.saveValueWithName(value, name)
+
+      value match {
+        case IS(IntValue(src), IntValue(snk), graph: GraphValue) =>
+          writeGraphToFile(src, snk, graph, s"$name.graph.txt")
+      }
+    }
   }
 
   abstract class AirplanFuzzingTaskProvider extends FuzzingTaskProvider {

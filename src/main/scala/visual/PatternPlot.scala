@@ -59,9 +59,8 @@ object PatternPlot {
     }
 
     val workDir = FileInteraction.getWorkingDir(0)
-
-    val ind = FileInteraction.readObjectFromFile[MultiStateInd]("InterestingResults/airplan2/bestIndividual[seed=1].serialized")
-    val xys = plotPatternPerformance(FuzzingTaskProvider.airplan2Example(workDir), ind, sizeLimit = 150)
+    val ind = FileInteraction.readObjectFromFile[MultiStateInd]("results/17-11-24-18:24:27[ioId=2]/bestIndividual[seed=2].serialized")
+    val xys = plotPatternPerformance(FuzzingTaskProvider.fordFulkersonExample(false), ind, sizeLimit = 20000)
 
     var data = IndexedSeq[(Double, Double)]()
     xys.foreach{ xy =>
