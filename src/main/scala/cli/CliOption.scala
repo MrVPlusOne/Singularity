@@ -12,8 +12,11 @@ case class CliOption(target: String = "",
                      threadNum: Int = 1,
                      timeLimitInMillis: Int = 10000,
                      maxNonIncreaseTime: Int = 150,
-                     extrapolatePattern: Option[ExtrapolationArgs] = None
+                     extrapolatePattern: Option[ExtrapolationArgs] = None,
+                     plotPattern: Option[PlotArgs] = None
                     )
 
 
 case class ExtrapolationArgs(indPath: String, outputName: String, size: Int, memoryLimit: Long, evaluatePerformance: Boolean)
+
+case class PlotArgs(indPath: String, sizeLimit: Int, density: Int)

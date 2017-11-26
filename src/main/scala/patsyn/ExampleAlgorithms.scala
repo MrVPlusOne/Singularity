@@ -685,32 +685,7 @@ object FuzzingTaskProvider {
     GPEnvironment(constMap, functions, stateTypes)
   }
 
-  def fordFulkersonExample(useBFS: Boolean) = new FuzzingTaskProvider {
-
-    protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EInt, EInt, EGraph(EInt)),
-      sizeOfInterest = 100,
-      resourceUsage = {
-        case IS(IntValue(src), IntValue(dst), GraphValue(nodeNum, edges)) =>
-          if (nodeNum == 0 || nodeNum == 1)
-            0
-          else {
-            val srcInt = Math.floorMod(src, nodeNum)
-            val dstInt = Math.floorMod(dst, nodeNum)
-            val edgeArray = edges.flatMap {
-              case (s, t, value) =>
-                Seq(s, t, value.asInstanceOf[IntValue].value)
-            }.toArray
-
-            Cost.reset()
-            patbench.ds.edu.utexas.stac.DataStructureHarness.fordFulkersonHarness(nodeNum, srcInt, dstInt, edgeArray,
-              useBFS)
-            Cost.read()
-          }
-      },
-      gpEnv = airplanEnv
-    )
-
+  abstract class MaxFlowFuzzingTaskProvider extends FuzzingTaskProvider {
     def sizeF = {
       case IS(IntValue(_), IntValue(_), graph: GraphValue) =>
         graph.size.toInt
@@ -740,6 +715,59 @@ object FuzzingTaskProvider {
           writeGraphToFile(src, snk, graph, s"$name.graph.txt")
       }
     }
+  }
+
+  def fordFulkersonExample(useBFS: Boolean) = new MaxFlowFuzzingTaskProvider {
+
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      outputTypes = IS(EInt, EInt, EGraph(EInt)),
+      sizeOfInterest = 100,
+      resourceUsage = {
+        case IS(IntValue(src), IntValue(dst), GraphValue(nodeNum, edges)) =>
+          if (nodeNum == 0 || nodeNum == 1)
+            0
+          else {
+            val srcInt = Math.floorMod(src, nodeNum)
+            val dstInt = Math.floorMod(dst, nodeNum)
+            val edgeArray = edges.flatMap {
+              case (s, t, value) =>
+                Seq(s, t, value.asInstanceOf[IntValue].value)
+            }.toArray
+
+            Cost.reset()
+            patbench.ds.edu.utexas.stac.DataStructureHarness.fordFulkersonHarness(nodeNum, srcInt, dstInt, edgeArray,
+              useBFS)
+            Cost.read()
+          }
+      },
+      gpEnv = airplanEnv
+    )
+  }
+
+  def dinicExample = new MaxFlowFuzzingTaskProvider {
+
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      outputTypes = IS(EInt, EInt, EGraph(EInt)),
+      sizeOfInterest = 100,
+      resourceUsage = {
+        case IS(IntValue(src), IntValue(dst), GraphValue(nodeNum, edges)) =>
+          if (nodeNum == 0 || nodeNum == 1)
+            0
+          else {
+            val srcInt = Math.floorMod(src, nodeNum)
+            val dstInt = Math.floorMod(dst, nodeNum)
+            val edgeArray = edges.flatMap {
+              case (s, t, value) =>
+                Seq(s, t, value.asInstanceOf[IntValue].value)
+            }.toArray
+
+            Cost.reset()
+            patbench.ds.edu.utexas.stac.DataStructureHarness.dinicHarness(nodeNum, srcInt, dstInt, edgeArray)
+            Cost.read()
+          }
+      },
+      gpEnv = airplanEnv
+    )
   }
 
   abstract class AirplanFuzzingTaskProvider extends FuzzingTaskProvider {

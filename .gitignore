@@ -13,6 +13,7 @@ project/plugins/project/
 .cache
 .lib/
 .idea/
+META-INF/
 workingDir*
 ### Scala template
 *.class

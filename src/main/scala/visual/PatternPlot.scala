@@ -52,24 +52,39 @@ object PatternPlot {
     }
   }
 
-  def main(args: Array[String]): Unit = {
+  def showResourceUsageChart(taskProvider: FuzzingTaskProvider,
+                             patternFile: String,
+                             sizeLimit: Int,
+                             pointDensity: Int = 10,
+                             lineName: String = "pattern",
+                             plotName: String = "Resource Usage Chart",
+                             xLabel: String = "size",
+                             yLabel: String = "R"): Unit
+  = {
     val frame = new JFrame("Monitor") {
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
       setVisible(true)
     }
-
-    val workDir = FileInteraction.getWorkingDir(0)
-    val ind = FileInteraction.readObjectFromFile[MultiStateInd]("results/17-11-24-18:24:27[ioId=2]/bestIndividual[seed=2].serialized")
-    val xys = plotPatternPerformance(FuzzingTaskProvider.fordFulkersonExample(false), ind, sizeLimit = 20000)
+    val ind = FileInteraction.readObjectFromFile[MultiStateInd](patternFile)
+    val xys = plotPatternPerformance(taskProvider, ind, sizeLimit, maxPoints
+      = pointDensity)
 
     var data = IndexedSeq[(Double, Double)]()
     xys.foreach{ xy =>
       data :+= xy
-      val chart = ListPlot.plot("pattern[seed=1]" -> data)("Resource Usage Chart", xLabel = "size", yLabel = "R")
+      val chart = ListPlot.plot(lineName -> data)(plotName, xLabel, yLabel)
       frame.setContentPane(new MonitorPanel(chart, margin = 10, plotSize = (600,450)))
       frame.pack()
     }
+    println(data)
 
     println("Evaluation finished.")
+  }
+
+  def main(args: Array[String]): Unit = {
+    val patternFile = "InterestingResults/airplan2/bestIndividual[seed=1].serialized"
+    val example = FuzzingTaskProvider.airplan2Example("workingDir0")
+    val sizeLimit = 20000
+    showResourceUsageChart(example, patternFile, sizeLimit)
   }
 }
