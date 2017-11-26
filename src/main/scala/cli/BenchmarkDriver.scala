@@ -135,7 +135,7 @@ object BenchmarkDriver {
       opt[Seq[Int]]('s', "seeds").valueName("<seed1>,<seed2>,...").action((ss, c) =>
         c.copy(seeds = ss)).text("The random seeds to use. Default to {0} (only 1 seed).")
 
-      opt[Int]('p', "population-size").action((x, c) =>
+      opt[Int]("population-size").action((x, c) =>
         c.copy(tournamentSize = x)).text("[GP parameter] Population size. Default to 500.")
 
       opt[Int]("tournament-size").hidden().action((x, c) =>
