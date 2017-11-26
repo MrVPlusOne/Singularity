@@ -359,5 +359,21 @@ object StandardSystem {
         case IS(g1: GraphValue, g2: GraphValue) =>
           GraphValue(g1.nodeNum + g2.nodeNum, g2.shiftIndex(g1.nodeNum).edges)
       })
+
+    val updateEdgeValue = mkAbstract("updateEdge", tyVarNum = 1,
+      typeInstantiation = {
+        case IS(eT) => IS(EGraph(eT), EInt, eT) -> EGraph(eT)
+      }, eval = {
+        case IS(g1: GraphValue, eId: IntValue, v: EValue) =>
+          val eNum = g1.edges.length
+          if(eNum==0) g1
+          else{
+            val index = SimpleMath.wrapInRange(eId.value, eNum)
+            val (from, to, _) = g1.edges(index)
+            val newEdges = g1.edges.updated(index, (from, to, v))
+            GraphValue(g1.nodeNum, newEdges)
+          }
+      }
+    )
   }
 }
