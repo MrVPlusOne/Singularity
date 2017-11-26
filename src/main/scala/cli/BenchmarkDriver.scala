@@ -49,6 +49,7 @@ object BenchmarkDriver {
       "ds/splaytree" -> splayTreeExample,
       "ds/fordFulkersonDFS" -> fordFulkersonExample(false),
       "ds/fordFulkersonBFS" -> fordFulkersonExample(true),
+      "ds/dinic" -> dinicExample,
 
       // We cheated in these benchmark and therefore it is debatable whether to include them
       "stac/airplan5" -> airplan5Example(getWorkingDir(opt)),
