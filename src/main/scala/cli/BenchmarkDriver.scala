@@ -110,7 +110,8 @@ object BenchmarkDriver {
               case Some(plotArg) =>
                 val taskProvider = benchmarks(cliOption).getOrElse(cliOption.target,
                   throw new IllegalArgumentException("Cannot find benchmark named " + cliOption.target))
-                PatternPlot.showResourceUsageChart(taskProvider, plotArg.indPath, plotArg.sizeLimit, plotArg.density)
+                val ind = FileInteraction.readObjectFromFile[MultiStateInd](plotArg.indPath)
+                PatternPlot.showResourceUsageChart(taskProvider, ind, plotArg.sizeLimit, plotArg.density)
             }
           case Some(extraArg) =>
             val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)

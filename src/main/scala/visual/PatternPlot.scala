@@ -53,7 +53,7 @@ object PatternPlot {
   }
 
   def showResourceUsageChart(taskProvider: FuzzingTaskProvider,
-                             patternFile: String,
+                             ind: MultiStateInd,
                              sizeLimit: Int,
                              pointDensity: Int = 10,
                              lineName: String = "pattern",
@@ -65,7 +65,6 @@ object PatternPlot {
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
       setVisible(true)
     }
-    val ind = FileInteraction.readObjectFromFile[MultiStateInd](patternFile)
     val xys = plotPatternPerformance(taskProvider, ind, sizeLimit, maxPoints
       = pointDensity)
 
@@ -85,6 +84,7 @@ object PatternPlot {
     val patternFile = "InterestingResults/airplan2/bestIndividual[seed=1].serialized"
     val example = FuzzingTaskProvider.airplan2Example("workingDir0")
     val sizeLimit = 20000
-    showResourceUsageChart(example, patternFile, sizeLimit)
+    val ind = FileInteraction.readObjectFromFile[MultiStateInd](patternFile)
+    showResourceUsageChart(example, ind, sizeLimit)
   }
 }
