@@ -744,6 +744,32 @@ object FuzzingTaskProvider {
     )
   }
 
+  def pushRelabelExample = new MaxFlowFuzzingTaskProvider {
+
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      outputTypes = IS(EInt, EInt, EGraph(EInt)),
+      sizeOfInterest = 100,
+      resourceUsage = {
+        case IS(IntValue(src), IntValue(dst), GraphValue(nodeNum, edges)) =>
+          if (nodeNum == 0 || nodeNum == 1)
+            0
+          else {
+            val srcInt = Math.floorMod(src, nodeNum)
+            val dstInt = Math.floorMod(dst, nodeNum)
+            val edgeArray = edges.flatMap {
+              case (s, t, value) =>
+                Seq(s, t, value.asInstanceOf[IntValue].value)
+            }.toArray
+
+            Cost.reset()
+            patbench.ds.edu.utexas.stac.DataStructureHarness.altPushRelabelHarness(nodeNum, srcInt, dstInt, edgeArray)
+            Cost.read()
+          }
+      },
+      gpEnv = airplanEnv
+    )
+  }
+
   def dinicExample = new MaxFlowFuzzingTaskProvider {
 
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
