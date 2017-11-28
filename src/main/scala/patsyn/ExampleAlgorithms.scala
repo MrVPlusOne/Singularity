@@ -139,13 +139,14 @@ object FuzzingTaskProvider {
     }
   }
 
-  def vectIntToString(vec: VectValue): String = {
-    String.valueOf(vectIntToCharArray(vec).toArray)
+  def vectIntToString(vec: VectValue, charSize: Int = 16): String = {
+    String.valueOf(vectIntToCharArray(vec, charSize).toArray)
   }
 
-  def vectIntToCharArray(vec: VectValue): List[Char] = {
+  def vectIntToCharArray(vec: VectValue, charSize: Int): List[Char] = {
+    val range = 1 << charSize
     vec.value.map { i =>
-      i.asInstanceOf[IntValue].value.toChar
+      SimpleMath.wrapInRange(i.asInstanceOf[IntValue].value, range).toChar
     }.toList
   }
 
@@ -162,10 +163,10 @@ object FuzzingTaskProvider {
     GPEnvironment(constMap, functions, stateTypes ++ stateTypes)
   }
 
-  def hashCollisionExample(hashFunc: Seq[Char] => Int) = new FuzzingTaskProvider {
+  def hashCollisionExample(hashFunc: Seq[Char] => Int, charSize: Int) = new FuzzingTaskProvider {
     def totalCollisionMetric(vec: Vector[EValue]): Double = {
       val hashes = vec.map(v => {
-        vectIntToCharArray(v.asInstanceOf[VectValue])
+        vectIntToCharArray(v.asInstanceOf[VectValue], charSize)
       }).distinct.map(hashFunc)
 
       hashes.groupBy(identity).values.map {
@@ -175,7 +176,7 @@ object FuzzingTaskProvider {
 
     def squareMetric(vec: Vector[EValue]): Double = {
       val hashes = vec.map(v => {
-        vectIntToCharArray(v.asInstanceOf[VectValue])
+        vectIntToCharArray(v.asInstanceOf[VectValue], charSize)
       }).distinct.map(hashFunc)
       val updateNum = vec.length - hashes.length
 
@@ -200,32 +201,22 @@ object FuzzingTaskProvider {
     override def saveValueWithName(value: IS[EValue], name: String): Unit = {
       super.saveValueWithName(value, name)
       println(s"# of string = ${value(0).asInstanceOf[VectValue].value.length}")
-
-      val inds = value.map(v => {
-        vectIntToCharArray(v.asInstanceOf[VectValue])
-      }).distinct
-
-      val stat = inds.groupBy(hashFunc).toIndexedSeq.sortBy{
-        case (i, is) => is.length
-      }.reverse
-      println(s"stat:")
-      stat.foreach{case (hash, inds) => println(s"hash -> $inds")}
     }
   }
-  def phpHashCollisionExample = hashCollisionExample(HashFunc.php)
-  def javaHashCollisionExample = hashCollisionExample(HashFunc.java)
-  def rubyHashCollisionExample = hashCollisionExample(HashFunc.ruby)
-  def aspDotNetHashCollisionExample = hashCollisionExample(HashFunc.aspDotNet)
-  def pythonHashCollisionExample = hashCollisionExample(HashFunc.python)
-  def v8HashCollisionExample = hashCollisionExample(HashFunc.v8)
-  def murmur2HashCollisionExample = hashCollisionExample(HashFunc.murmur2(0))
+  def phpHashCollisionExample = hashCollisionExample(HashFunc.php, 8)
+  def javaHashCollisionExample = hashCollisionExample(HashFunc.java, 16)
+  def rubyHashCollisionExample = hashCollisionExample(HashFunc.ruby, 8)
+  def aspDotNetHashCollisionExample = hashCollisionExample(HashFunc.aspDotNet, 16)
+  def pythonHashCollisionExample = hashCollisionExample(HashFunc.python, 8)
+  def v8HashCollisionExample = hashCollisionExample(HashFunc.v8, 8)
+  def murmur2HashCollisionExample = hashCollisionExample(HashFunc.murmur2(0), 8)
 
-  private def hashPerformanceExample(hashFunc: Array[String] => Any) = new FuzzingTaskProvider {
+  private def hashPerformanceExample(hashFunc: Array[String] => Any, charSize: Int) = new FuzzingTaskProvider {
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
       outputTypes = IS(EVect(EVect(EInt))),
       resourceUsage = {
         case IS(VectValue(vec)) =>
-          val strs = vec.map(v => vectIntToString(v.asInstanceOf[VectValue])).filter(s => s.nonEmpty).toArray
+          val strs = vec.map(v => vectIntToString(v.asInstanceOf[VectValue], charSize)).filter(s => s.nonEmpty).toArray
 
           Cost.reset()
           hashFunc(strs)
@@ -244,15 +235,19 @@ object FuzzingTaskProvider {
       println(s"# of string = ${value(0).asInstanceOf[VectValue].value.length}")
     }
   }
-  def phpHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.phpStringHarness)
-  def javaHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.javaStringHarness)
-  def rubyHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.rubyStringHarness)
-  def aspDotNetHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.aspDotNetStringHarness)
+  def phpHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.phpStringHarness, 8)
+  def javaHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness
+    .javaStringHarness, 16)
+  def rubyHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness
+    .rubyStringHarness, 8)
+  def aspDotNetHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness
+    .aspDotNetStringHarness, 16)
   def pythonHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness
-    .pythonStringHarness)
-  def v8HashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.v8StringHarness)
+    .pythonStringHarness, 8)
+  def v8HashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.v8StringHarness, 8)
   def murmur2HashPerformanceExample = hashPerformanceExample(arr =>
-    patbench.hash.edu.utexas.stac.HashHarness.murmur2StringHarness(arr, 0)
+    patbench.hash.edu.utexas.stac.HashHarness.murmur2StringHarness(arr, 0),
+    8
   )
 
   def splayTreeExample = new FuzzingTaskProvider {
