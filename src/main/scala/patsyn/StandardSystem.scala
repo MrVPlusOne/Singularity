@@ -6,15 +6,15 @@ import scala.language.implicitConversions
 object StandardSystem {
 
   // Type declarations
-  case object EInt extends EType
+  case object EInt extends EType()
 
-  case class EVect(elemT: EType) extends EType
+  case class EVect(elemT: EType) extends EType(elemT)
 
-  case object EBool extends EType
+  case object EBool extends EType()
 
-  case class EPair(t1: EType, t2: EType) extends EType
+  case class EPair(t1: EType, t2: EType) extends EType(t1,t2)
 
-  case class EGraph(edgeT: EType) extends EType
+  case class EGraph(edgeT: EType) extends EType(edgeT)
 
   // Value declarations
   case class IntValue(value: Int) extends EValue {

@@ -1,14 +1,7 @@
 package patsyn
 
-sealed trait EAbstrType
 
-trait EType extends EAbstrType{
+/** Concrete Types */
+abstract class EType(children: EType*){
 }
 
-case class ETyVar(id: Int) extends EAbstrType
-
-object ETyVar{
-  implicit def intToTyVar(int: Int): ETyVar = {
-    ETyVar(int)
-  }
-}

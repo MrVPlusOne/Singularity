@@ -34,7 +34,12 @@ object Playground {
   def main(args: Array[String]): Unit = {
 //    MultiStateRepresentation.individualToPattern(ind).take(10).foreach{x => println(x._2)}
 
-    PatternPlot.showResourceUsageChart(FuzzingTaskProvider.dinicExample, ind, 10000, pointDensity = 15)
+//    PatternPlot.showResourceUsageChart(FuzzingTaskProvider.dinicExample, ind, 10000, pointDensity = 15)
+
+    println{
+//      EVect(EInt).isInstanceOf[Product]
+      EInt.isInstanceOf[Product]
+    }
   }
 
 }
