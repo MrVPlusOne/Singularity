@@ -61,16 +61,16 @@ object FuzzingTaskProvider {
     v.asInstanceOf[Vector[IntValue]].map(_.value)
   }
 
-  def makeConstMap(pairs: (EType, IS[Random => EValue])*): Map[EType, IS[ExprGen[EConst]]] = {
-    pairs.map { case (t, fs) =>
-      t -> fs.map(f => ExprGen(t, r => EConst(t, f(r))))
+  def makeConstMap(pairs: (EType, Random => EValue)*): Map[EType, ExprGen[EConst]] = {
+    pairs.map { case (t, f) =>
+      t ->  ExprGen(t, r => EConst(t, f(r)))
     }.toMap
   }
 
   def sortingEnv: GPEnvironment = {
     val constMap = makeConstMap(
-      EInt -> IS(r => r.nextInt(12)),
-      EVect(EInt) -> IS(_ => Vector())
+      EInt -> (r => r.nextInt(12)),
+      EVect(EInt) -> (_ => Vector())
     )
 
     val functions = IntComponents.collection ++ VectComponents.collection
@@ -151,9 +151,9 @@ object FuzzingTaskProvider {
 
   def hashEnv: GPEnvironment = {
     val constMap = makeConstMap(
-      EInt -> IS(r => r.nextInt(12)),
-      EVect(EInt) -> IS(_ => Vector()),
-      EVect(EVect(EInt)) -> IS(_ => Vector())
+      EInt -> (r => r.nextInt(12)),
+      EVect(EInt) -> (_ => Vector()),
+      EVect(EVect(EInt)) -> (_ => Vector())
     )
 
     val functions = IntComponents.collection ++ VectComponents.collection
@@ -277,14 +277,15 @@ object FuzzingTaskProvider {
 
   def abcRegexEnv: GPEnvironment = {
     val symbols = "abcABC ,.\\(){}[]+-*/=_".toCharArray.toIndexedSeq
-    val intGens: IS[Random => IntValue] = IS(
-      r => r.nextInt(7),
-      r => SimpleMath.randomSelect(r)(symbols).toInt
-    )
+
+    def intGen(r: Random): IntValue = {
+      if(r.nextDouble()<0.5) r.nextInt(7)
+      else SimpleMath.randomSelect(r)(symbols).toInt
+    }
 
     val constMap = makeConstMap(
-      EInt -> intGens,
-      EVect(EInt) -> IS(_ => Vector()),
+      EInt -> intGen,
+      EVect(EInt) -> (_ => Vector()),
       //      EVect(EVect(EInt)) -> IS(_ => Vector())
     )
 
@@ -446,8 +447,8 @@ object FuzzingTaskProvider {
 
   def imageEnv: GPEnvironment = {
     val constMap = makeConstMap(
-      EInt -> IS(r => r.nextInt(12)),
-      EVect(EInt) -> IS(_ => Vector())
+      EInt -> (r => r.nextInt(12)),
+      EVect(EInt) -> (_ => Vector())
     )
 
     val functions = IntComponents.collection ++ VectComponents.collection ++ IS(BitComponents.shiftByteLeft)
@@ -592,8 +593,8 @@ object FuzzingTaskProvider {
 
   def linearAlgebraEnv: GPEnvironment = {
     val constMap = makeConstMap(
-      EInt -> IS(r => r.nextInt(12)),
-      EVect(EInt) -> IS(_ => Vector())
+      EInt -> (r => r.nextInt(12)),
+      EVect(EInt) -> (_ => Vector())
     )
 
     val functions = IntComponents.collection ++ VectComponents.collection
@@ -704,9 +705,9 @@ object FuzzingTaskProvider {
 
   def airplanEnv: GPEnvironment = {
     val constMap = makeConstMap(
-      EInt -> IS(r => r.nextInt(12)),
-      EVect(EInt) -> IS(r => Vector()),
-      EGraph(EInt) -> IS(r => GraphValue(0, IS())),
+      EInt -> (r => r.nextInt(12)),
+      EVect(EInt) -> (r => Vector()),
+      EGraph(EInt) -> (r => GraphValue(0, IS())),
     )
 
     val functions = IntComponents.collection ++ VectComponents.collection ++ GraphComponents.collection ++

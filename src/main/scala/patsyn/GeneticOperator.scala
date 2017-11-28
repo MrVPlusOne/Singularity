@@ -22,7 +22,7 @@ object GeneticOperator{
   case class ExprGen[+E <:Expr](returnType: EType, gen: Random => E)
 
   def genExpr(ty: EType, maxDepth: Int,
-              terminalMap: Map[EType, IS[ExprGen[ETerminal]]],
+              terminalMap: Map[EType, ExprGen[ETerminal]],
               functionMap: Map[EType, IS[EConcreteFunc]],
               random: Random, terminalChance: Double = 0.5
              ): Expr = {
@@ -33,7 +33,7 @@ object GeneticOperator{
 
     def rec(ty: EType, maxDepth: Int): Expr = {
       if(maxDepth <= 0 || random.nextDouble()<terminalChance || !functionMap.contains(ty))
-        return randomPick(terminalMap(ty)).gen(random)
+        return terminalMap(ty).gen(random)
 
       val f = randomPick(functionMap(ty))
       val args = f.argTypes.map{aTy =>
@@ -61,8 +61,7 @@ object GeneticOperator{
   }
 }
 
-case class GPEnvironment(constMap: Map[EType, IS[ExprGen[EConst]]], functions: IS[EFunction], stateTypes: IS[EType]) {
-  require(constMap.forall{case (_, gens) => gens.nonEmpty}, "For each type in constMap, there should be at least one ExprGen.")
+case class GPEnvironment(constMap: Map[EType, ExprGen[EConst]], functions: IS[EFunction], stateTypes: IS[EType], argConstRatio: Double = 0.35) {
 
   /** type set used to concretize abstract functions, all function argument types and
     * return types must be in this typeUniverse */
@@ -100,9 +99,16 @@ case class GPEnvironment(constMap: Map[EType, IS[ExprGen[EConst]]], functions: I
     case (t, i) => ExprGen(t, _ =>EArg(i, t))
   }
 
-  val terminalMap: Map[EType, IS[ExprGen[ETerminal]]] = {
-    args.foldLeft(constMap: Map[EType, IS[ExprGen[ETerminal]]]){(map, gen) => {
-      map.updated(gen.returnType, gen +: map(gen.returnType))
+  val terminalMap: Map[EType, ExprGen[ETerminal]] = {
+    stateTypes.zipWithIndex.foldLeft(constMap: Map[EType, ExprGen[ETerminal]]){(map, argPair) => argPair match {
+      case (ty, id) =>
+      map.updated(ty, ExprGen(ty, r => {
+        if(r.nextDouble()<=argConstRatio){
+          EArg(id, ty)
+        }else{
+          map(ty).gen(r)
+        }
+      }))
     }}
   }
 }
