@@ -28,6 +28,7 @@ object BenchmarkDriver {
       "stac/airplan1" -> airplan1Example(getWorkingDir(opt)),
       "stac/airplan2" -> airplan2Example(getWorkingDir(opt)),
       "redos/cookie" -> regexExample("^(([^=;]+))\\s*=\\s*([^\\n\\r\\00]*)", defaultRegexDic),
+      "quicksortMiddle" -> quickSortMiddlePivotExample,
       "hashperf/php" -> phpHashPerformanceExample,
 
       // These benchmarks are yet to be solved

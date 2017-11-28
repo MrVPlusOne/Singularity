@@ -119,6 +119,26 @@ object FuzzingTaskProvider {
     }
   }
 
+  def quickSortMiddlePivotExample = new FuzzingTaskProvider {
+
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      outputTypes = IS(EVect(EInt)),
+      resourceUsage = {
+        case IS(VectValue(v)) =>
+          val intArray = toIntVect(v).toArray
+          Cost.reset()
+          patbench.slowfuzz.QuickSort.sortMiddlePivotPublic(intArray)
+          Cost.read()
+      },
+      gpEnv = sortingEnv
+    )
+
+    def sizeF = {
+      case IS(VectValue(v)) =>
+        v.length
+    }
+  }
+
   def vectIntToString(vec: VectValue): String = {
     String.valueOf(vectIntToCharArray(vec).toArray)
   }
@@ -136,7 +156,7 @@ object FuzzingTaskProvider {
       EVect(EVect(EInt)) -> IS(_ => Vector())
     )
 
-    val functions = IntComponents.collection ++ VectComponents.collection ++ BitComponents.collection
+    val functions = IntComponents.collection ++ VectComponents.collection
 
     val stateTypes = constMap.keys.toIndexedSeq
     GPEnvironment(constMap, functions, stateTypes ++ stateTypes)
@@ -166,7 +186,7 @@ object FuzzingTaskProvider {
       outputTypes = IS(EVect(EVect(EInt))),
       resourceUsage = {
         case IS(VectValue(vec)) =>
-          totalCollisionMetric(vec)
+          squareMetric(vec)
       },
       gpEnv = hashEnv,
       sizeOfInterest = 600
@@ -180,6 +200,16 @@ object FuzzingTaskProvider {
     override def saveValueWithName(value: IS[EValue], name: String): Unit = {
       super.saveValueWithName(value, name)
       println(s"# of string = ${value(0).asInstanceOf[VectValue].value.length}")
+
+      val inds = value.map(v => {
+        vectIntToCharArray(v.asInstanceOf[VectValue])
+      }).distinct
+
+      val stat = inds.groupBy(hashFunc).toIndexedSeq.sortBy{
+        case (i, is) => is.length
+      }.reverse
+      println(s"stat:")
+      stat.foreach{case (hash, inds) => println(s"hash -> $inds")}
     }
   }
   def phpHashCollisionExample = hashCollisionExample(HashFunc.php)
@@ -195,7 +225,7 @@ object FuzzingTaskProvider {
       outputTypes = IS(EVect(EVect(EInt))),
       resourceUsage = {
         case IS(VectValue(vec)) =>
-          val strs = vec.map(v => vectIntToString(v.asInstanceOf[VectValue])).toArray
+          val strs = vec.map(v => vectIntToString(v.asInstanceOf[VectValue])).filter(s => s.nonEmpty).toArray
 
           Cost.reset()
           hashFunc(strs)
@@ -206,7 +236,7 @@ object FuzzingTaskProvider {
 
     def sizeF = {
       case IS(VectValue(strings)) =>
-        strings.map(s => s.asInstanceOf[VectValue].value.length + 2).sum
+        strings.map(s => s.asInstanceOf[VectValue].value.length + 1).sum
     }
 
     override def saveValueWithName(value: IS[EValue], name: String): Unit = {
@@ -679,7 +709,8 @@ object FuzzingTaskProvider {
       EGraph(EInt) -> IS(r => GraphValue(0, IS())),
     )
 
-    val functions = IntComponents.collection ++ VectComponents.collection ++ GraphComponents.collection
+    val functions = IntComponents.collection ++ VectComponents.collection ++ GraphComponents.collection ++
+      IS(GraphComponents.updateEdgeValue)
 
     val stateTypes = IS(EInt, EInt) ++ constMap.keys.toIndexedSeq
     GPEnvironment(constMap, functions, stateTypes)
