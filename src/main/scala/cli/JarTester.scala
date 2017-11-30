@@ -35,8 +35,9 @@ object JarTester {
         case IS(VectValue(v)) => v.length
       }
 
+      def outputTypes = IS(EVect(EInt))
+
       override protected def task: RunningFuzzingTask = RunningFuzzingTask(
-        outputTypes = IS(EVect(EInt)),
         resourceUsage = {
           case IS(VectValue(vec)) =>
             val intArray = toIntVect(vec).toArray

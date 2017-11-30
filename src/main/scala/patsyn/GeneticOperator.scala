@@ -111,6 +111,15 @@ case class GPEnvironment(constMap: Map[EType, ExprGen[EConst]], functions: IS[EF
       }))
     }}
   }
+
+  def show: String = {
+    s"""
+       |stateTypes = $stateTypes
+       |argConstRatio = $argConstRatio
+       |constMap: $constMap
+       |functions: $functions
+     """.stripMargin
+  }
 }
 
 case class SingleStateGOpLibrary(environment: GPEnvironment)  {

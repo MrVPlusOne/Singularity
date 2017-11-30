@@ -12,6 +12,8 @@ import scala.util.Random
 trait FuzzingTaskProvider {
   protected def task: RunningFuzzingTask
 
+  def outputTypes: IS[EType]
+
   def sizeF: PartialFunction[IS[EValue], Int]
 
   def setupTask(task: RunningFuzzingTask): Unit = {}
@@ -43,9 +45,9 @@ trait FuzzingTaskProvider {
   }
 }
 
+case class ResourceConfig(resourceUsage: PartialFunction[IS[EValue], Double], setup: () => Unit, teardown: () => Unit)
 
-case class RunningFuzzingTask(outputTypes: IS[EType],
-                              sizeOfInterest: Int = 500,
+case class RunningFuzzingTask(sizeOfInterest: Int = 500,
                               resourceUsage: PartialFunction[IS[EValue], Double],
                               gpEnv: GPEnvironment
                              )
@@ -63,7 +65,7 @@ object FuzzingTaskProvider {
 
   def makeConstMap(pairs: (EType, Random => EValue)*): Map[EType, ExprGen[EConst]] = {
     pairs.map { case (t, f) =>
-      t ->  ExprGen(t, r => EConst(t, f(r)))
+      t -> ExprGen(t, r => EConst(t, f(r)))
     }.toMap
   }
 
@@ -81,12 +83,13 @@ object FuzzingTaskProvider {
 
   def insertionSortExample = new FuzzingTaskProvider {
 
+    def outputTypes = IS(EVect(EInt))
+
     def sizeF = {
       case IS(VectValue(v)) => v.length
     }
 
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EVect(EInt)),
       resourceUsage = {
         case IS(VectValue(v)) =>
           val intArray = toIntVect(v).toArray
@@ -101,8 +104,9 @@ object FuzzingTaskProvider {
 
   def quickSortExample = new FuzzingTaskProvider {
 
+    def outputTypes = IS(EVect(EInt))
+
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EVect(EInt)),
       resourceUsage = {
         case IS(VectValue(v)) =>
           val intArray = toIntVect(v).toArray
@@ -121,8 +125,10 @@ object FuzzingTaskProvider {
 
   def quickSortMiddlePivotExample = new FuzzingTaskProvider {
 
+    def outputTypes = IS(EVect(EInt))
+
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EVect(EInt)),
+
       resourceUsage = {
         case IS(VectValue(v)) =>
           val intArray = toIntVect(v).toArray
@@ -180,11 +186,13 @@ object FuzzingTaskProvider {
       }).distinct.map(hashFunc)
       val updateNum = vec.length - hashes.length
 
-      hashes.groupBy(identity).values.map(e => 3*e.length*e.length).sum + updateNum
+      hashes.groupBy(identity).values.map(e => 3 * e.length * e.length).sum + updateNum
     }
 
+    def outputTypes = IS(EVect(EVect(EInt)))
+
+
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EVect(EVect(EInt))),
       resourceUsage = {
         case IS(VectValue(vec)) =>
           squareMetric(vec)
@@ -195,7 +203,7 @@ object FuzzingTaskProvider {
 
     def sizeF = {
       case IS(VectValue(strings)) =>
-        strings.map(s => s.asInstanceOf[VectValue].value.length+1).sum
+        strings.map(s => s.asInstanceOf[VectValue].value.length + 1).sum
     }
 
     override def saveValueWithName(value: IS[EValue], name: String): Unit = {
@@ -203,17 +211,27 @@ object FuzzingTaskProvider {
       println(s"# of string = ${value(0).asInstanceOf[VectValue].value.length}")
     }
   }
+
   def phpHashCollisionExample = hashCollisionExample(HashFunc.php, 8)
+
   def javaHashCollisionExample = hashCollisionExample(HashFunc.java, 16)
+
   def rubyHashCollisionExample = hashCollisionExample(HashFunc.ruby, 8)
+
   def aspDotNetHashCollisionExample = hashCollisionExample(HashFunc.aspDotNet, 16)
+
   def pythonHashCollisionExample = hashCollisionExample(HashFunc.python, 8)
+
   def v8HashCollisionExample = hashCollisionExample(HashFunc.v8, 8)
+
   def murmur2HashCollisionExample = hashCollisionExample(HashFunc.murmur2(0), 8)
 
+
   private def hashPerformanceExample(hashFunc: Array[String] => Any, charSize: Int) = new FuzzingTaskProvider {
+    def outputTypes = IS(EVect(EVect(EInt)))
+
+
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EVect(EVect(EInt))),
       resourceUsage = {
         case IS(VectValue(vec)) =>
           val strs = vec.map(v => vectIntToString(v.asInstanceOf[VectValue], charSize)).filter(s => s.nonEmpty).toArray
@@ -235,24 +253,32 @@ object FuzzingTaskProvider {
       println(s"# of string = ${value(0).asInstanceOf[VectValue].value.length}")
     }
   }
+
   def phpHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.phpStringHarness, 8)
+
   def javaHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness
     .javaStringHarness, 16)
+
   def rubyHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness
     .rubyStringHarness, 8)
+
   def aspDotNetHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness
     .aspDotNetStringHarness, 16)
+
   def pythonHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness
     .pythonStringHarness, 8)
+
   def v8HashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.v8StringHarness, 8)
+
   def murmur2HashPerformanceExample = hashPerformanceExample(arr =>
     patbench.hash.edu.utexas.stac.HashHarness.murmur2StringHarness(arr, 0),
     8
   )
 
   def splayTreeExample = new FuzzingTaskProvider {
+    def outputTypes = IS(EVect(EInt))
+
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EVect(EInt)),
       resourceUsage = {
         case IS(VectValue(vec)) =>
           val insertArray = toIntVect(vec).toArray
@@ -274,7 +300,7 @@ object FuzzingTaskProvider {
     val symbols = "abcABC ,.\\(){}[]+-*/=_".toCharArray.toIndexedSeq
 
     def intGen(r: Random): IntValue = {
-      if(r.nextDouble()<0.5) r.nextInt(7)
+      if (r.nextDouble() < 0.5) r.nextInt(7)
       else SimpleMath.randomSelect(r)(symbols).toInt
     }
 
@@ -308,9 +334,10 @@ object FuzzingTaskProvider {
         vs.map(intValueAsChar).mkString("")
     }
 
+    def outputTypes = IS(EVect(EInt))
+
     protected def task: RunningFuzzingTask = {
       RunningFuzzingTask(
-        outputTypes = IS(EVect(EInt)),
         sizeOfInterest = 200,
         resourceUsage = {
           case IS(VectValue(chars)) =>
@@ -335,7 +362,9 @@ object FuzzingTaskProvider {
   val SLOWFUZZ_REGEX3 = "(?i:<.*[:]vmlframe.*?[ /+\\t]*?src[\n/+\\t]*=)"
 
   def slowFuzzRegexExample1 = regexExample(SLOWFUZZ_REGEX1, defaultRegexDic)
+
   def slowFuzzRegexExample2 = regexExample(SLOWFUZZ_REGEX2, defaultRegexDic)
+
   def slowFuzzRegexExample3 = regexExample(SLOWFUZZ_REGEX3, defaultRegexDic)
 
   def intVectorToGraph(graphId: Int, refs: Vector[Int]): String = {
@@ -358,12 +387,15 @@ object FuzzingTaskProvider {
         graphs.map(g => g.asInstanceOf[VectValue].value.length + 1).sum
     }
 
+    def outputTypes = IS(EVect(EVect(EInt)))
+
+
     protected def task: RunningFuzzingTask = {
       import edu.utexas.stac.Cost
       import patbench.graphanalyzer.user.commands.CommandProcessor
 
+
       RunningFuzzingTask(
-        outputTypes = IS(EVect(EVect(EInt))),
         sizeOfInterest = 12,
         resourceUsage = {
           case IS(VectValue(graphs)) =>
@@ -400,7 +432,7 @@ object FuzzingTaskProvider {
 
     import sys.process._
 
-    val server = new JavaWebServer(8080+ioId)
+    val server = new JavaWebServer(8080 + ioId)
 
     override def setupTask(task: RunningFuzzingTask): Unit = {
       new Thread(() => server.start()).start()
@@ -420,9 +452,10 @@ object FuzzingTaskProvider {
         chars.length
     }
 
+    def outputTypes = IS(EVect(EInt))
+
     protected def task: RunningFuzzingTask = {
       RunningFuzzingTask(
-        outputTypes = IS(EVect(EInt)),
         sizeOfInterest = 100,
         resourceUsage = {
           case IS(vec: VectValue) =>
@@ -492,12 +525,13 @@ object FuzzingTaskProvider {
       ImageIO.write(image, "png", new File(name + ".png"))
     }
 
+    def outputTypes = IS(EVect(EInt))
+
     protected def task: RunningFuzzingTask = {
       var bestPerformanceSoFar = Double.MinValue
 
       val imageDataSize = imageWidth * imageHeight
       RunningFuzzingTask(
-        outputTypes = IS(EVect(EInt)),
         sizeOfInterest = imageDataSize,
         resourceUsage = {
           case IS(VectValue(data)) =>
@@ -551,9 +585,10 @@ object FuzzingTaskProvider {
       case IS(VectValue(chars)) => chars.length
     }
 
+    def outputTypes = IS(EVect(EInt))
+
     protected def task: RunningFuzzingTask = {
       RunningFuzzingTask(
-        outputTypes = IS(EVect(EInt)),
         sizeOfInterest = 5000,
         resourceUsage = {
           case IS(chars: VectValue) =>
@@ -654,11 +689,12 @@ object FuzzingTaskProvider {
         rhsMatrix, midSize, colSize)
     }
 
+    def outputTypes = IS(EVect(EInt), EVect(EInt))
+
     override protected def task: RunningFuzzingTask = {
       import patbench.linearalgebra.com.example.linalg.external.operations.MultiplyOperation
 
       RunningFuzzingTask(
-        outputTypes = IS(EVect(EInt), EVect(EInt)),
         sizeOfInterest = rowSize * midSize + midSize * colSize,
         resourceUsage = {
           case IS(lhs: VectValue, rhs: VectValue) =>
@@ -721,7 +757,7 @@ object FuzzingTaskProvider {
     def graphToString(src: Int, snk: Int, graphValue: GraphValue): String = {
       val numNodes = graphValue.nodeNum
       val numEdges = graphValue.edges.length
-      val edgeLines = graphValue.edges.map{
+      val edgeLines = graphValue.edges.map {
         case (src: Int, dst: Int, capacityValue: EValue) =>
           s"$src $dst ${capacityValue.asInstanceOf[IntValue].value}"
       }.mkString("\n")
@@ -746,8 +782,10 @@ object FuzzingTaskProvider {
 
   def fordFulkersonExample(useBFS: Boolean) = new MaxFlowFuzzingTaskProvider {
 
+    def outputTypes = IS(EInt, EInt, EGraph(EInt))
+
+
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EInt, EInt, EGraph(EInt)),
       sizeOfInterest = 100,
       resourceUsage = {
         case IS(IntValue(src), IntValue(dst), GraphValue(nodeNum, edges)) =>
@@ -773,8 +811,9 @@ object FuzzingTaskProvider {
 
   def pushRelabelExample = new MaxFlowFuzzingTaskProvider {
 
+    def outputTypes = IS(EInt, EInt, EGraph(EInt))
+
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EInt, EInt, EGraph(EInt)),
       sizeOfInterest = 100,
       resourceUsage = {
         case IS(IntValue(src), IntValue(dst), GraphValue(nodeNum, edges)) =>
@@ -799,8 +838,9 @@ object FuzzingTaskProvider {
 
   def dinicExample = new MaxFlowFuzzingTaskProvider {
 
+    def outputTypes = IS(EInt, EInt, EGraph(EInt))
+
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EInt, EInt, EGraph(EInt)),
       sizeOfInterest = 100,
       resourceUsage = {
         case IS(IntValue(src), IntValue(dst), GraphValue(nodeNum, edges)) =>
@@ -824,6 +864,9 @@ object FuzzingTaskProvider {
   }
 
   abstract class AirplanFuzzingTaskProvider extends FuzzingTaskProvider {
+
+    def outputTypes = IS(EInt, EInt, EGraph(EInt))
+
 
     def airportsToString(numAirports: Int): String = {
       val airportNames = (0 until numAirports).map(i => s"$i").mkString("\n")
@@ -877,7 +920,6 @@ object FuzzingTaskProvider {
 
     override protected def task: RunningFuzzingTask = {
       RunningFuzzingTask(
-        outputTypes = IS(EInt, EInt, EGraph(EInt)),
         sizeOfInterest = 100,
         resourceUsage = {
           case IS(origin: IntValue, dest: IntValue, graphValue: GraphValue) =>
@@ -910,7 +952,7 @@ object FuzzingTaskProvider {
 
     def edgesToString(edgeList: IS[(Int, Int, EValue)]): String = {
       val numEdges = edgeList.size
-      val edgeLines = edgeList.map{
+      val edgeLines = edgeList.map {
         case (src, dst, weightValue) =>
           s"$src $dst ${weightValue.asInstanceOf[IntValue].value} 0 0 0 0 0"
       }.mkString("\n")
@@ -923,7 +965,6 @@ object FuzzingTaskProvider {
 
     override protected def task: RunningFuzzingTask = {
       RunningFuzzingTask(
-        outputTypes = IS(EInt, EInt, EGraph(EInt)),
         sizeOfInterest = 100,
         resourceUsage = {
           case IS(origin: IntValue, dest: IntValue, graphValue: GraphValue) =>
@@ -952,7 +993,7 @@ object FuzzingTaskProvider {
 
     def edgesToString(edgeList: IS[(Int, Int, EValue)]): String = {
       val numEdges = edgeList.size
-      val edgeLines = edgeList.map{
+      val edgeLines = edgeList.map {
         case (src, dst, weightValue) =>
           s"$src $dst ${math.abs(weightValue.asInstanceOf[IntValue].value)} 0 0 0 0 0"
       }.mkString("\n")
@@ -965,7 +1006,6 @@ object FuzzingTaskProvider {
 
     override protected def task: RunningFuzzingTask = {
       RunningFuzzingTask(
-        outputTypes = IS(EInt, EInt, EGraph(EInt)),
         sizeOfInterest = 100,
         resourceUsage = {
           case IS(origin: IntValue, dest: IntValue, graphValue: GraphValue) =>
@@ -999,6 +1039,8 @@ object FuzzingTaskProvider {
         val numNodes = graph.size
         numNodes + numEdges
     }
+
+    def outputTypes = IS(EVect(EVect(EInt)))
 
     type Graph = IS[IS[Int]]
 
@@ -1050,7 +1092,6 @@ object FuzzingTaskProvider {
 
     override protected def task: RunningFuzzingTask = {
       RunningFuzzingTask(
-        outputTypes = IS(EVect(EVect(EInt))),
         sizeOfInterest = 100,
         resourceUsage = {
           case IS(VectValue(graph)) =>
@@ -1086,15 +1127,16 @@ object FuzzingTaskProvider {
       case IS(VectValue(chars)) => chars.length
     }
 
+    def outputTypes = IS(EVect(EInt))
+
     override protected def task: RunningFuzzingTask = {
       import patbench.gabfeed4.edu.utexas.stac.GabfeedNoServer
 
       RunningFuzzingTask(
-        outputTypes = IS(EVect(EInt)),
         sizeOfInterest = 500,
         resourceUsage = {
 
-          case IS(chars:VectValue) =>
+          case IS(chars: VectValue) =>
             val content = vectIntToString(chars)
 
             val dbFileName = s"$workingDir/gabfeed.db"
@@ -1167,8 +1209,9 @@ object FuzzingTaskProvider {
       case IS(VectValue(v)) => v.length
     }
 
+    def outputTypes = IS(EVect(EInt))
+
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EVect(EInt)),
       sizeOfInterest = 64,
       resourceUsage = {
         case IS(VectValue(v)) =>
@@ -1180,10 +1223,15 @@ object FuzzingTaskProvider {
   }
 
   def insertionSortNativeExample = sortNativeExample("isort") _
+
   def appleQsortNativeExample = sortNativeExample("appleqsort") _
+
   def bsdQsortNativeExample = sortNativeExample("bsdqsort") _
+
   def gnuQsortNativeExample = sortNativeExample("gnuqsort") _
+
   def pgQsortNativeExample = sortNativeExample("pgqsort") _
+
   def slowfuzzQsortNativeExample = sortNativeExample("qsort") _
 
   def phpHashNativeExample(workingDir: String) = new NativeExample("phphash") {
@@ -1192,9 +1240,10 @@ object FuzzingTaskProvider {
       case IS(VectValue(v)) => v.length
     }
 
+    def outputTypes = IS(EVect(EInt))
+
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      outputTypes = IS(EVect(EInt)),
-      sizeOfInterest = 128,  // 64 insertions and char_size is 2
+      sizeOfInterest = 128, // 64 insertions and char_size is 2
       resourceUsage = {
         case IS(VectValue(v)) =>
           val data = toIntVect(v).map(x => x.toByte).toArray

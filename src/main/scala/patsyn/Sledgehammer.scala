@@ -72,6 +72,26 @@ object Sledgehammer{
     )
   }
 
+  def makeTaskProvider(random: Random, aggressiveness: Double)
+                      (returnTypes: IS[EType], sizeMetric: PartialFunction[IS[EValue], Int], sizeOfInterest: Int,
+                       resourceConfig: ResourceConfig): FuzzingTaskProvider = {
+    val gpEnv = genStandardEnv(random, aggressiveness)(returnTypes)
+
+    new FuzzingTaskProvider {
+      val sizeF = sizeMetric
+
+      def outputTypes = returnTypes
+
+      override def setupTask(task: RunningFuzzingTask): Unit = resourceConfig.setup()
+
+      override def teardownTask(task: RunningFuzzingTask): Unit = resourceConfig.teardown()
+
+      protected def task: RunningFuzzingTask = {
+        RunningFuzzingTask(sizeOfInterest, resourceConfig.resourceUsage, gpEnv)
+      }
+    }
+  }
+
   def main(args: Array[String]): Unit = {
     import StandardSystem._
 
@@ -79,12 +99,21 @@ object Sledgehammer{
 
     def sigmoid(x: Double) = 1.0/(1+math.exp(-x))
 
-    for(ag <- Seq.fill(10)(sigmoid(rand.nextGaussian()))) {
+    val example = FuzzingTaskProvider.phpHashCollisionExample
+
+    for(
+      id <- 0 until 10;
+      ag = sigmoid(rand.nextGaussian())) {
       val env = genStandardEnv(rand, aggressiveness = ag)(IS(EInt, EVect(EInt)))
       val runConfig = genRunConfig(rand, ag, env.stateTypes.length)
-      println(ag)
-      println(env)
-      println(runConfig)
+
+      example.run { task =>
+        makeTaskProvider(rand, ag)(
+          returnTypes = example.outputTypes, sizeMetric = example.sizeF, sizeOfInterest = 300,
+          resourceConfig = ResourceConfig(task.resourceUsage, setup = () => (), teardown = () => ()))
+
+        Runner.runExample(example, ioId = id, seeds = Seq(id), runConfig, useGUI = true)
+      }
     }
   }
 }

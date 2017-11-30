@@ -105,7 +105,7 @@ object Runner {
 
     import config._
 
-    val library = MultiStateGOpLibrary(task.gpEnv, task.outputTypes)
+    val library = MultiStateGOpLibrary(task.gpEnv, taskProvider.outputTypes)
 
     for (seed <- seeds) {
       val recordDirPath = {
@@ -139,6 +139,7 @@ object Runner {
 
         printSection("Configuration"){
           println(s"sizeOfInterest = ${task.sizeOfInterest}")
+          println(task.gpEnv.show)
           println(config.show)
         }
 
@@ -169,7 +170,7 @@ object Runner {
         )
         val representation = MultiStateRepresentation(totalSizeTolerance = totalSizeTolerance,
           singleSizeTolerance = singleSizeTolerance,
-          stateTypes = task.gpEnv.stateTypes, outputTypes = task.outputTypes, evaluation = evaluation)
+          stateTypes = task.gpEnv.stateTypes, outputTypes = taskProvider.outputTypes, evaluation = evaluation)
         val optimizer = EvolutionaryOptimizer(representation)
         val operators = IS(
           library.simpleCrossOp -> 0.4,
