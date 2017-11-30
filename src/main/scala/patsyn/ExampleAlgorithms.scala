@@ -139,13 +139,14 @@ object FuzzingTaskProvider {
     }
   }
 
-  def vectIntToString(vec: VectValue): String = {
-    String.valueOf(vectIntToCharArray(vec).toArray)
+  def vectIntToString(vec: VectValue, charSize: Int = 16): String = {
+    String.valueOf(vectIntToCharArray(vec, charSize).toArray)
   }
 
-  def vectIntToCharArray(vec: VectValue): List[Char] = {
+  def vectIntToCharArray(vec: VectValue, charSize: Int): List[Char] = {
+    val range = 1 << charSize
     vec.value.map { i =>
-      i.asInstanceOf[IntValue].value.toChar
+      SimpleMath.wrapInRange(i.asInstanceOf[IntValue].value, range).toChar
     }.toList
   }
 
@@ -162,10 +163,10 @@ object FuzzingTaskProvider {
     GPEnvironment(constMap, functions, stateTypes ++ stateTypes)
   }
 
-  def hashCollisionExample(hashFunc: Seq[Char] => Int) = new FuzzingTaskProvider {
+  def hashCollisionExample(hashFunc: Seq[Char] => Int, charSize: Int) = new FuzzingTaskProvider {
     def totalCollisionMetric(vec: Vector[EValue]): Double = {
       val hashes = vec.map(v => {
-        vectIntToCharArray(v.asInstanceOf[VectValue])
+        vectIntToCharArray(v.asInstanceOf[VectValue], charSize)
       }).distinct.map(hashFunc)
 
       hashes.groupBy(identity).values.map {
@@ -175,7 +176,7 @@ object FuzzingTaskProvider {
 
     def squareMetric(vec: Vector[EValue]): Double = {
       val hashes = vec.map(v => {
-        vectIntToCharArray(v.asInstanceOf[VectValue])
+        vectIntToCharArray(v.asInstanceOf[VectValue], charSize)
       }).distinct.map(hashFunc)
       val updateNum = vec.length - hashes.length
 
@@ -200,32 +201,22 @@ object FuzzingTaskProvider {
     override def saveValueWithName(value: IS[EValue], name: String): Unit = {
       super.saveValueWithName(value, name)
       println(s"# of string = ${value(0).asInstanceOf[VectValue].value.length}")
-
-      val inds = value.map(v => {
-        vectIntToCharArray(v.asInstanceOf[VectValue])
-      }).distinct
-
-      val stat = inds.groupBy(hashFunc).toIndexedSeq.sortBy{
-        case (i, is) => is.length
-      }.reverse
-      println(s"stat:")
-      stat.foreach{case (hash, inds) => println(s"hash -> $inds")}
     }
   }
-  def phpHashCollisionExample = hashCollisionExample(HashFunc.php)
-  def javaHashCollisionExample = hashCollisionExample(HashFunc.java)
-  def rubyHashCollisionExample = hashCollisionExample(HashFunc.ruby)
-  def aspDotNetHashCollisionExample = hashCollisionExample(HashFunc.aspDotNet)
-  def pythonHashCollisionExample = hashCollisionExample(HashFunc.python)
-  def v8HashCollisionExample = hashCollisionExample(HashFunc.v8)
-  def murmur2HashCollisionExample = hashCollisionExample(HashFunc.murmur2(0))
+  def phpHashCollisionExample = hashCollisionExample(HashFunc.php, 8)
+  def javaHashCollisionExample = hashCollisionExample(HashFunc.java, 16)
+  def rubyHashCollisionExample = hashCollisionExample(HashFunc.ruby, 8)
+  def aspDotNetHashCollisionExample = hashCollisionExample(HashFunc.aspDotNet, 16)
+  def pythonHashCollisionExample = hashCollisionExample(HashFunc.python, 8)
+  def v8HashCollisionExample = hashCollisionExample(HashFunc.v8, 8)
+  def murmur2HashCollisionExample = hashCollisionExample(HashFunc.murmur2(0), 8)
 
-  private def hashPerformanceExample(hashFunc: Array[String] => Any) = new FuzzingTaskProvider {
+  private def hashPerformanceExample(hashFunc: Array[String] => Any, charSize: Int) = new FuzzingTaskProvider {
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
       outputTypes = IS(EVect(EVect(EInt))),
       resourceUsage = {
         case IS(VectValue(vec)) =>
-          val strs = vec.map(v => vectIntToString(v.asInstanceOf[VectValue])).filter(s => s.nonEmpty).toArray
+          val strs = vec.map(v => vectIntToString(v.asInstanceOf[VectValue], charSize)).filter(s => s.nonEmpty).toArray
 
           Cost.reset()
           hashFunc(strs)
@@ -244,15 +235,19 @@ object FuzzingTaskProvider {
       println(s"# of string = ${value(0).asInstanceOf[VectValue].value.length}")
     }
   }
-  def phpHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.phpStringHarness)
-  def javaHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.javaStringHarness)
-  def rubyHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.rubyStringHarness)
-  def aspDotNetHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.aspDotNetStringHarness)
+  def phpHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.phpStringHarness, 8)
+  def javaHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness
+    .javaStringHarness, 16)
+  def rubyHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness
+    .rubyStringHarness, 8)
+  def aspDotNetHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness
+    .aspDotNetStringHarness, 16)
   def pythonHashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness
-    .pythonStringHarness)
-  def v8HashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.v8StringHarness)
+    .pythonStringHarness, 8)
+  def v8HashPerformanceExample = hashPerformanceExample(patbench.hash.edu.utexas.stac.HashHarness.v8StringHarness, 8)
   def murmur2HashPerformanceExample = hashPerformanceExample(arr =>
-    patbench.hash.edu.utexas.stac.HashHarness.murmur2StringHarness(arr, 0)
+    patbench.hash.edu.utexas.stac.HashHarness.murmur2StringHarness(arr, 0),
+    8
   )
 
   def splayTreeExample = new FuzzingTaskProvider {
@@ -1123,53 +1118,89 @@ object FuzzingTaskProvider {
     }
   }
 
-  /*def sendCommand(cmd: String): Unit = {
-    import sys.process._
+  abstract class NativeExample(name: String) extends FuzzingTaskProvider {
+    val nativeBinaryPath: String = {
+      val arch = System.getProperty("os.arch") match {
+        case "x86_64" | "amd64" => "amd64"
+        case _@a => throw new RuntimeException(s"We currently do not prepare native binaries for architecture \'$a\'")
+      }
+      val os = System.getProperty("os.name") match {
+        case "Mac OS X" => "macos"
+        case "Linux" => "linux"
+        case _@o => throw new RuntimeException(s"We currently do not prepare native binaries for OS \'$o\'")
+      }
+      val binPath = s"benchmarks/native/${arch}_${os}/$name"
+      ensureExecutable(binPath)
+      binPath
+    }
 
-    cmd.split("\\s+").toSeq.!
+    def ensureExecutable(filePath: String): Unit = {
+      val file = new java.io.File(filePath)
+      if (!file.exists)
+        throw new RuntimeException(s"native binary file \'$filePath\' does not exist")
+      if (!file.isFile)
+        throw new RuntimeException(s"\'$filePath\' is not a file")
+      if (!file.canExecute)
+        throw new RuntimeException(s"\'$filePath\' is not executable")
+    }
+
+    def runNativeGetCost(cmdParams: String): Double = {
+      import sys.process._
+
+      val cmd = s"$nativeBinaryPath $cmdParams"
+      val results = cmd.split("\\s+").toSeq.lineStream
+      val cost = parseCost(results.last)
+      cost.toDouble
+    }
+
+    def writeByteArrayRunNativeGetCost(data: Array[Byte], workingDir: String): Double = {
+      val inputFileName = s"$workingDir/input"
+      FileInteraction.deleteIfExist(inputFileName)
+      FileInteraction.writeToBinaryFile(inputFileName)(data)
+      runNativeGetCost(inputFileName)
+    }
   }
 
-  def gabFeed2Example(ioId: Int, workDir: String) = new FuzzingTaskProvider {
-    import gabfeed2.ServerManager
+  def sortNativeExample(name: String)(workingDir: String) = new NativeExample(name) {
 
-    val port = 8080+ioId
-    val serverMain = ServerManager.makeServer(port, "benchmarks/gabfeed2/data", false,
-      "benchmarks/gabfeed2/ServersPrivateKey.txt","benchmarks/gabfeed2/ServersPasswordKey.txt", null)
-
-    override def setupTask(task: RunningFuzzingTask): Unit = {
-      serverMain.start()
+    def sizeF = {
+      case IS(VectValue(v)) => v.length
     }
 
-    override def teardownTask(task: RunningFuzzingTask): Unit = {
-      serverMain.stop()
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      outputTypes = IS(EVect(EInt)),
+      sizeOfInterest = 64,
+      resourceUsage = {
+        case IS(VectValue(v)) =>
+          val data = toIntVect(v).map(x => x.toByte).toArray
+          writeByteArrayRunNativeGetCost(data, workingDir)
+      },
+      gpEnv = sortingEnv
+    )
+  }
+
+  def insertionSortNativeExample = sortNativeExample("isort") _
+  def appleQsortNativeExample = sortNativeExample("appleqsort") _
+  def bsdQsortNativeExample = sortNativeExample("bsdqsort") _
+  def gnuQsortNativeExample = sortNativeExample("gnuqsort") _
+  def pgQsortNativeExample = sortNativeExample("pgqsort") _
+  def slowfuzzQsortNativeExample = sortNativeExample("qsort") _
+
+  def phpHashNativeExample(workingDir: String) = new NativeExample("phphash") {
+
+    def sizeF = {
+      case IS(VectValue(v)) => v.length
     }
 
-    def sizeF: PartialFunction[IS[EValue], Int] = {
-      case IS(VectValue(chars)) => chars.length
-    }
-
-    protected def task: RunningFuzzingTask = {
-      RunningFuzzingTask(
-        outputTypes = IS(EVect(EInt)),
-        sizeOfInterest = 300,
-        resourceUsage = {
-
-          case IS(chars:VectValue) =>
-            val content = vectIntToString(chars)
-
-            val messagePath = s"$workDir/gabfeed2.txt"
-            FileInteraction.writeToFile(messagePath)(content)
-
-            Cost.reset()
-            sendCommand(s"curl -s -c cookies.txt -F username=foo -F password=df89gy9Qw --insecure https://localhost:$port/login")
-            sendCommand(s"curl -s -F messageContents=@$messagePath -b cookies.txt --insecure https://localhost:$port/newmessage/1_0")
-            sendCommand(s"curl -s -L -b cookies.txt --insecure https://localhost:$port/thread/1_0?suppressTimestamp=true")
-
-            Cost.read().toDouble
-        },
-        gpEnv = abcRegexEnv.copy(stateTypes = abcRegexEnv.stateTypes ++ IS(EInt, EVect(EInt)))
-      )
-    }
-  }*/
-
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      outputTypes = IS(EVect(EInt)),
+      sizeOfInterest = 128,  // 64 insertions and char_size is 2
+      resourceUsage = {
+        case IS(VectValue(v)) =>
+          val data = toIntVect(v).map(x => x.toByte).toArray
+          writeByteArrayRunNativeGetCost(data, workingDir)
+      },
+      gpEnv = sortingEnv
+    )
+  }
 }

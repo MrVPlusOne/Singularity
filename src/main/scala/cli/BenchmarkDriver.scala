@@ -14,13 +14,23 @@ object BenchmarkDriver {
   def benchmarks(opt: CliOption): Map[String, FuzzingTaskProvider] = {
     import FuzzingTaskProvider._
     Map[String, FuzzingTaskProvider](
+
+      // Evaluation section 1
+      "slowfuzz/insertionSort" -> insertionSortNativeExample(getWorkingDir(opt)),
+      "slowfuzz/qsort" -> slowfuzzQsortNativeExample(getWorkingDir(opt)),
+      "slowfuzz/appleqsort" -> appleQsortNativeExample(getWorkingDir(opt)),
+      "slowfuzz/bsdqsort" -> bsdQsortNativeExample(getWorkingDir(opt)),
+      "slowfuzz/pgqsort" -> pgQsortNativeExample(getWorkingDir(opt)),
+      "slowfuzz/phpHash" -> phpHashNativeExample(getWorkingDir(opt)),
+      // TODO: slowfuzz/bzip and slowfuzz/regexes
+
       // These benchmarks have already been solved
-      "slowfuzz/insertionSort" -> insertionSortExample,
-      "slowfuzz/quickSort" -> quickSortExample,
-      "slowfuzz/phpHash" -> phpHashCollisionExample,
-      "slowfuzz/regex1" -> slowFuzzRegexExample1,
-      "slowfuzz/regex2" -> slowFuzzRegexExample2,
-      "slowfuzz/regex3" -> slowFuzzRegexExample3,
+      "slowfuzz/emu/insertionSort" -> insertionSortExample,
+      "slowfuzz/emu/quickSort" -> quickSortExample,
+      "slowfuzz/emu/phpHash" -> phpHashCollisionExample,
+      "slowfuzz/emu/regex1" -> slowFuzzRegexExample1,
+      "slowfuzz/emu/regex2" -> slowFuzzRegexExample2,
+      "slowfuzz/emu/regex3" -> slowFuzzRegexExample3,
       "stac/graphAnalyzer" -> graphAnalyzerExample(getWorkingDir(opt)),
       "stac/blogger" -> bloggerExample(opt.ioId),
       "stac/imageProcessor" -> imageExample(10, 10, getWorkingDir(opt)),
