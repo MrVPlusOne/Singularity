@@ -32,4 +32,22 @@ object SimpleMath {
     val r = rec(n).reverse
     if(r.isEmpty) List(0) else r
   }
+
+  def aggressiveSigmoid(aggressiveness: Double) = (x: Double) => {
+    val a = math.pow(50, 2*(0.5 - aggressiveness))
+    math.pow(x,a)
+  }
+
+  def aggressiveInterpolate(aggressiveness: Double, from: Double, to: Double)(x: Double) = {
+    linearInterpolate(from, to)(aggressiveSigmoid(aggressiveness)(x))
+  }
+
+  def linearInterpolate(from: Double, to: Double)(x: Double): Double = {
+    (to - from) * x + from
+  }
+
+  def expInterpolate(from: Double, to: Double)(x: Double): Double = {
+    val ratio = to/from
+    from*math.pow(ratio, x)
+  }
 }

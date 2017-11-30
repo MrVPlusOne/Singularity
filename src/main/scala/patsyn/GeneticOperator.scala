@@ -61,7 +61,7 @@ object GeneticOperator{
   }
 }
 
-case class GPEnvironment(constMap: Map[EType, ExprGen[EConst]], functions: IS[EFunction], stateTypes: IS[EType], argConstRatio: Double = 0.35) {
+case class GPEnvironment(constMap: Map[EType, ExprGen[EConst]], functions: IS[EFunction], stateTypes: IS[EType], argConstRatio: Double = 0.35, warningOn: Boolean = true) {
 
   /** type set used to concretize abstract functions, all function argument types and
     * return types must be in this typeUniverse */
@@ -88,7 +88,7 @@ case class GPEnvironment(constMap: Map[EType, ExprGen[EConst]], functions: IS[EF
       ) yield {
         cf
       }
-      if(instantiations.isEmpty){
+      if(instantiations.isEmpty && warningOn){
         System.err.println(s"[Warning] ${af.name} will not be used, because there is no valid concrete instantiations under the current type universe")
       }
       instantiations
