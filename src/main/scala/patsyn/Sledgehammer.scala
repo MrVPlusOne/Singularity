@@ -35,8 +35,6 @@ object Sledgehammer{
     import StandardSystem._
     import SimpleMath.{aggressiveInterpolate, aggressiveSigmoid}
 
-    require(aggressiveness >= 0 && aggressiveness <= 1.0)
-
     val intRange = aggressiveInterpolate(aggressiveness, 5, 500)(rand.nextDouble()).toInt
     val constRule = PartialFunction[EType, Random => EValue] {
       case EInt => r => r.nextInt(intRange)
@@ -95,24 +93,26 @@ object Sledgehammer{
   def main(args: Array[String]): Unit = {
     import StandardSystem._
 
-    val rand = new Random(0)
 
     def sigmoid(x: Double) = 1.0/(1+math.exp(-x))
 
     val example = FuzzingTaskProvider.phpHashCollisionExample
 
+    val rand = new Random(1)
+
     for(
       id <- 0 until 10;
       ag = sigmoid(rand.nextGaussian())) {
+
       val env = genStandardEnv(rand, aggressiveness = ag)(IS(EInt, EVect(EInt)))
       val runConfig = genRunConfig(rand, ag, env.stateTypes.length)
 
       example.run { task =>
-        makeTaskProvider(rand, ag)(
+        val provider = makeTaskProvider(rand, ag)(
           returnTypes = example.outputTypes, sizeMetric = example.sizeF, sizeOfInterest = 300,
           resourceConfig = ResourceConfig(task.resourceUsage, setup = () => (), teardown = () => ()))
 
-        Runner.runExample(example, ioId = id, seeds = Seq(id), runConfig, useGUI = true)
+        Runner.runExample(provider, ioId = id, seeds = Seq(id), runConfig, useGUI = true)
       }
     }
   }

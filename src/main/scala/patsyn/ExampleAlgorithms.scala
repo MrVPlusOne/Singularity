@@ -1030,97 +1030,6 @@ object FuzzingTaskProvider {
     }
   }
 
-  // Airplan5 is purely about the XML parser and therefore it does not share anything with other airplan benchmarks
-  def airplan5Example(workingDir: String) = new FuzzingTaskProvider {
-
-    override def sizeF: PartialFunction[IS[EValue], Int] = {
-      case IS(VectValue(graph)) =>
-        val numEdges = graph.map(g => g.asInstanceOf[VectValue].value.length).sum
-        val numNodes = graph.size
-        numNodes + numEdges
-    }
-
-    def outputTypes = IS(EVect(EVect(EInt)))
-
-    type Graph = IS[IS[Int]]
-
-    def valueToGraph(graphValue: IS[EValue]): Graph = {
-      val numNodes = graphValue.length
-
-      def toAdjList(srcIdx: Int, vec: IS[EValue]): IS[Int] = {
-        vec.foldLeft(IS[Int]())((edgeList, elemValue: EValue) => {
-          val dstValue = elemValue.asInstanceOf[IntValue]
-          val dst = Math.floorMod(dstValue.value, numNodes)
-          if (srcIdx == dst) edgeList else edgeList :+ dst
-        })
-      }
-
-      graphValue.zipWithIndex.map {
-        case (l, srcIdx) => toAdjList(srcIdx, l.asInstanceOf[VectValue].value)
-      }
-    }
-
-    def graphToXmlString(graph: Graph): String = {
-      def adjListToXmlString(src: Int, dsts: IS[Int]): String = {
-        val refString =
-          if (dsts.nonEmpty)
-            dsts.map(i => s"&a$i;").mkString("")
-          else
-            "dummy"
-        "<!ENTITY a%d \"%s\">".format(src, refString)
-      }
-
-      if (graph.isEmpty)
-        ""
-      else {
-        val doctDef = graph.zipWithIndex.map {
-          case (adjList, srcIdx) => adjListToXmlString(srcIdx, adjList)
-        }.mkString("\n")
-
-        s"""
-           |<!DOCTYPE doct [
-           |$doctDef
-           |]>
-           |<doct>&a${graph.size - 1};</doct>
-       """.stripMargin
-      }
-    }
-
-    def writeRouteMapToFile(graph: Graph, fileName: String) = {
-      FileInteraction.writeToFile(fileName)(graphToXmlString(graph))
-    }
-
-    override protected def task: RunningFuzzingTask = {
-      RunningFuzzingTask(
-        sizeOfInterest = 100,
-        resourceUsage = {
-          case IS(VectValue(graph)) =>
-            import patbench.airplan5.edu.utexas.stac.AirplanNoServer
-
-            val dbFileName = s"$workingDir/airplan.db"
-            FileInteraction.deleteIfExist(dbFileName)
-
-            val routeMapFileName = s"$workingDir/routemap.xml"
-            writeRouteMapToFile(valueToGraph(graph), routeMapFileName)
-
-            Cost.reset()
-            AirplanNoServer.run(workingDir, routeMapFileName)
-            Cost.read()
-        },
-        gpEnv = hashEnv
-      )
-    }
-
-    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
-      super.saveValueWithName(value, name)
-
-      value match {
-        case IS(VectValue(graph)) =>
-          writeRouteMapToFile(valueToGraph(graph), s"$name.routemap.xml")
-      }
-    }
-  }
-
   def gabfeed4Example(workingDir: String) = new FuzzingTaskProvider {
 
     override def sizeF: PartialFunction[IS[EValue], Int] = {
@@ -1220,6 +1129,15 @@ object FuzzingTaskProvider {
       },
       gpEnv = sortingEnv
     )
+
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      value match {
+        case IS(VectValue(v)) =>
+          val data = toIntVect(v).map(x => x.toByte).toArray
+          val fileName = s"$name.bin"
+          FileInteraction.writeToBinaryFile(fileName)(data)
+      }
+    }
   }
 
   def insertionSortNativeExample = sortNativeExample("isort") _
@@ -1251,5 +1169,14 @@ object FuzzingTaskProvider {
       },
       gpEnv = sortingEnv
     )
+
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      value match {
+        case IS(VectValue(v)) =>
+          val data = toIntVect(v).map(x => x.toByte).toArray
+          val fileName = s"$name.bin"
+          FileInteraction.writeToBinaryFile(fileName)(data)
+      }
+    }
   }
 }
