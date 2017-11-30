@@ -62,9 +62,6 @@ object BenchmarkDriver {
       "ds/fordFulkersonBFS" -> fordFulkersonExample(true),
       "ds/dinic" -> dinicExample,
       "ds/pushRelabel" -> pushRelabelExample,
-
-      // We cheated in these benchmark and therefore it is debatable whether to include them
-      "stac/airplan5" -> airplan5Example(getWorkingDir(opt)),
     )
   }
 
