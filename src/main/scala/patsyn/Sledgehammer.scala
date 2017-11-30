@@ -36,14 +36,15 @@ object Sledgehammer{
     import SimpleMath.{aggressiveInterpolate, aggressiveSigmoid}
 
     val intRange = aggressiveInterpolate(aggressiveness, 5, 500)(rand.nextDouble()).toInt
-    val constRule = PartialFunction[EType, Random => EValue] {
+    lazy val constRule: PartialFunction[EType, Random => EValue] = PartialFunction[EType, Random => EValue] {
       case EInt => r => r.nextInt(intRange)
       case EVect(_) => _ => Vector()
-      case _ => ???
+      case EGraph(_) => _ => GraphValue.empty
+      case EPair(a,b) => r => (constRule(a)(r), constRule(b)(r))
     }
 
 
-    val safeFunctions = IS(IntComponents, VectComponents).flatMap(_.collection)
+    val safeFunctions = IS(IntComponents, VectComponents, GraphComponents, PairComponents).flatMap(_.collection)
     val unsafeFunctions = IS(BitComponents, AdvancedVectComponents).
       flatMap(_.collection).filter(_ => aggressiveSigmoid(aggressiveness)(rand.nextDouble()) > 0.5)
 
@@ -92,9 +93,7 @@ object Sledgehammer{
 
   def main(args: Array[String]): Unit = {
     import StandardSystem._
-
-
-    def sigmoid(x: Double) = 1.0/(1+math.exp(-x))
+    import SimpleMath._
 
     val example = FuzzingTaskProvider.phpHashCollisionExample
 

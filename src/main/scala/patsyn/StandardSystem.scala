@@ -80,6 +80,10 @@ object StandardSystem {
     PairValue(convA(p._1) -> convB(p._2))
   }
 
+  object GraphValue{
+    def empty = GraphValue(0, IS())
+  }
+
   trait ComponentSet{
     private var _collection = IS[EFunction]()
 

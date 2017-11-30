@@ -737,7 +737,7 @@ object FuzzingTaskProvider {
     val constMap = makeConstMap(
       EInt -> (r => r.nextInt(12)),
       EVect(EInt) -> (r => Vector()),
-      EGraph(EInt) -> (r => GraphValue(0, IS())),
+      EGraph(EInt) -> (r => GraphValue.empty),
     )
 
     val functions = IntComponents.collection ++ VectComponents.collection ++ GraphComponents.collection ++

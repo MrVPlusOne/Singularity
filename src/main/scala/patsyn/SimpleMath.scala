@@ -50,4 +50,7 @@ object SimpleMath {
     val ratio = to/from
     from*math.pow(ratio, x)
   }
+
+  def sigmoid(x: Double) = 1.0/(1+math.exp(-x))
+
 }
