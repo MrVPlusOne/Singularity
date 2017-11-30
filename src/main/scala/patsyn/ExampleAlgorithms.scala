@@ -184,9 +184,8 @@ object FuzzingTaskProvider {
       val hashes = vec.map(v => {
         vectIntToCharArray(v.asInstanceOf[VectValue], charSize)
       }).distinct.map(hashFunc)
-      val updateNum = vec.length - hashes.length
 
-      hashes.groupBy(identity).values.map(e => 3 * e.length * e.length).sum + updateNum
+      hashes.groupBy(identity).values.map(e => e.length * e.length).sum
     }
 
     def outputTypes = IS(EVect(EVect(EInt)))
