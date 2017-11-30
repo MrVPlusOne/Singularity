@@ -78,6 +78,10 @@ case class EAbstractFunc(name: String, tyVarNum: Int,
     val (argTypes, returnType) = typeInstantiation(tyMap)
     EConcreteFunc(name, argTypes, returnType, eval)
   }
+
+  override def toString: String = {
+    s"$name[$tyVarNum]"
+  }
 }
 
 

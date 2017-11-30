@@ -38,7 +38,7 @@ object Playground {
 
     println{
 //      EVect(EInt).isInstanceOf[Product]
-      EInt.isInstanceOf[Product]
+      EVect(EVect(EPair(EInt, EGraph(EInt)))).powerset
     }
   }
 
