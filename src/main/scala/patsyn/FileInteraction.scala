@@ -27,11 +27,22 @@ class FileLogger(fileName: String, printToConsole: Boolean, writer: FileWriter) 
 }
 
 object FileInteraction{
+
   def writeToFile(filePath: String, append: Boolean = false)(content: String): Unit = {
     import java.io._
     val fw = new FileWriter(filePath, append)
     try {
       fw.write(content)
+    }finally{
+      fw.close()
+    }
+  }
+
+  def writeToBinaryFile(filePath: String)(content: Array[Byte]): Unit = {
+    import java.io._
+    val fw = new DataOutputStream(new FileOutputStream(filePath))
+    try {
+      fw.write(content, 0, content.length)
     }finally{
       fw.close()
     }

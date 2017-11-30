@@ -1117,53 +1117,89 @@ object FuzzingTaskProvider {
     }
   }
 
-  /*def sendCommand(cmd: String): Unit = {
-    import sys.process._
+  abstract class NativeExample(name: String) extends FuzzingTaskProvider {
+    val nativeBinaryPath: String = {
+      val arch = System.getProperty("os.arch") match {
+        case "x86_64" | "amd64" => "amd64"
+        case _@a => throw new RuntimeException(s"We currently do not prepare native binaries for architecture \'$a\'")
+      }
+      val os = System.getProperty("os.name") match {
+        case "Mac OS X" => "macos"
+        case "Linux" => "linux"
+        case _@o => throw new RuntimeException(s"We currently do not prepare native binaries for OS \'$o\'")
+      }
+      val binPath = s"benchmarks/native/${arch}_${os}/$name"
+      ensureExecutable(binPath)
+      binPath
+    }
 
-    cmd.split("\\s+").toSeq.!
+    def ensureExecutable(filePath: String): Unit = {
+      val file = new java.io.File(filePath)
+      if (!file.exists)
+        throw new RuntimeException(s"native binary file \'$filePath\' does not exist")
+      if (!file.isFile)
+        throw new RuntimeException(s"\'$filePath\' is not a file")
+      if (!file.canExecute)
+        throw new RuntimeException(s"\'$filePath\' is not executable")
+    }
+
+    def runNativeGetCost(cmdParams: String): Double = {
+      import sys.process._
+
+      val cmd = s"$nativeBinaryPath $cmdParams"
+      val results = cmd.split("\\s+").toSeq.lineStream
+      val cost = parseCost(results.last)
+      cost.toDouble
+    }
+
+    def writeByteArrayRunNativeGetCost(data: Array[Byte], workingDir: String): Double = {
+      val inputFileName = s"$workingDir/input"
+      FileInteraction.deleteIfExist(inputFileName)
+      FileInteraction.writeToBinaryFile(inputFileName)(data)
+      runNativeGetCost(inputFileName)
+    }
   }
 
-  def gabFeed2Example(ioId: Int, workDir: String) = new FuzzingTaskProvider {
-    import gabfeed2.ServerManager
+  def sortNativeExample(name: String)(workingDir: String) = new NativeExample(name) {
 
-    val port = 8080+ioId
-    val serverMain = ServerManager.makeServer(port, "benchmarks/gabfeed2/data", false,
-      "benchmarks/gabfeed2/ServersPrivateKey.txt","benchmarks/gabfeed2/ServersPasswordKey.txt", null)
-
-    override def setupTask(task: RunningFuzzingTask): Unit = {
-      serverMain.start()
+    def sizeF = {
+      case IS(VectValue(v)) => v.length
     }
 
-    override def teardownTask(task: RunningFuzzingTask): Unit = {
-      serverMain.stop()
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      outputTypes = IS(EVect(EInt)),
+      sizeOfInterest = 64,
+      resourceUsage = {
+        case IS(VectValue(v)) =>
+          val data = toIntVect(v).map(x => x.toByte).toArray
+          writeByteArrayRunNativeGetCost(data, workingDir)
+      },
+      gpEnv = sortingEnv
+    )
+  }
+
+  def insertionSortNativeExample = sortNativeExample("isort") _
+  def appleQsortNativeExample = sortNativeExample("appleqsort") _
+  def bsdQsortNativeExample = sortNativeExample("bsdqsort") _
+  def gnuQsortNativeExample = sortNativeExample("gnuqsort") _
+  def pgQsortNativeExample = sortNativeExample("pgqsort") _
+  def slowfuzzQsortNativeExample = sortNativeExample("qsort") _
+
+  def phpHashNativeExample(workingDir: String) = new NativeExample("phphash") {
+
+    def sizeF = {
+      case IS(VectValue(v)) => v.length
     }
 
-    def sizeF: PartialFunction[IS[EValue], Int] = {
-      case IS(VectValue(chars)) => chars.length
-    }
-
-    protected def task: RunningFuzzingTask = {
-      RunningFuzzingTask(
-        outputTypes = IS(EVect(EInt)),
-        sizeOfInterest = 300,
-        resourceUsage = {
-
-          case IS(chars:VectValue) =>
-            val content = vectIntToString(chars)
-
-            val messagePath = s"$workDir/gabfeed2.txt"
-            FileInteraction.writeToFile(messagePath)(content)
-
-            Cost.reset()
-            sendCommand(s"curl -s -c cookies.txt -F username=foo -F password=df89gy9Qw --insecure https://localhost:$port/login")
-            sendCommand(s"curl -s -F messageContents=@$messagePath -b cookies.txt --insecure https://localhost:$port/newmessage/1_0")
-            sendCommand(s"curl -s -L -b cookies.txt --insecure https://localhost:$port/thread/1_0?suppressTimestamp=true")
-
-            Cost.read().toDouble
-        },
-        gpEnv = abcRegexEnv.copy(stateTypes = abcRegexEnv.stateTypes ++ IS(EInt, EVect(EInt)))
-      )
-    }
-  }*/
-
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      outputTypes = IS(EVect(EInt)),
+      sizeOfInterest = 128,  // 64 insertions and char_size is 2
+      resourceUsage = {
+        case IS(VectValue(v)) =>
+          val data = toIntVect(v).map(x => x.toByte).toArray
+          writeByteArrayRunNativeGetCost(data, workingDir)
+      },
+      gpEnv = sortingEnv
+    )
+  }
 }

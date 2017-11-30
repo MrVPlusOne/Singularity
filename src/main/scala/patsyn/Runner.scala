@@ -12,9 +12,9 @@ object Runner {
 
   def main(args: Array[String]): Unit = {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
-//    val workingDir = FileInteraction.getWorkingDir(ioId)
+    val workingDir = FileInteraction.getWorkingDir(ioId)
 
-    runExample(FuzzingTaskProvider.fordFulkersonExample(false), ioId, Seq(ioId), useGUI = true)
+    runExample(FuzzingTaskProvider.phpHashNativeExample(workingDir), ioId, Seq(ioId), useGUI = true)
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
