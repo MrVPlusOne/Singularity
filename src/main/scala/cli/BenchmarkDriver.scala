@@ -146,9 +146,20 @@ object BenchmarkDriver {
         c.copy(useSledgehammer = false)).text("Manually specify GP parameters instead of letting the tool " +
         "auto-configure them. This option is off by default.")
 
-      opt[Int]("size-override").action((x, c) =>
+      opt[Int]("size-override").hidden().action((x, c) =>
         c.copy(sizeOfInterestOverride = Some(x))).text("Manually override the problem size for evaluation. Only " +
         "specify this when you know what you are doing.")
+
+      opt[Int]("thread-num").action((x, c) =>
+        c.copy(threadNum = x)).text("Thread number to use for individual evaluation. Default to 1.")
+
+      opt[Int]("max-nonincrease-gen").action((x, c) =>
+        c.copy(maxNonIncreaseTime = x)).text("Stop after this number of generations if the fitness " +
+        " for the best individual does not increase. Default to 150.")
+
+      opt[Int]("time-limit").action((x, c) =>
+        c.copy(timeLimitInMillis = x)).text("Time limit for each black-box execution (in milliseconds). Default to " +
+        "10000.")
 
       opt[Int]("population-size").hidden().action((x, c) =>
         c.copy(tournamentSize = x)).text("[GP parameter] Population size. Default to 500.")
@@ -164,17 +175,6 @@ object BenchmarkDriver {
 
       opt[Int]("single-size-tolerance").hidden().action((x, c) =>
         c.copy(singleSizeTolerance = x)).text("[GP parameter] Single size tolerance. Default to 30.")
-
-      opt[Int]("thread-num").hidden().action((x, c) =>
-        c.copy(threadNum = x)).text("[GP parameter UNUSED] Thread number. Default to 1.")
-
-      opt[Int]("max-nonincrease-gen").hidden().action((x, c) =>
-        c.copy(maxNonIncreaseTime = x)).text("[GP parameter] Stop after this number of generations if the fitness " +
-        " for the best individual does not increase. Default to 150.")
-
-      opt[Int]("time-limit").action((x, c) =>
-        c.copy(timeLimitInMillis = x)).text("Time limit for each black-box execution (in milliseconds). Default to " +
-        "10000.")
 
 
       def parseBool(s: String): Boolean = {

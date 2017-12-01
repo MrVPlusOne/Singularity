@@ -75,7 +75,7 @@ object Runner {
   : Unit = taskProvider.run{ task =>
 
     val RunConfig(
-      BenchmarkConfig(ioId, _),
+      BenchmarkConfig(ioId, sizeOfInterestOverride),
       GPConfig(populationSize, tournamentSize, evaluationTrials,
       totalSizeTolerance, singleSizeTolerance),
       ExecutionConfig(threadNum, timeLimitInMillis, maxNonIncreaseTime, seed, useGUI)
@@ -111,6 +111,7 @@ object Runner {
         r
       }
 
+      val sizeOfInterest = sizeOfInterestOverride.getOrElse(task.sizeOfInterest)
       printSection("Configuration"){
         println(s"sizeOfInterest = ${task.sizeOfInterest}")
         println(task.gpEnv.show)
@@ -136,7 +137,6 @@ object Runner {
         )
       }
 
-      val sizeOfInterest = task.sizeOfInterest
       val memoryLimit = sizeOfInterest * 4 * task.gpEnv.stateTypes.length
       val evaluation = new SimplePerformanceEvaluation(
         sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
