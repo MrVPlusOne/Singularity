@@ -105,7 +105,7 @@ object Sledgehammer{
 
     taskProvider.run { task =>
       val provider = makeTaskProvider(rand, ag)(
-        returnTypes = taskProvider.outputTypes, sizeMetric = taskProvider.sizeF, sizeOfInterest = 300,
+        returnTypes = taskProvider.outputTypes, sizeMetric = taskProvider.sizeF, sizeOfInterest = task.sizeOfInterest,
         resourceConfig = ResourceConfig(task.resourceUsage, setup = () => (), teardown = () => ()))
 
       Runner.runExample(provider, runConfig)
