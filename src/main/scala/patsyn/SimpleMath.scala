@@ -53,7 +53,7 @@ object SimpleMath {
 
   def sigmoid(x: Double) = 1.0/(1+math.exp(-x))
 
-  def parallelMap[A,B](seq: IS[A], f: A => B, threadNum: Int): IS[B] = {
+  def parallelMap[A,B](seq: Seq[A], f: A => B, threadNum: Int): Seq[B] = {
     import scala.collection.parallel
     import parallel._
 
