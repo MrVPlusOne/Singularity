@@ -39,7 +39,8 @@ object Sledgehammer{
       case EInt => r => r.nextInt(intRange)
       case EVect(_) => _ => Vector()
       case EGraph(_) => _ => GraphValue.empty
-      case EPair(a,b) => r => (constRule(a)(r), constRule(b)(r))
+      case EPair(a,b) => r => (constRule(a)(r), constRule(b)(r)),
+      case EByteArray(i) => r => ByteArrayValue(IS.fill(i){ r.nextInt(256).toByte})
     }
 
 
