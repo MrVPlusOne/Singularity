@@ -72,7 +72,7 @@ object BenchmarkDriver {
   }
 
   def getRunConfig(option: CliOption): RunConfig = {
-    val benchConfig = BenchmarkConfig(option.ioId, None)
+    val benchConfig = BenchmarkConfig(option.ioId, option.sizeOfInterestOverride)
     val gpConfig = GPConfig(option.populationSize,
                             option.tournamentSize,
                             option.evaluationTrials,
@@ -145,6 +145,10 @@ object BenchmarkDriver {
       opt[Unit]('m', "manual").action((_, c) =>
         c.copy(useSledgehammer = false)).text("Manually specify GP parameters instead of letting the tool " +
         "auto-configure them. This option is off by default.")
+
+      opt[Int]("size-override").action((x, c) =>
+        c.copy(sizeOfInterestOverride = Some(x))).text("Manually override the problem size for evaluation. Only " +
+        "specify this when you know what you are doing.")
 
       opt[Int]("population-size").hidden().action((x, c) =>
         c.copy(tournamentSize = x)).text("[GP parameter] Population size. Default to 500.")
