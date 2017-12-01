@@ -122,7 +122,7 @@ object Runner {
       printSection("Configuration"){
         println(s"sizeOfInterest = $sizeOfInterest")
         println(gpEnv.show)
-        println(execConfig.show)
+        println(config.show)
       }
 
       printSection("Function map"){
