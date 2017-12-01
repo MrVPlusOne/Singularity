@@ -53,4 +53,18 @@ object SimpleMath {
 
   def sigmoid(x: Double) = 1.0/(1+math.exp(-x))
 
+  def parallelMap[A,B](seq: IS[A], f: A => B, threadNum: Int): IS[B] = {
+    import scala.collection.parallel
+    import parallel._
+
+    val taskSupport = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(threadNum))
+
+    if(threadNum>1) {
+      val p = seq.par
+      p.tasksupport = taskSupport
+      p.map(f).toIndexedSeq
+    }else{
+      seq.map(f).toIndexedSeq
+    }
+  }
 }

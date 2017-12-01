@@ -91,28 +91,28 @@ object Sledgehammer{
     }
   }
 
-  def main(args: Array[String]): Unit = {
+  def sledgehammerRun(ioId: Int, taskProvider: FuzzingTaskProvider, useGui: Boolean): Unit = {
     import StandardSystem._
     import SimpleMath._
 
-    val example = FuzzingTaskProvider.phpHashCollisionExample
+    val rand = new Random(ioId)
+    val ag = sigmoid(rand.nextGaussian())
 
-    val rand = new Random(1)
 
-    for(
-      id <- 0 until 10;
-      ag = sigmoid(rand.nextGaussian())) {
+    val env = genStandardEnv(rand, aggressiveness = ag)(IS(EInt, EVect(EInt)))
+    val runConfig = genRunConfig(rand, ag, env.stateTypes.length)
 
-      val env = genStandardEnv(rand, aggressiveness = ag)(IS(EInt, EVect(EInt)))
-      val runConfig = genRunConfig(rand, ag, env.stateTypes.length)
+    taskProvider.run { task =>
+      val provider = makeTaskProvider(rand, ag)(
+        returnTypes = taskProvider.outputTypes, sizeMetric = taskProvider.sizeF, sizeOfInterest = 300,
+        resourceConfig = ResourceConfig(task.resourceUsage, setup = () => (), teardown = () => ()))
 
-      example.run { task =>
-        val provider = makeTaskProvider(rand, ag)(
-          returnTypes = example.outputTypes, sizeMetric = example.sizeF, sizeOfInterest = 300,
-          resourceConfig = ResourceConfig(task.resourceUsage, setup = () => (), teardown = () => ()))
-
-        Runner.runExample(provider, ioId = id, seeds = Seq(id), runConfig, useGUI = true)
-      }
+      Runner.runExample(provider, ioId = ioId, seeds = Seq(ioId), runConfig, useGUI = true)
     }
+  }
+
+  def main(args: Array[String]): Unit = {
+    val example = FuzzingTaskProvider.phpHashCollisionExample
+    sledgehammerRun(ioId = 0, example, useGui = true)
   }
 }
