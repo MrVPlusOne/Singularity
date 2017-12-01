@@ -13,14 +13,21 @@ case class GPConfig(populationSize: Int = 500,
                     tournamentSize: Int = 7,
                     evaluationTrials: Int = 1,
                     totalSizeTolerance: Int = 60,
-                    singleSizeTolerance: Int = 30){
+                    singleSizeTolerance: Int = 30,
+                    crossoverP: Double = 0.4,
+                    mutateP: Double = 0.5,
+                    copyP: Double = 0.1
+                   ){
   def show: String = {
     s"""
-       |populationSize: ${populationSize}
-       |tournamentSize: ${tournamentSize}
-       |evaluationTrials：${evaluationTrials}
-       |totalSizeTolerance：${totalSizeTolerance}
-       |singleSizeTolerance：${singleSizeTolerance}
+       |populationSize: $populationSize
+       |tournamentSize: $tournamentSize
+       |evaluationTrials：$evaluationTrials
+       |totalSizeTolerance：$totalSizeTolerance
+       |singleSizeTolerance：$singleSizeTolerance
+       |crossoverP: $crossoverP
+       |mutateP: $mutateP
+       |copyP: $copyP
      """.stripMargin
   }
 }

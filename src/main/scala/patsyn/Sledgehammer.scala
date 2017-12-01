@@ -68,7 +68,10 @@ object Sledgehammer{
       populationSize = inter(100,1000).toInt,
       tournamentSize = inter(2,8).toInt,
       totalSizeTolerance = totalTolerance.toInt,
-      singleSizeTolerance = singleTolerance.toInt
+      singleSizeTolerance = singleTolerance.toInt,
+      mutateP = inter(0.4,0.7),
+      crossoverP = 0.5,
+      copyP = 0.05+0.2-inter(0.0,0.2)
     )
   }
 
@@ -104,10 +107,9 @@ object Sledgehammer{
   }
 
   def sledgehammerTask(taskProvider: FuzzingTaskProvider, runnerConfig: RunnerConfig, execConfig: ExecutionConfig, rand: Random): Unit = {
-    val (env, gpConfig) = sledgehammer(taskProvider.outputTypes, rand)
-    val config = RunConfig(runnerConfig, gpConfig, execConfig)
-
-    Runner.runExample(taskProvider, config)
+    taskProvider.runAsProbConfig{ problemConfig =>
+      sledgehammerProblem(problemConfig, execConfig, runnerConfig, rand)
+    }
   }
 
   def sledgehammerProblem(problemConfig: ProblemConfig, execConfig: ExecutionConfig, runnerConfig: RunnerConfig, rand: Random): Unit ={

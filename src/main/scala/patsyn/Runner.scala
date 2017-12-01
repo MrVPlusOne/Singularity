@@ -155,10 +155,10 @@ object Runner {
         stateTypes = gpEnv.stateTypes, outputTypes = outputTypes, evaluation = evaluation)
       val optimizer = EvolutionaryOptimizer(representation)
       val operators = IS(
-        library.simpleCrossOp -> 0.4,
-        library.simpleMutateOp(newTreeMaxDepth = 3) -> 0.5,
-        library.copyOp -> 0.1
-      ) //todo
+        library.simpleCrossOp -> crossoverP,
+        library.simpleMutateOp(newTreeMaxDepth = 3) -> mutateP,
+        library.copyOp -> copyP
+      )
 
       val generations = optimizer.optimize(
         populationSize = populationSize, tournamentSize = tournamentSize,
