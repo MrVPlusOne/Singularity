@@ -1,6 +1,6 @@
 package patsyn
 
-import patsyn.Runner.{RunConfig, runExample}
+import patsyn.Runner.runExample
 
 object MotivatingExample {
   def main(args: Array[String]): Unit = {
@@ -8,6 +8,11 @@ object MotivatingExample {
     val workingDir = s"workingDir$ioId"
     FileInteraction.mkDirsAlongPath(workingDir)
 
-    runExample(FuzzingTaskProvider.quickSortExample, ioId, Seq(ioId), RunConfig.default.copy(populationSize = 300))
+    val defaultConfig = RunConfig.default
+    runExample(FuzzingTaskProvider.quickSortExample,
+      defaultConfig.copy(
+        gpConfig = defaultConfig.gpConfig.copy(populationSize = 300)
+      )
+    )
   }
 }

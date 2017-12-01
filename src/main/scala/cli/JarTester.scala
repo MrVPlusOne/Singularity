@@ -1,18 +1,31 @@
 package cli
 
-import patsyn.Sledgehammer
+import patsyn.{RunConfig, Sledgehammer}
 import scopt.OptionParser
 
 case class JarTesterOption(jarPath: String = "",
                            className: String = "",
                            methodName: String = "",
                            ioId: Int = 0,
-                           seeds: Seq[Int] = Seq(0),
+                           seed: Int = 0,
                            disableGui: Boolean = false)
 
 object JarTester {
   import java.io.File
   import java.net.URLClassLoader
+
+  private def getRunConfig(option: JarTesterOption): RunConfig = {
+    val defaultConfig = RunConfig.default
+    defaultConfig.copy(
+      benchConfig = defaultConfig.benchConfig.copy(
+        ioId = option.ioId
+      ),
+      execConfig = defaultConfig.execConfig.copy(
+        randomSeed = option.seed,
+        useGUI = !option.disableGui
+      )
+    )
+  }
 
   def runJarTester(opt: JarTesterOption): Unit = {
     var classLoader = new URLClassLoader(
@@ -23,6 +36,7 @@ object JarTester {
     if (method == null)
       throw new RuntimeException(s"Cannot find method ${opt.methodName} of class ${opt.className} in jar file ${opt
         .jarPath}")
+    val runConfig = getRunConfig(opt)
 
     val taskProvider = new patsyn.FuzzingTaskProvider {
       import patsyn.FuzzingTaskProvider._
@@ -47,7 +61,7 @@ object JarTester {
         gpEnv = sortingEnv
       )
     }
-    Sledgehammer.sledgehammerRun(taskProvider, opt.ioId, opt.seeds, useGUI = !opt.disableGui)
+    Sledgehammer.sledgehammerRun(taskProvider, runConfig)
   }
 
   def main(args: Array[String]): Unit = {
@@ -66,8 +80,8 @@ object JarTester {
         c.copy(ioId = id)
       ).text("The id used to perform IO actions. If you have n processes running at the same time, just set their idIo to 0 through n.")
 
-      opt[Seq[Int]]('s', "seeds").valueName("<seed1>,<seed2>,...").action((ss, c) =>
-        c.copy(seeds = ss)).text("The random seeds to use. Default to {0} (only 1 seed).")
+      opt[Int]('s', "seed").action((s, c) =>
+        c.copy(seed = s)).text("The random seed to use. Default to 0.")
 
       help("help").text("Prints this usage text")
       version("version").text("Prints the version info")

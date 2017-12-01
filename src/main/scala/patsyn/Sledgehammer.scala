@@ -1,7 +1,6 @@
 package patsyn
 
 import patsyn.GeneticOperator.ExprGen
-import patsyn.Runner.RunConfig
 
 import scala.util.Random
 
@@ -64,10 +63,12 @@ object Sledgehammer{
     val totalTolerance = inter(2, math.max(stateNum,3).toDouble) * singleTolerance
 
     base.copy(
-      populationSize = inter(100,1000).toInt,
-      tournamentSize = inter(2,8).toInt,
-      totalSizeTolerance = totalTolerance.toInt,
-      singleSizeTolerance = singleTolerance.toInt
+      gpConfig = base.gpConfig.copy(
+        populationSize = inter(100,1000).toInt,
+        tournamentSize = inter(2,8).toInt,
+        totalSizeTolerance = totalTolerance.toInt,
+        singleSizeTolerance = singleTolerance.toInt
+      )
     )
   }
 
@@ -92,31 +93,27 @@ object Sledgehammer{
   }
 
   def sledgehammerRun(taskProvider: FuzzingTaskProvider,
-                      ioId: Int,
-                      seeds: Seq[Int],
-                      baseConfig: RunConfig = RunConfig.default,
-                      useGUI: Boolean): Unit = {
+                      config: RunConfig = RunConfig.default): Unit = {
     import StandardSystem._
     import SimpleMath._
 
-    val rand = new Random(ioId)
+    val rand = new Random(config.benchConfig.ioId)
     val ag = sigmoid(rand.nextGaussian())
 
-
     val env = genStandardEnv(rand, aggressiveness = ag)(IS(EInt, EVect(EInt)))
-    val runConfig = genRunConfig(rand, ag, env.stateTypes.length, base = baseConfig)
+    val runConfig = genRunConfig(rand, ag, env.stateTypes.length, base = config)
 
     taskProvider.run { task =>
       val provider = makeTaskProvider(rand, ag)(
         returnTypes = taskProvider.outputTypes, sizeMetric = taskProvider.sizeF, sizeOfInterest = 300,
         resourceConfig = ResourceConfig(task.resourceUsage, setup = () => (), teardown = () => ()))
 
-      Runner.runExample(provider, ioId = ioId, seeds = Seq(ioId), runConfig, useGUI)
+      Runner.runExample(provider, runConfig)
     }
   }
 
   def main(args: Array[String]): Unit = {
     val example = FuzzingTaskProvider.phpHashCollisionExample
-    sledgehammerRun(example, ioId = 0, seeds=Seq(0), useGUI = true)
+    sledgehammerRun(example)
   }
 }

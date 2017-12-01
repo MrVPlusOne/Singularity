@@ -1,27 +1,23 @@
 package cli
 
-import patsyn.Runner.RunConfig
 import patsyn._
 import scopt.OptionParser
 import visual.PatternPlot
 
 object BenchmarkDriver {
 
-  def getWorkingDir(opt: CliOption): String = {
-    FileInteraction.getWorkingDir(opt.ioId)
-  }
-
-  def benchmarks(opt: CliOption): Map[String, FuzzingTaskProvider] = {
+  private def benchmarks(benchConfig: BenchmarkConfig): Map[String, FuzzingTaskProvider] = {
     import FuzzingTaskProvider._
+    val BenchmarkConfig(ioId, _) = benchConfig
     Map[String, FuzzingTaskProvider](
 
       // Evaluation section 1
-      "slowfuzz/insertionSort" -> insertionSortNativeExample(getWorkingDir(opt)),
-      "slowfuzz/qsort" -> slowfuzzQsortNativeExample(getWorkingDir(opt)),
-      "slowfuzz/appleqsort" -> appleQsortNativeExample(getWorkingDir(opt)),
-      "slowfuzz/bsdqsort" -> bsdQsortNativeExample(getWorkingDir(opt)),
-      "slowfuzz/pgqsort" -> pgQsortNativeExample(getWorkingDir(opt)),
-      "slowfuzz/phpHash" -> phpHashNativeExample(getWorkingDir(opt)),
+      "slowfuzz/insertionSort" -> insertionSortNativeExample(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/qsort" -> slowfuzzQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/appleqsort" -> appleQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/bsdqsort" -> bsdQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/pgqsort" -> pgQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/phpHash" -> phpHashNativeExample(FileInteraction.getWorkingDir(ioId)),
       // TODO: slowfuzz/bzip and slowfuzz/regexes
 
       // These benchmarks have already been solved
@@ -31,12 +27,12 @@ object BenchmarkDriver {
       "slowfuzz/emu/regex1" -> slowFuzzRegexExample1,
       "slowfuzz/emu/regex2" -> slowFuzzRegexExample2,
       "slowfuzz/emu/regex3" -> slowFuzzRegexExample3,
-      "stac/graphAnalyzer" -> graphAnalyzerExample(getWorkingDir(opt)),
-      "stac/blogger" -> bloggerExample(opt.ioId),
-      "stac/imageProcessor" -> imageExample(10, 10, getWorkingDir(opt)),
-      "stac/linearAlgebra" -> linearAlgebraExample(10, getWorkingDir(opt)),
-      "stac/airplan1" -> airplan1Example(getWorkingDir(opt)),
-      "stac/airplan2" -> airplan2Example(getWorkingDir(opt)),
+      "stac/graphAnalyzer" -> graphAnalyzerExample(FileInteraction.getWorkingDir(ioId)),
+      "stac/blogger" -> bloggerExample(ioId),
+      "stac/imageProcessor" -> imageExample(10, 10, FileInteraction.getWorkingDir(ioId)),
+      "stac/linearAlgebra" -> linearAlgebraExample(10, FileInteraction.getWorkingDir(ioId)),
+      "stac/airplan1" -> airplan1Example(FileInteraction.getWorkingDir(ioId)),
+      "stac/airplan2" -> airplan2Example(FileInteraction.getWorkingDir(ioId)),
       "redos/cookie" -> regexExample("^(([^=;]+))\\s*=\\s*([^\\n\\r\\00]*)", defaultRegexDic),
       "quicksortMiddle" -> quickSortMiddlePivotExample,
       "hashperf/php" -> phpHashPerformanceExample,
@@ -48,9 +44,9 @@ object BenchmarkDriver {
       "hashcol/python" -> pythonHashCollisionExample,
       "hashcol/v8" -> v8HashCollisionExample,
       "hashcol/murmur2s0" -> murmur2HashCollisionExample,
-      "stac/textCrunchr" -> textCrunchrExample(getWorkingDir(opt)),
-      "stac/gabfeed4" -> gabfeed4Example(getWorkingDir(opt)),
-      "stac/airplan3" -> airplan3Example(getWorkingDir(opt)),
+      "stac/textCrunchr" -> textCrunchrExample(FileInteraction.getWorkingDir(ioId)),
+      "stac/gabfeed4" -> gabfeed4Example(FileInteraction.getWorkingDir(ioId)),
+      "stac/airplan3" -> airplan3Example(FileInteraction.getWorkingDir(ioId)),
       "hashperf/java" -> javaHashPerformanceExample,
       "hashperf/ruby" -> rubyHashPerformanceExample,
       "hashperf/asp.net" -> aspDotNetHashPerformanceExample,
@@ -61,35 +57,33 @@ object BenchmarkDriver {
       "ds/fordFulkersonDFS" -> fordFulkersonExample(false),
       "ds/fordFulkersonBFS" -> fordFulkersonExample(true),
       "ds/dinic" -> dinicExample,
-      "ds/pushRelabel" -> pushRelabelExample,
+      "ds/pushRelabel" -> pushRelabelExample
     )
   }
 
   val benchmarkNames: Seq[String] = {
-    val names = benchmarks(CliOption()).keys
+    val names = benchmarks(BenchmarkConfig()).keys
     require(names.size == names.toSet.size, "benchmark name collision detected!")
     names.toSeq
   }
 
-  def getBenchmarksFromTarget(target: String, cliOption: CliOption): Seq[(String, FuzzingTaskProvider)] = {
-    target match {
-      case "all" => benchmarks(cliOption).toSeq
-      case name => Seq(name -> benchmarks(cliOption).getOrElse(name,
-        throw new IllegalArgumentException("Cannot find benchmark named " + name)))
-    }
+  def getBenchmarkFromTarget(target: String, benchConfig: BenchmarkConfig): Option[FuzzingTaskProvider] = {
+    benchmarks(benchConfig).get(target)
   }
 
   def getRunConfig(option: CliOption): RunConfig = {
-    RunConfig(
-      populationSize = option.populationSize,
-      tournamentSize = option.tournamentSize,
-      evaluationTrials = option.evaluationTrials,
-      totalSizeTolerance = option.totalSizeTolerance,
-      singleSizeTolerance = option.singleSizeTolerance,
-      threadNum = option.threadNum,
-      timeLimitInMillis = option.timeLimitInMillis,
-      maxNonIncreaseTime = option.maxNonIncreaseTime
-    )
+    val benchConfig = BenchmarkConfig(option.ioId, None)
+    val gpConfig = GPConfig(option.populationSize,
+                            option.tournamentSize,
+                            option.evaluationTrials,
+                            option.totalSizeTolerance,
+                            option.singleSizeTolerance)
+    val execConfig = ExecutionConfig(option.threadNum,
+                                     option.timeLimitInMillis,
+                                     option.maxNonIncreaseTime,
+                                     option.seed,
+                                     !option.disableGui)
+    RunConfig(benchConfig, gpConfig, execConfig)
   }
 
   def main(args: Array[String]): Unit = {
@@ -97,40 +91,37 @@ object BenchmarkDriver {
 
     parser.parse(args, CliOption()).foreach {
       cliOption =>
+        val config = getRunConfig(cliOption)
+        val name = cliOption.target
+        val taskProvider = getBenchmarkFromTarget(name, config.benchConfig).getOrElse(throw new
+            IllegalArgumentException("Cannot find benchmark named " + name))
+
         cliOption.extrapolatePattern match {
           case None =>
             cliOption.plotPattern match {
               case None =>
-                val benchs = getBenchmarksFromTarget(cliOption.target, cliOption)
-                val config = getRunConfig(cliOption)
-                benchs.foreach { case (name, bench) =>
-                  println(s"*** Task $name started ***")
-                  try {
-                    if (cliOption.useSledgehammer) {
-                      Sledgehammer.sledgehammerRun(bench, cliOption.ioId, cliOption.seeds, config, useGUI = !cliOption
-                        .disableGui)
-                    } else {
-                      Runner.runExample(bench, cliOption.ioId, cliOption.seeds, config, useGUI = !cliOption.disableGui)
-                    }
-                    println(s"*** Task $name finished ***")
-
-                  } catch {
-                    case ex: Exception =>
-                      System.err.println(s"Exception thrown: $ex")
-                      ex.printStackTrace(System.err)
-                      System.err.println(s"Task $name aborted. Continuing to the next task...")
+                println(s"*** Task $name started ***")
+                try {
+                  if (cliOption.useSledgehammer) {
+                    Sledgehammer.sledgehammerRun(taskProvider, config)
+                  } else {
+                    Runner.runExample(taskProvider, config)
                   }
+                  println(s"*** Task $name finished ***")
+
+                } catch {
+                  case ex: Exception =>
+                    System.err.println(s"Exception thrown: $ex")
+                    ex.printStackTrace(System.err)
+                    System.err.println(s"Task $name aborted. Continuing to the next task...")
                 }
+
               case Some(plotArg) =>
-                val taskProvider = benchmarks(cliOption).getOrElse(cliOption.target,
-                  throw new IllegalArgumentException("Cannot find benchmark named " + cliOption.target))
                 val ind = FileInteraction.readObjectFromFile[MultiStateInd](plotArg.indPath)
                 PatternPlot.showResourceUsageChart(taskProvider, ind, plotArg.sizeLimit, plotArg.density)
             }
           case Some(extraArg) =>
             val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
-            val taskProvider = benchmarks(cliOption).getOrElse(cliOption.target,
-              throw new IllegalArgumentException("Cannot find benchmark named " + cliOption.target))
             MultiStateRepresentation.saveExtrapolation(
               taskProvider, ind, extraArg.size, extraArg.memoryLimit, extraArg.outputName, extraArg.evaluatePerformance)
         }
@@ -148,8 +139,8 @@ object BenchmarkDriver {
         c.copy(ioId = id)
       ).text("The id used to perform IO actions. If you have n processes running at the same time, just set their idIo to 0 through n.")
 
-      opt[Seq[Int]]('s', "seeds").valueName("<seed1>,<seed2>,...").action((ss, c) =>
-        c.copy(seeds = ss)).text("The random seeds to use. Default to {0} (only 1 seed).")
+      opt[Int]('s', "seed").action((s, c) =>
+        c.copy(seed = s)).text("The random seed to use. Default to 0.")
 
       opt[Unit]('m', "manual").action((_, c) =>
         c.copy(useSledgehammer = false)).text("Manually specify GP parameters instead of letting the tool " +

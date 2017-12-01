@@ -2,7 +2,7 @@ package cli
 
 case class CliOption(target: String = "",
                      ioId: Int = 0,
-                     seeds: Seq[Int] = Seq(0),
+                     seed: Int = 0,
                      disableGui: Boolean = false,
                      useSledgehammer: Boolean = true,
                      populationSize: Int = 500,

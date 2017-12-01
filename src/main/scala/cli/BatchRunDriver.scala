@@ -70,7 +70,7 @@ object BatchRunDriver {
 
       override def showUsageOnError = true
 
-      arg[String]("<target>...").unbounded().optional().action( (x, c) =>
+      arg[String]("<target>...").unbounded().required().action( (x, c) =>
         c.copy(benchNames = c.benchNames :+ x) ).text("Benchmark targets to run")
     }
   }

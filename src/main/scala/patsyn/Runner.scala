@@ -14,7 +14,7 @@ object Runner {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
     val workingDir = FileInteraction.getWorkingDir(ioId)
 
-    runExample(FuzzingTaskProvider.phpHashNativeExample(workingDir), ioId, Seq(ioId), useGUI = true)
+    runExample(FuzzingTaskProvider.phpHashNativeExample(workingDir), RunConfig.default.withIoIdAndSeed(ioId, ioId))
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -71,199 +71,172 @@ object Runner {
     )
   }
 
-  case class RunConfig(populationSize: Int = 500,
-                       tournamentSize: Int = 7,
-                       evaluationTrials: Int = 1,
-                       totalSizeTolerance: Int = 60,
-                       singleSizeTolerance: Int = 30,
-                       threadNum: Int = 1,
-                       timeLimitInMillis: Int = 20000,
-                       maxNonIncreaseTime: Int = 150
-                      ){
-    def show: String = {
-      s"""
-         |populationSize: $populationSize
-         |tournamentSize: $tournamentSize
-         |evaluationTrials：$evaluationTrials
-         |totalSizeTolerance：$totalSizeTolerance
-         |singleSizeTolerance：$singleSizeTolerance
-         |threadNum：$threadNum
-         |timeLimitInMillis：$timeLimitInMillis
-         |maxNonIncreaseTime：$maxNonIncreaseTime
-       """.stripMargin
-    }
-  }
+  def runExample(taskProvider: FuzzingTaskProvider, config: RunConfig = RunConfig.default)
+  : Unit = taskProvider.run{ task =>
 
-  object RunConfig{
-    def default = RunConfig()
-  }
-
-  def runExample(taskProvider: FuzzingTaskProvider, ioId: Int, seeds: Seq[Int], config: RunConfig = RunConfig.default,
-                 useGUI: Boolean = true)
-  : Unit = taskProvider
-    .run{ task =>
-
-    import config._
+    val RunConfig(
+      BenchmarkConfig(ioId, _),
+      GPConfig(populationSize, tournamentSize, evaluationTrials,
+      totalSizeTolerance, singleSizeTolerance),
+      ExecutionConfig(threadNum, timeLimitInMillis, maxNonIncreaseTime, seed, useGUI)
+    ) = config
 
     val library = MultiStateGOpLibrary(task.gpEnv, taskProvider.outputTypes)
+    val recordDirPath = {
+      val dateTime = TimeTools.numericalDateTime()
+      s"results/$dateTime[ioId=$ioId]"
+    }
 
-    for (seed <- seeds) {
-      val recordDirPath = {
-        val dateTime = TimeTools.numericalDateTime()
-        s"results/$dateTime[ioId=$ioId]"
-      }
-
-      val (evalProgressCallback, monitorCallback): (Int => Unit, MonitoringData => Unit) = {
-        if (useGUI) {
-          val monitor = createMonitor(populationSize, ioId)
-          (monitor.evalProgressCallback, monitor.monitorCallback)
-        } else {
-          val monitorDataPath = s"$recordDirPath/monitorData[seed=$seed].txt"
-          ((_: Int) => Unit, (data: MonitoringData) => {
-            FileInteraction.writeToFile(monitorDataPath, append = true){
-              s"${data.bestPerformance}, ${data.bestFitness}, ${data.averageFitness}\n"
-            }
-          })
-        }
-      }
-
-      FileInteraction.runWithAFileLogger(s"$recordDirPath/testResult[seed=$seed].txt") { logger =>
-        import logger._
-
-        def printSection[A](name: String)(content: => A): A = {
-          println(s"[$name]")
-          val r = content
-          println(s"[End of $name]\n")
-          r
-        }
-
-        printSection("Configuration"){
-          println(s"sizeOfInterest = ${task.sizeOfInterest}")
-          println(task.gpEnv.show)
-          println(config.show)
-        }
-
-        printSection("Function map"){
-          task.gpEnv.functionMap.foreach { case (t, comps) =>
-            println(s"$t -> ${comps.mkString("{", ", ", "}")}")
+    val (evalProgressCallback, monitorCallback): (Int => Unit, MonitoringData => Unit) = {
+      if (useGUI) {
+        val monitor = createMonitor(populationSize, ioId)
+        (monitor.evalProgressCallback, monitor.monitorCallback)
+      } else {
+        val monitorDataPath = s"$recordDirPath/monitorData[seed=$seed].txt"
+        ((_: Int) => Unit, (data: MonitoringData) => {
+          FileInteraction.writeToFile(monitorDataPath, append = true){
+            s"${data.bestPerformance}, ${data.bestFitness}, ${data.averageFitness}\n"
           }
+        })
+      }
+    }
+
+    FileInteraction.runWithAFileLogger(s"$recordDirPath/testResult[seed=$seed].txt") { logger =>
+      import logger._
+
+      def printSection[A](name: String)(content: => A): A = {
+        println(s"[$name]")
+        val r = content
+        println(s"[End of $name]\n")
+        r
+      }
+
+      printSection("Configuration"){
+        println(s"sizeOfInterest = ${task.sizeOfInterest}")
+        println(task.gpEnv.show)
+        println(config.show)
+      }
+
+      printSection("Function map"){
+        task.gpEnv.functionMap.foreach { case (t, comps) =>
+          println(s"$t -> ${comps.mkString("{", ", ", "}")}")
         }
+      }
 
-        @throws[TimeoutException]
-        def timeLimitedResourceUsage(timeLimitInMillis: Int)(value: IS[EValue]): Double = {
-          import scala.concurrent.ExecutionContext.Implicits.global
-          import scala.concurrent._
-          import scala.concurrent.duration._
-          Await.result(
-            Future {
-              task.resourceUsage(value)
-            }
-            , timeLimitInMillis.milliseconds
-          )
-        }
-
-        val sizeOfInterest = task.sizeOfInterest
-        val memoryLimit = sizeOfInterest * 4 * task.gpEnv.stateTypes.length
-        val evaluation = new SimplePerformanceEvaluation(
-          sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
-          resourceUsage = timeLimitedResourceUsage(timeLimitInMillis), sizeF = taskProvider.sizeF, breakingMemoryUsage = memoryLimit
+      @throws[TimeoutException]
+      def timeLimitedResourceUsage(timeLimitInMillis: Int)(value: IS[EValue]): Double = {
+        import scala.concurrent.ExecutionContext.Implicits.global
+        import scala.concurrent._
+        import scala.concurrent.duration._
+        Await.result(
+          Future {
+            task.resourceUsage(value)
+          }
+          , timeLimitInMillis.milliseconds
         )
-        val representation = MultiStateRepresentation(totalSizeTolerance = totalSizeTolerance,
-          singleSizeTolerance = singleSizeTolerance,
-          stateTypes = task.gpEnv.stateTypes, outputTypes = taskProvider.outputTypes, evaluation = evaluation)
-        val optimizer = EvolutionaryOptimizer(representation)
-        val operators = IS(
-          library.simpleCrossOp -> 0.4,
-          library.simpleMutateOp(newTreeMaxDepth = 3) -> 0.5,
-          library.copyOp -> 0.1
-        )
+      }
 
-        val generations = optimizer.optimize(
-          populationSize = populationSize, tournamentSize = tournamentSize,
-          initOperator = library.initOp(maxDepth = 3),
-          operators = operators,
-          indEval = ind => {
-            try {
-              representation.fitnessEvaluation(ind)._1
-            } catch {
-              case _: TimeoutException =>
-                println("Evaluation timed out!")
-                val firstSevenInputs = representation.individualToPattern(ind).take(7).toList.map {
-                  case (_, v) => escapeStrings(taskProvider.displayValue(v))
-                }.mkString(", ")
-                representation.printIndividualMultiLine(println)(ind)
-                println(s"Individual Pattern: $firstSevenInputs, ...")
-                FileInteraction.saveObjectToFile(s"$recordDirPath/timeoutIndividual[seed=$seed].serialized")(ind)
+      val sizeOfInterest = task.sizeOfInterest
+      val memoryLimit = sizeOfInterest * 4 * task.gpEnv.stateTypes.length
+      val evaluation = new SimplePerformanceEvaluation(
+        sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
+        resourceUsage = timeLimitedResourceUsage(timeLimitInMillis), sizeF = taskProvider.sizeF, breakingMemoryUsage = memoryLimit
+      )
+      val representation = MultiStateRepresentation(totalSizeTolerance = totalSizeTolerance,
+        singleSizeTolerance = singleSizeTolerance,
+        stateTypes = task.gpEnv.stateTypes, outputTypes = taskProvider.outputTypes, evaluation = evaluation)
+      val optimizer = EvolutionaryOptimizer(representation)
+      val operators = IS(
+        library.simpleCrossOp -> 0.4,
+        library.simpleMutateOp(newTreeMaxDepth = 3) -> 0.5,
+        library.copyOp -> 0.1
+      )
 
-                // We might also be interested in the value
-                MultiStateRepresentation.saveExtrapolation(taskProvider, ind, task.sizeOfInterest, Long.MaxValue,
-                  s"$recordDirPath/timeoutValue")
+      val generations = optimizer.optimize(
+        populationSize = populationSize, tournamentSize = tournamentSize,
+        initOperator = library.initOp(maxDepth = 3),
+        operators = operators,
+        indEval = ind => {
+          try {
+            representation.fitnessEvaluation(ind)._1
+          } catch {
+            case _: TimeoutException =>
+              println("Evaluation timed out!")
+              val firstSevenInputs = representation.individualToPattern(ind).take(7).toList.map {
+                case (_, v) => escapeStrings(taskProvider.displayValue(v))
+              }.mkString(", ")
+              representation.printIndividualMultiLine(println)(ind)
+              println(s"Individual Pattern: $firstSevenInputs, ...")
+              FileInteraction.saveObjectToFile(s"$recordDirPath/timeoutIndividual[seed=$seed].serialized")(ind)
 
-                System.exit(0)
-                throw new Exception("Timed out!")
-            }
-          },
-          threadNum = threadNum,
-          randSeed = seed,
-          evalProgressCallback = evalProgressCallback
-        )
+              // We might also be interested in the value
+              MultiStateRepresentation.saveExtrapolation(taskProvider, ind, task.sizeOfInterest, Long.MaxValue,
+                s"$recordDirPath/timeoutValue")
+
+              System.exit(0)
+              throw new Exception("Timed out!")
+          }
+        },
+        threadNum = threadNum,
+        randSeed = seed,
+        evalProgressCallback = evalProgressCallback
+      )
 
 
-        val startTime = System.nanoTime()
+      val startTime = System.nanoTime()
 
-        var bestSoFar: Option[IndividualData[MultiStateInd]] = None
-        var nonIncreasingTime = 0
+      var bestSoFar: Option[IndividualData[MultiStateInd]] = None
+      var nonIncreasingTime = 0
 
-        def setBestInd(indData: IndividualData[MultiStateInd]): Unit ={
-          bestSoFar = Some(indData)
-          FileInteraction.saveObjectToFile(s"$recordDirPath/bestIndividual[seed=$seed].serialized")(indData.ind)
-          MultiStateRepresentation.saveExtrapolation(taskProvider, indData.ind,
-            task.sizeOfInterest, memoryLimit, s"$recordDirPath/bestInput[seed=$seed]")
-        }
+      def setBestInd(indData: IndividualData[MultiStateInd]): Unit ={
+        bestSoFar = Some(indData)
+        FileInteraction.saveObjectToFile(s"$recordDirPath/bestIndividual[seed=$seed].serialized")(indData.ind)
+        MultiStateRepresentation.saveExtrapolation(taskProvider, indData.ind,
+          task.sizeOfInterest, memoryLimit, s"$recordDirPath/bestInput[seed=$seed]")
+      }
 
-        generations.takeWhile(pop => {
-          val shouldContinue = bestSoFar match {
-            case Some(previousBest) =>
-              if (pop.bestIndividual.evaluation.fitness > previousBest.evaluation.fitness) {
-                nonIncreasingTime = 0
-                setBestInd(pop.bestIndividual)
-              }
-              nonIncreasingTime <= maxNonIncreaseTime
-            case None =>
+      generations.takeWhile(pop => {
+        val shouldContinue = bestSoFar match {
+          case Some(previousBest) =>
+            if (pop.bestIndividual.evaluation.fitness > previousBest.evaluation.fitness) {
+              nonIncreasingTime = 0
               setBestInd(pop.bestIndividual)
-              true
-          }
-          nonIncreasingTime += 1
-          shouldContinue
-        }).zipWithIndex.foreach { case (pop, i) =>
-          val best = pop.bestIndividual
-          val data = MonitoringData(pop.averageFitness, best.evaluation.fitness, best.evaluation.performance)
-          monitorCallback(data)
-
-          println("------------")
-          print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
-          println(s"Generation ${i + 1}")
-          println(s"Best Result: ${best.evaluation.showAsLinearExpr}, Created by ${best.history.birthOp}")
-          representation.printIndividualMultiLine(println)(best.ind)
-          val firstSevenInputs = representation.individualToPattern(best.ind).take(7).toList.map {
-            case (_, v) => escapeStrings(taskProvider.displayValue(v))
-          }.mkString(", ")
-          println(s"Best Individual Pattern: $firstSevenInputs, ...")
-          println(s"Diversity: ${pop.fitnessMap.keySet.size}")
-          println(s"Average Size: ${representation.populationAverageSize(pop)}")
-          println(s"Average Fitness: ${pop.averageFitness}")
-          println(s"Fitness Variation: ${pop.fitnessStdDiv}")
-          print("Distribution: ")
-          println {
-            representation.frequencyRatioStat(pop.individuals.map(_.ind)).take(10).map {
-              case (s, f) => s"$s -> ${"%.3f".format(f)}"
-            }.mkString(", ")
-          }
+            }
+            nonIncreasingTime <= maxNonIncreaseTime
+          case None =>
+            setBestInd(pop.bestIndividual)
+            true
         }
+        nonIncreasingTime += 1
+        shouldContinue
+      }).zipWithIndex.foreach { case (pop, i) =>
+        val best = pop.bestIndividual
+        val data = MonitoringData(pop.averageFitness, best.evaluation.fitness, best.evaluation.performance)
+        monitorCallback(data)
 
-        println("Evolution Finished!")
-        System.exit(0)
+        println("------------")
+        print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
+        println(s"Generation ${i + 1}")
+        println(s"Best Result: ${best.evaluation.showAsLinearExpr}, Created by ${best.history.birthOp}")
+        representation.printIndividualMultiLine(println)(best.ind)
+        val firstSevenInputs = representation.individualToPattern(best.ind).take(7).toList.map {
+          case (_, v) => escapeStrings(taskProvider.displayValue(v))
+        }.mkString(", ")
+        println(s"Best Individual Pattern: $firstSevenInputs, ...")
+        println(s"Diversity: ${pop.fitnessMap.keySet.size}")
+        println(s"Average Size: ${representation.populationAverageSize(pop)}")
+        println(s"Average Fitness: ${pop.averageFitness}")
+        println(s"Fitness Variation: ${pop.fitnessStdDiv}")
+        print("Distribution: ")
+        println {
+          representation.frequencyRatioStat(pop.individuals.map(_.ind)).take(10).map {
+            case (s, f) => s"$s -> ${"%.3f".format(f)}"
+          }.mkString(", ")
+        }
       }
+
+      println("Evolution Finished!")
+      System.exit(0)
     }
   }
 }
