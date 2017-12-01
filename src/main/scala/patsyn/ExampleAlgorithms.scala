@@ -20,18 +20,10 @@ trait FuzzingTaskProvider {
 
   def teardownTask(task: RunningFuzzingTask): Unit = {}
 
-  def displayValue: PartialFunction[IS[EValue], String] = {
-    case v => v.toString
-  }
+  def displayValue: PartialFunction[IS[EValue], String] = FuzzingTaskProvider.defaultDisplayValue
 
   def saveValueWithName(value: IS[EValue], name: String): Unit = {
-    import java.io._
-    val fw = new FileWriter(new File(name + ".txt"))
-    try {
-      fw.write(displayValue(value))
-    } finally {
-      fw.close()
-    }
+    FuzzingTaskProvider.defaultSaveValueWithName(value, name)
   }
 
   def run[A](f: RunningFuzzingTask => A): A = {
@@ -43,7 +35,15 @@ trait FuzzingTaskProvider {
       teardownTask(task)
     }
   }
+
+  def runAsProbConfig[A](f: ProblemConfig => A): A = {
+    run{ task =>
+      val config = ProblemConfig(outputTypes, sizeF, task.resourceUsage, displayValue, saveValueWithName)
+      f(config)
+    }
+  }
 }
+
 
 case class ResourceConfig(resourceUsage: PartialFunction[IS[EValue], Double], setup: () => Unit, teardown: () => Unit)
 
@@ -54,6 +54,20 @@ case class RunningFuzzingTask(sizeOfInterest: Int = 500,
 
 //noinspection TypeAnnotation
 object FuzzingTaskProvider {
+
+  def defaultDisplayValue: PartialFunction[IS[EValue], String] = {
+    case v => v.toString
+  }
+
+  def defaultSaveValueWithName(value: IS[EValue], name: String): Unit = {
+    import java.io._
+    val fw = new FileWriter(new File(name + ".txt"))
+    try {
+      fw.write(defaultDisplayValue(value))
+    } finally {
+      fw.close()
+    }
+  }
 
   def emptyAction(): Unit = ()
 

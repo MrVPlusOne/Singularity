@@ -1,6 +1,7 @@
 package patsyn
 
 import patsyn.GeneticOperator.ExprGen
+import patsyn.Runner.RunnerConfig
 
 import scala.util.Random
 
@@ -39,7 +40,7 @@ object Sledgehammer{
       case EInt => r => r.nextInt(intRange)
       case EVect(_) => _ => Vector()
       case EGraph(_) => _ => GraphValue.empty
-      case EPair(a,b) => r => (constRule(a)(r), constRule(b)(r)),
+      case EPair(a,b) => r => (constRule(a)(r), constRule(b)(r))
       case EByteArray(i) => r => ByteArrayValue(IS.fill(i){ r.nextInt(256).toByte})
     }
 
@@ -57,19 +58,17 @@ object Sledgehammer{
     GPEnvGenerator(constRule, safeFunctions ++ unsafeFunctions, stateNum, argConstRatio).generate(returnTypes)
   }
 
-  def genRunConfig(rand: Random, aggressiveness: Double, stateNum: Int, base: RunConfig = RunConfig.default): RunConfig = {
+  def genGPConfig(rand: Random, aggressiveness: Double, stateNum: Int): GPConfig = {
     def inter(from: Double, to: Double): Double = SimpleMath.aggressiveInterpolate(aggressiveness, from, to)(rand.nextDouble())
 
     val singleTolerance = inter(20, 30)
     val totalTolerance = inter(2, math.max(stateNum,3).toDouble) * singleTolerance
 
-    base.copy(
-      gpConfig = base.gpConfig.copy(
-        populationSize = inter(100,1000).toInt,
-        tournamentSize = inter(2,8).toInt,
-        totalSizeTolerance = totalTolerance.toInt,
-        singleSizeTolerance = singleTolerance.toInt
-      )
+    GPConfig(
+      populationSize = inter(100,1000).toInt,
+      tournamentSize = inter(2,8).toInt,
+      totalSizeTolerance = totalTolerance.toInt,
+      singleSizeTolerance = singleTolerance.toInt
     )
   }
 
@@ -93,29 +92,32 @@ object Sledgehammer{
     }
   }
 
-  def sledgehammerRun(taskProvider: FuzzingTaskProvider,
-                      config: RunConfig = RunConfig.default): Unit = {
-    import StandardSystem._
+  def sledgehammer(outputTypes: IS[EType], rand: Random): (GPEnvironment, GPConfig) = {
     import SimpleMath._
 
-    val rand = new Random(config.benchConfig.ioId)
     val ag = sigmoid(rand.nextGaussian())
 
-    val env = genStandardEnv(rand, aggressiveness = ag)(IS(EInt, EVect(EInt)))
-    val runConfig = genRunConfig(rand, ag, env.stateTypes.length, base = config)
+    val env = genStandardEnv(rand, aggressiveness = ag)(outputTypes)
+    val gpConfig = genGPConfig(rand, ag, env.stateTypes.length)
 
-    taskProvider.run { task =>
-      val evalSize = config.benchConfig.sizeOfInterest.getOrElse(task.sizeOfInterest)
-      val provider = makeTaskProvider(rand, ag)(
-        returnTypes = taskProvider.outputTypes, sizeMetric = taskProvider.sizeF, sizeOfInterest = evalSize,
-        resourceConfig = ResourceConfig(task.resourceUsage, setup = () => (), teardown = () => ()))
+    (env, gpConfig)
+  }
 
-      Runner.runExample(provider, runConfig)
-    }
+  def sledgehammerTask(taskProvider: FuzzingTaskProvider, runnerConfig: RunnerConfig, execConfig: ExecutionConfig, rand: Random): Unit = {
+    val (env, gpConfig) = sledgehammer(taskProvider.outputTypes, rand)
+    val config = RunConfig(runnerConfig, gpConfig, execConfig)
+
+    Runner.runExample(taskProvider, config)
+  }
+
+  def sledgehammerProblem(problemConfig: ProblemConfig, execConfig: ExecutionConfig, runnerConfig: RunnerConfig, rand: Random): Unit ={
+    val (env, gpConfig) = sledgehammer(problemConfig.outputTypes, rand)
+    Runner.run(problemConfig, env, RunConfig(runnerConfig, gpConfig, execConfig))
   }
 
   def main(args: Array[String]): Unit = {
     val example = FuzzingTaskProvider.phpHashCollisionExample
-    sledgehammerRun(example)
+    val rand = new Random(0)
+    sledgehammerTask(example, RunnerConfig(), ExecutionConfig(), rand)
   }
 }

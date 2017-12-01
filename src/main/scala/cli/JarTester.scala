@@ -1,7 +1,9 @@
 package cli
 
-import patsyn.{RunConfig, Sledgehammer}
+import patsyn.{ProblemConfig, RunConfig, Sledgehammer}
 import scopt.OptionParser
+
+import scala.util.Random
 
 case class JarTesterOption(jarPath: String = "",
                            className: String = "",
@@ -17,18 +19,15 @@ object JarTester {
   private def getRunConfig(option: JarTesterOption): RunConfig = {
     val defaultConfig = RunConfig.default
     defaultConfig.copy(
-      benchConfig = defaultConfig.benchConfig.copy(
-        ioId = option.ioId
-      ),
-      execConfig = defaultConfig.execConfig.copy(
+      runnerConfig = defaultConfig.runnerConfig.copy(
+        ioId = option.ioId,
         randomSeed = option.seed,
-        useGUI = !option.disableGui
-      )
+        useGUI = !option.disableGui)
     )
   }
 
   def runJarTester(opt: JarTesterOption): Unit = {
-    var classLoader = new URLClassLoader(
+    val classLoader = new URLClassLoader(
       Array(new File(opt.jarPath).toURI.toURL), this.getClass.getClassLoader)
     val targetClass = classLoader.loadClass(opt.className)
     val intArrayClass = Class.forName("[I")
@@ -36,21 +35,22 @@ object JarTester {
     if (method == null)
       throw new RuntimeException(s"Cannot find method ${opt.methodName} of class ${opt.className} in jar file ${opt
         .jarPath}")
+
     val runConfig = getRunConfig(opt)
 
-    val taskProvider = new patsyn.FuzzingTaskProvider {
-      import patsyn.FuzzingTaskProvider._
-      import patsyn.StandardSystem._
-      import patsyn._
-      import edu.utexas.stac.Cost
+    import patsyn.StandardSystem._
+    import patsyn._
+    import edu.utexas.stac.Cost
+    import FuzzingTaskProvider.toIntVect
 
-      override def sizeF: PartialFunction[IS[EValue], Int] = {
-        case IS(VectValue(v)) => v.length
-      }
+    val rand = new Random(runConfig.runnerConfig.randomSeed)
 
-      def outputTypes = IS(EVect(EInt))
-
-      override protected def task: RunningFuzzingTask = RunningFuzzingTask(
+    Sledgehammer.sledgehammerProblem(
+      problemConfig = ProblemConfig(
+        outputTypes = IS(EVect(EInt)),
+        sizeF = {
+          case IS(VectValue(v)) => v.length
+        },
         resourceUsage = {
           case IS(VectValue(vec)) =>
             val intArray = toIntVect(vec).toArray
@@ -58,10 +58,13 @@ object JarTester {
             method.invoke(null, intArray)
             Cost.read()
         },
-        gpEnv = sortingEnv
-      )
-    }
-    Sledgehammer.sledgehammerRun(taskProvider, runConfig)
+        displayValue = FuzzingTaskProvider.defaultDisplayValue,
+        saveValueWithName = FuzzingTaskProvider.defaultSaveValueWithName
+      ),
+      execConfig = runConfig.execConfig,
+      runnerConfig = runConfig.runnerConfig,
+      rand = rand
+    )
   }
 
   def main(args: Array[String]): Unit = {

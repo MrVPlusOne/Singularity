@@ -24,6 +24,13 @@ class FileLogger(fileName: String, printToConsole: Boolean, writer: FileWriter) 
       System.out.print(s)
     }
   }
+
+  def printSection[A](name: String)(content: => A): A = {
+    println(s"[$name]")
+    val r = content
+    println(s"[End of $name]\n")
+    r
+  }
 }
 
 object FileInteraction{

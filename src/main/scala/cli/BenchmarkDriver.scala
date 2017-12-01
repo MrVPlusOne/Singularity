@@ -1,14 +1,17 @@
 package cli
 
+import patsyn.Runner.RunnerConfig
 import patsyn._
 import scopt.OptionParser
 import visual.PatternPlot
 
+import scala.util.Random
+
 object BenchmarkDriver {
 
-  private def benchmarks(benchConfig: BenchmarkConfig): Map[String, FuzzingTaskProvider] = {
+  private def benchmarks(ioId: Int): Map[String, FuzzingTaskProvider] = {
     import FuzzingTaskProvider._
-    val BenchmarkConfig(ioId, _) = benchConfig
+
     Map[String, FuzzingTaskProvider](
 
       // Evaluation section 1
@@ -62,29 +65,27 @@ object BenchmarkDriver {
   }
 
   val benchmarkNames: Seq[String] = {
-    val names = benchmarks(BenchmarkConfig()).keys
+    val names = benchmarks(ioId = 0).keys
     require(names.size == names.toSet.size, "benchmark name collision detected!")
     names.toSeq
   }
 
-  def getBenchmarkFromTarget(target: String, benchConfig: BenchmarkConfig): Option[FuzzingTaskProvider] = {
-    benchmarks(benchConfig).get(target)
-  }
 
-  def getRunConfig(option: CliOption): RunConfig = {
-    val benchConfig = BenchmarkConfig(option.ioId, option.sizeOfInterestOverride)
+  def getRunConfig(option: CliOption, sizeOfInterest: Int): RunConfig = {
+    import option._
+
+    val runnerConfig = RunnerConfig(option.target, ioId, seed, !disableGui,
+      keepBestIndividuals, previewPatternLen = 7, callExitAfterFinish = true //todo: more options
+    )
+
     val gpConfig = GPConfig(option.populationSize,
                             option.tournamentSize,
                             option.evaluationTrials,
                             option.totalSizeTolerance,
                             option.singleSizeTolerance)
-    val execConfig = ExecutionConfig(option.threadNum,
-                                     option.timeLimitInMillis,
-                                     option.maxNonIncreaseTime,
-                                     option.seed,
-                                     option.keepBestIndividuals,
-                                     !option.disableGui)
-    RunConfig(benchConfig, gpConfig, execConfig)
+    val execConfig = ExecutionConfig(sizeOfInterest, threadNum, timeLimitInMillis, maxNonIncreaseTime)
+
+    RunConfig(runnerConfig, gpConfig, execConfig)
   }
 
   def main(args: Array[String]): Unit = {
@@ -92,40 +93,51 @@ object BenchmarkDriver {
 
     parser.parse(args, CliOption()).foreach {
       cliOption =>
-        val config = getRunConfig(cliOption)
         val name = cliOption.target
-        val taskProvider = getBenchmarkFromTarget(name, config.benchConfig).getOrElse(throw new
+        val ioId = cliOption.ioId
+        val taskProvider = benchmarks(ioId).getOrElse(name, throw new
             IllegalArgumentException("Cannot find benchmark named " + name))
+        val random = new Random(cliOption.seed)
 
-        cliOption.extrapolatePattern match {
-          case None =>
-            cliOption.plotPattern match {
-              case None =>
-                println(s"*** Task $name started ***")
-                try {
-                  if (cliOption.useSledgehammer) {
-                    Sledgehammer.sledgehammerRun(taskProvider, config)
-                  } else {
-                    Runner.runExample(taskProvider, config)
+        taskProvider.run{ task =>
+          val sizeOfInterest = cliOption.sizeOfInterestOverride.getOrElse(task.sizeOfInterest)
+          val config = getRunConfig(cliOption, sizeOfInterest)
+
+          cliOption.extrapolatePattern match {
+            case None =>
+              cliOption.plotPattern match {
+                case None =>
+                  println(s"*** Task $name started ***")
+                  try {
+                    if (cliOption.useSledgehammer) {
+                      Sledgehammer.sledgehammerTask(taskProvider, config.runnerConfig, config.execConfig, random)
+                    } else {
+                      Runner.runExample(taskProvider, config)
+                    }
+                    println(s"*** Task $name finished ***")
+
+                  } catch {
+                    case ex: Exception =>
+                      System.err.println(s"Exception thrown: $ex")
+                      ex.printStackTrace(System.err)
+                      System.err.println(s"Task $name aborted. Continuing to the next task...")
                   }
-                  println(s"*** Task $name finished ***")
 
-                } catch {
-                  case ex: Exception =>
-                    System.err.println(s"Exception thrown: $ex")
-                    ex.printStackTrace(System.err)
-                    System.err.println(s"Task $name aborted. Continuing to the next task...")
-                }
+                case Some(plotArg) =>
+                  val ind = FileInteraction.readObjectFromFile[MultiStateInd](plotArg.indPath)
+                  PatternPlot.showResourceUsageChart(taskProvider, ind, plotArg.sizeLimit, plotArg.density)
+              }
+            case Some(extraArg) =>
+              taskProvider.runAsProbConfig{ probConfig =>
+                val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
+                MultiStateRepresentation.saveExtrapolation(
+                  probConfig, ind, extraArg.size, extraArg.memoryLimit, extraArg.outputName, extraArg.evaluatePerformance)
+              }
 
-              case Some(plotArg) =>
-                val ind = FileInteraction.readObjectFromFile[MultiStateInd](plotArg.indPath)
-                PatternPlot.showResourceUsageChart(taskProvider, ind, plotArg.sizeLimit, plotArg.density)
-            }
-          case Some(extraArg) =>
-            val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
-            MultiStateRepresentation.saveExtrapolation(
-              taskProvider, ind, extraArg.size, extraArg.memoryLimit, extraArg.outputName, extraArg.evaluatePerformance)
+          }
+
         }
+
     }
   }
 
