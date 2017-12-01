@@ -1,7 +1,6 @@
 package cli
 
-import patsyn.Runner.RunConfig
-import patsyn.{FuzzingTaskProvider, SimpleMath, Sledgehammer}
+import patsyn.SimpleMath
 import scopt.OptionParser
 
 case class BatchRunOption(benchNames: Seq[String] = Seq(),
@@ -10,12 +9,26 @@ case class BatchRunOption(benchNames: Seq[String] = Seq(),
                           startIoId: Int = 0,
                           startSeed: Int = 0)
 
-case class SingleRunOption(taskProvider: FuzzingTaskProvider, ioId: Int, seed: Int)
+case class SingleRunOption(benchName: String, ioId: Int, seed: Int)
 
 object BatchRunDriver {
 
   def runSingle(opt: SingleRunOption): Unit = {
-    Sledgehammer.sledgehammerRun(opt.taskProvider, opt.ioId, Seq(opt.seed), RunConfig.default, useGUI = false)
+    println(s"[JOB STARTED] $opt")
+
+    import java.io.File
+    import java.nio.file.Paths
+    val javaPath = Paths.get(System.getProperty("java.home"), "bin", "java").toFile.getAbsolutePath
+    val jarPath = new File(this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath).getAbsolutePath
+    // TODO: Make timeout configurable
+    val cmdOpts = s"-i ${opt.ioId} -s ${opt.seed} -n --time-limit 120000 ${opt.benchName}"
+    val cmd = s"$javaPath -jar $jarPath $cmdOpts"
+    println(cmd)
+
+    import sys.process._
+    cmd.split("\\s+").toSeq.!
+
+    println(s"[JOB FINISHED] $opt")
   }
 
   def runBatch(opt: BatchRunOption): Unit = {
@@ -23,10 +36,7 @@ object BatchRunDriver {
       for { bench <- opt.benchNames; seed <- opt.startSeed until opt.startSeed + opt.benchTrials} yield (bench, seed)
     val singleConfigs = benchNameSeeds.zipWithIndex.map {
       case ((benchName: String, seed: Int), ioId: Int) =>
-        // TODO: Decouple CliOption from target selection
-        val dummyCliOpt = CliOption(ioId = ioId)
-        val taskProvider = BenchmarkDriver.getBenchmarksFromTarget(benchName, dummyCliOpt).head._2
-        SingleRunOption(taskProvider, ioId, seed)
+        SingleRunOption(benchName, ioId, seed)
     }
 
     SimpleMath.parallelMap(singleConfigs, runSingle, opt.jobNumber)

@@ -1069,7 +1069,8 @@ object FuzzingTaskProvider {
   }
 
   abstract class NativeExample(name: String) extends FuzzingTaskProvider {
-    val nativeBinaryPath: String = {
+    // We need this to be lazy since we don't want to actively looking for the binary if we do not need to run it
+    lazy val nativeBinaryPath: String = {
       val arch = System.getProperty("os.arch") match {
         case "x86_64" | "amd64" => "amd64"
         case _@a => throw new RuntimeException(s"We currently do not prepare native binaries for architecture \'$a\'")
