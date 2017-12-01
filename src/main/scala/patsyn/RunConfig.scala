@@ -13,6 +13,7 @@ case class ExecutionConfig(threadNum: Int = 1,
                            timeLimitInMillis: Int = 120000,
                            maxNonIncreaseTime: Int = 150,
                            randomSeed: Int = 0,
+                           keepBestIndividuals: Boolean = false,
                            useGUI: Boolean = true)
 
 case class RunConfig(benchConfig: BenchmarkConfig,

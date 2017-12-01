@@ -78,7 +78,7 @@ object Runner {
       BenchmarkConfig(ioId, sizeOfInterestOverride),
       GPConfig(populationSize, tournamentSize, evaluationTrials,
       totalSizeTolerance, singleSizeTolerance),
-      ExecutionConfig(threadNum, timeLimitInMillis, maxNonIncreaseTime, seed, useGUI)
+      ExecutionConfig(threadNum, timeLimitInMillis, maxNonIncreaseTime, seed, keepBestIndividuals, useGUI)
     ) = config
 
     val library = MultiStateGOpLibrary(task.gpEnv, taskProvider.outputTypes)
@@ -191,8 +191,16 @@ object Runner {
       def setBestInd(indData: IndividualData[MultiStateInd]): Unit ={
         bestSoFar = Some(indData)
         FileInteraction.saveObjectToFile(s"$recordDirPath/bestIndividual[seed=$seed].serialized")(indData.ind)
+
+        val bestInputFileName = if (keepBestIndividuals) {
+          val timeInNano = System.nanoTime() - startTime
+          val timeInMillis = (timeInNano/1e6).toInt
+          s"$recordDirPath/bestInput[seed=$seed][time=$timeInMillis]"
+        } else {
+          s"$recordDirPath/bestInput[seed=$seed]"
+        }
         MultiStateRepresentation.saveExtrapolation(taskProvider, indData.ind,
-          task.sizeOfInterest, memoryLimit, s"$recordDirPath/bestInput[seed=$seed]")
+          task.sizeOfInterest, memoryLimit, bestInputFileName)
       }
 
       generations.takeWhile(pop => {

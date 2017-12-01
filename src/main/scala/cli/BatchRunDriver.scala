@@ -6,10 +6,12 @@ import scopt.OptionParser
 case class BatchRunOption(benchNames: Seq[String] = Seq(),
                           jobNumber: Int = 1,
                           benchTrials: Int = 1,
+                          keepBestIndividuals: Boolean = false,
+                          timeLimitInMillis: Int = 120000,
                           startIoId: Int = 0,
                           startSeed: Int = 0)
 
-case class SingleRunOption(benchName: String, ioId: Int, seed: Int)
+case class SingleRunOption(benchName: String, ioId: Int, seed: Int, timeout: Int, keepBestIndividuals: Boolean)
 
 object BatchRunDriver {
 
@@ -20,9 +22,11 @@ object BatchRunDriver {
     import java.nio.file.Paths
     val javaPath = Paths.get(System.getProperty("java.home"), "bin", "java").toFile.getAbsolutePath
     val jarPath = new File(this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath).getAbsolutePath
-    // TODO: Make timeout configurable
-    val cmdOpts = s"-i ${opt.ioId} -s ${opt.seed} -n --time-limit 120000 ${opt.benchName}"
-    val cmd = s"$javaPath -jar $jarPath $cmdOpts"
+
+    val timeoutOpt = s"--time-limit ${opt.timeout}"
+    val keepOpt = if (opt.keepBestIndividuals) "-k" else ""
+    val cmdOpts = s"-i ${opt.ioId} -s ${opt.seed} -n $timeoutOpt $keepOpt ${opt.benchName}"
+    val cmd = s"$javaPath -cp $jarPath cli.BenchmarkDriver $cmdOpts"
     println(cmd)
 
     import sys.process._
@@ -36,7 +40,7 @@ object BatchRunDriver {
       for { bench <- opt.benchNames; seed <- opt.startSeed until opt.startSeed + opt.benchTrials} yield (bench, seed)
     val singleConfigs = benchNameSeeds.zipWithIndex.map {
       case ((benchName: String, seed: Int), ioId: Int) =>
-        SingleRunOption(benchName, ioId, seed)
+        SingleRunOption(benchName, ioId, seed, opt.timeLimitInMillis, opt.keepBestIndividuals)
     }
 
     SimpleMath.parallelMap(singleConfigs, runSingle, opt.jobNumber)
@@ -57,6 +61,14 @@ object BatchRunDriver {
       opt[Int]('t', "trials").action((x, c) =>
         c.copy(benchTrials = x)).text("Try to run each benchmark target with this number of different random seeds. " +
         "Default to 1.")
+
+      opt[Unit]('k', "keep-best-individuals").action((_, c) =>
+        c.copy(keepBestIndividuals = true)).text("Each time the tool finds a better individual, preserve it in a " +
+        "separated file instead of overwriting the file that stores the previous best one. Off by default.")
+
+      opt[Int]("time-limit").action((x, c) =>
+        c.copy(timeLimitInMillis = x)).text("Time limit for each black-box execution (in milliseconds). Default to " +
+        "120000.")
 
       opt[Int]("base-ioid").action((id, c) =>
         c.copy(startIoId = id)

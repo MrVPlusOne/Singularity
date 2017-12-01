@@ -82,6 +82,7 @@ object BenchmarkDriver {
                                      option.timeLimitInMillis,
                                      option.maxNonIncreaseTime,
                                      option.seed,
+                                     option.keepBestIndividuals,
                                      !option.disableGui)
     RunConfig(benchConfig, gpConfig, execConfig)
   }
@@ -146,10 +147,6 @@ object BenchmarkDriver {
         c.copy(useSledgehammer = false)).text("Manually specify GP parameters instead of letting the tool " +
         "auto-configure them. This option is off by default.")
 
-      opt[Int]("size-override").hidden().action((x, c) =>
-        c.copy(sizeOfInterestOverride = Some(x))).text("Manually override the problem size for evaluation. Only " +
-        "specify this when you know what you are doing.")
-
       opt[Int]("thread-num").action((x, c) =>
         c.copy(threadNum = x)).text("Thread number to use for individual evaluation. Default to 1.")
 
@@ -159,7 +156,15 @@ object BenchmarkDriver {
 
       opt[Int]("time-limit").action((x, c) =>
         c.copy(timeLimitInMillis = x)).text("Time limit for each black-box execution (in milliseconds). Default to " +
-        "10000.")
+        "120000.")
+
+      opt[Unit]('k', "keep-best-individuals").action((_, c) =>
+        c.copy(keepBestIndividuals = true)).text("Each time the tool finds a better individual, preserve it in a " +
+        "separated file instead of overwriting the file that stores the previous best one. Off by default.")
+
+      opt[Int]("task-size").hidden().action((x, c) =>
+        c.copy(sizeOfInterestOverride = Some(x))).text("Manually override the problem size for the fuzzing task. Only" +
+        " specify this when you know what you are doing.")
 
       opt[Int]("population-size").hidden().action((x, c) =>
         c.copy(tournamentSize = x)).text("[GP parameter] Population size. Default to 500.")
