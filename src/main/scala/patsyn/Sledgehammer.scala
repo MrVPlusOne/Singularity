@@ -91,7 +91,7 @@ object Sledgehammer{
     }
   }
 
-  def sledgehammerRun(ioId: Int, taskProvider: FuzzingTaskProvider, useGui: Boolean): Unit = {
+  def sledgehammerRun(taskProvider: FuzzingTaskProvider, ioId: Int, seeds: Seq[Int], useGUI: Boolean): Unit = {
     import StandardSystem._
     import SimpleMath._
 
@@ -107,12 +107,12 @@ object Sledgehammer{
         returnTypes = taskProvider.outputTypes, sizeMetric = taskProvider.sizeF, sizeOfInterest = 300,
         resourceConfig = ResourceConfig(task.resourceUsage, setup = () => (), teardown = () => ()))
 
-      Runner.runExample(provider, ioId = ioId, seeds = Seq(ioId), runConfig, useGUI = true)
+      Runner.runExample(provider, ioId = ioId, seeds = Seq(ioId), runConfig, useGUI)
     }
   }
 
   def main(args: Array[String]): Unit = {
     val example = FuzzingTaskProvider.phpHashCollisionExample
-    sledgehammerRun(ioId = 0, example, useGui = true)
+    sledgehammerRun(example, ioId = 0, seeds=Seq(0), useGUI = true)
   }
 }

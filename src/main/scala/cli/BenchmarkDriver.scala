@@ -106,7 +106,7 @@ object BenchmarkDriver {
                 benchs.foreach { case (name, bench) =>
                   println(s"*** Task $name started ***")
                   try {
-                    Runner.runExample(bench, cliOption.ioId, cliOption.seeds, config, useGUI = !cliOption.disableGui)
+                    Sledgehammer.sledgehammerRun(bench, cliOption.ioId, cliOption.seeds, useGUI = !cliOption.disableGui)
                     println(s"*** Task $name finished ***")
 
                   } catch {
