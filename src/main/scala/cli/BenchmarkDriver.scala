@@ -106,7 +106,12 @@ object BenchmarkDriver {
                 benchs.foreach { case (name, bench) =>
                   println(s"*** Task $name started ***")
                   try {
-                    Sledgehammer.sledgehammerRun(bench, cliOption.ioId, cliOption.seeds, useGUI = !cliOption.disableGui)
+                    if (cliOption.useSledgehammer) {
+                      Sledgehammer.sledgehammerRun(bench, cliOption.ioId, cliOption.seeds, config, useGUI = !cliOption
+                        .disableGui)
+                    } else {
+                      Runner.runExample(bench, cliOption.ioId, cliOption.seeds, config, useGUI = !cliOption.disableGui)
+                    }
                     println(s"*** Task $name finished ***")
 
                   } catch {
@@ -146,7 +151,11 @@ object BenchmarkDriver {
       opt[Seq[Int]]('s', "seeds").valueName("<seed1>,<seed2>,...").action((ss, c) =>
         c.copy(seeds = ss)).text("The random seeds to use. Default to {0} (only 1 seed).")
 
-      opt[Int]("population-size").action((x, c) =>
+      opt[Unit]('m', "manual").action((_, c) =>
+        c.copy(useSledgehammer = false)).text("Manually specify GP parameters instead of letting the tool " +
+        "auto-configure them. This option is off by default.")
+
+      opt[Int]("population-size").hidden().action((x, c) =>
         c.copy(tournamentSize = x)).text("[GP parameter] Population size. Default to 500.")
 
       opt[Int]("tournament-size").hidden().action((x, c) =>
@@ -164,13 +173,14 @@ object BenchmarkDriver {
       opt[Int]("thread-num").hidden().action((x, c) =>
         c.copy(threadNum = x)).text("[GP parameter UNUSED] Thread number. Default to 1.")
 
+      opt[Int]("max-nonincrease-gen").hidden().action((x, c) =>
+        c.copy(maxNonIncreaseTime = x)).text("[GP parameter] Stop after this number of generations if the fitness " +
+        " for the best individual does not increase. Default to 150.")
+
       opt[Int]("time-limit").action((x, c) =>
         c.copy(timeLimitInMillis = x)).text("Time limit for each black-box execution (in milliseconds). Default to " +
         "10000.")
 
-      opt[Int]("max-nonincrease-gen").hidden().action((x, c) =>
-        c.copy(maxNonIncreaseTime = x)).text("[GP parameter] Stop after this number of generations if the fitness " +
-        " for the best individual does not increase. Default to 150.")
 
       def parseBool(s: String): Boolean = {
         Set("t", "true", "yes").contains(s.trim.toLowerCase())

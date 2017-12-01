@@ -57,13 +57,13 @@ object Sledgehammer{
     GPEnvGenerator(constRule, safeFunctions ++ unsafeFunctions, stateNum, argConstRatio).generate(returnTypes)
   }
 
-  def genRunConfig(rand: Random, aggressiveness: Double, stateNum: Int): RunConfig = {
+  def genRunConfig(rand: Random, aggressiveness: Double, stateNum: Int, base: RunConfig = RunConfig.default): RunConfig = {
     def inter(from: Double, to: Double): Double = SimpleMath.aggressiveInterpolate(aggressiveness, from, to)(rand.nextDouble())
 
     val singleTolerance = inter(20, 30)
     val totalTolerance = inter(2, math.max(stateNum,3).toDouble) * singleTolerance
 
-    RunConfig(
+    base.copy(
       populationSize = inter(100,1000).toInt,
       tournamentSize = inter(2,8).toInt,
       totalSizeTolerance = totalTolerance.toInt,
@@ -91,7 +91,11 @@ object Sledgehammer{
     }
   }
 
-  def sledgehammerRun(taskProvider: FuzzingTaskProvider, ioId: Int, seeds: Seq[Int], useGUI: Boolean): Unit = {
+  def sledgehammerRun(taskProvider: FuzzingTaskProvider,
+                      ioId: Int,
+                      seeds: Seq[Int],
+                      baseConfig: RunConfig = RunConfig.default,
+                      useGUI: Boolean): Unit = {
     import StandardSystem._
     import SimpleMath._
 
@@ -100,7 +104,7 @@ object Sledgehammer{
 
 
     val env = genStandardEnv(rand, aggressiveness = ag)(IS(EInt, EVect(EInt)))
-    val runConfig = genRunConfig(rand, ag, env.stateTypes.length)
+    val runConfig = genRunConfig(rand, ag, env.stateTypes.length, base = baseConfig)
 
     taskProvider.run { task =>
       val provider = makeTaskProvider(rand, ag)(

@@ -1,7 +1,6 @@
 package cli
 
-import patsyn.Runner
-import patsyn.Runner.RunConfig
+import patsyn.Sledgehammer
 import scopt.OptionParser
 
 case class JarTesterOption(jarPath: String = "",
@@ -45,10 +44,10 @@ object JarTester {
             method.invoke(null, intArray)
             Cost.read()
         },
-        gpEnv = sortingEnv,
+        gpEnv = sortingEnv
       )
     }
-    Runner.runExample(taskProvider, opt.ioId, opt.seeds, RunConfig.default, useGUI = !opt.disableGui)
+    Sledgehammer.sledgehammerRun(taskProvider, opt.ioId, opt.seeds, useGUI = !opt.disableGui)
   }
 
   def main(args: Array[String]): Unit = {
