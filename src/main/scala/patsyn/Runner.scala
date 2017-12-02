@@ -232,6 +232,7 @@ object Runner {
             true
         }
         nonIncreasingTime += 1
+        println(s"Until stabilized: ${maxNonIncreaseTime - nonIncreasingTime} generations")
         shouldContinue
       }).zipWithIndex.foreach { case (pop, i) =>
         val best = pop.bestIndData
