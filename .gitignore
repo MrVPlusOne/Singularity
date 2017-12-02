@@ -20,4 +20,5 @@ workingDir*
 *.log
 testResult.txt
 results/*
+results-running/*
 output-files/*
