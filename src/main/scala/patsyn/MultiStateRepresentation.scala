@@ -131,4 +131,6 @@ case class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType
     ind.exprs.map(e => gaussianForthOrder(singleSizeTolerance)(e.astSize)).product *
       gaussianForthOrder(totalSizeTolerance)(ind.totalAstSize)
   }
+
+  def isTooLarge(ind: MultiStateInd): Boolean = ind.totalAstSize > totalSizeTolerance
 }

@@ -65,13 +65,13 @@ object Sledgehammer{
     val totalTolerance = inter(2, math.max(stateNum,3).toDouble) * singleTolerance
 
     GPConfig(
-      populationSize = inter(100,1000).toInt,
-      tournamentSize = inter(2,8).toInt,
+      populationSize = inter(200,1000).toInt,
+      tournamentSize = inter(4,8).toInt,
       totalSizeTolerance = totalTolerance.toInt,
       singleSizeTolerance = singleTolerance.toInt,
       mutateP = inter(0.4,0.7),
       crossoverP = 0.5,
-      copyP = 0.04+0.11-inter(0.0,0.11)
+      copyP = 0.07+0.9-inter(0.0,0.9)
     )
   }
 
@@ -123,7 +123,7 @@ object Sledgehammer{
 
   def main(args: Array[String]): Unit = {
     val example = FuzzingTaskProvider.hashCollisionExample(HashFunc.php, 16)
-    val seed = 6
+    val seed = 2
     val rand = new Random(seed)
     sledgehammerTask(example, RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(), rand)
   }

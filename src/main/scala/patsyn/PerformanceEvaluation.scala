@@ -78,7 +78,7 @@ class ExtrapolatePerformanceEvaluation(mamLink: MamLink, sizeOfInterest: Int, fi
 
 }
 
-class SimplePerformanceEvaluation(sizeOfInterest: Int, evaluationTrials: Int, val resourceUsage: (IS[EValue]) => Double, val sizeF: (IS[EValue]) => Int, breakingMemoryUsage: Long, val nonsenseFitness: Double = 0.0) extends PerformanceEvaluation {
+class SimplePerformanceEvaluation(sizeOfInterest: Int, evaluationTrials: Int, val resourceUsage: (IS[EValue]) => Double, val sizeF: (IS[EValue]) => Int, breakingMemoryUsage: Long, val nonsenseFitness: Double) extends PerformanceEvaluation {
 
 
   def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): Double = {

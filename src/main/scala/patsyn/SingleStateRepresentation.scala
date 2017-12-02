@@ -44,4 +44,7 @@ case class SingleStateRepresentation(seedSizeTolerance: Int, iterSizeTolerance: 
       iters.map(iter => SimpleMath.gaussianForthOrder(iterSizeTolerance)(iter.astSize)).product
   }
 
+  def isTooLarge(ind: SingleStateInd): Boolean = {
+    (ind.seed ++ ind.iter).map(_.astSize).sum > iterSizeTolerance + seedSizeTolerance
+  }
 }

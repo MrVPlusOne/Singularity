@@ -5,7 +5,7 @@ import java.awt.Dimension
 import java.util.concurrent.TimeoutException
 
 import measure.TimeTools
-import patsyn.EvolutionRepresentation.IndividualData
+import patsyn.EvolutionRepresentation.{IndividualData, MemoryUsage}
 import FuzzingTaskProvider.escapeStrings
 
 object Runner {
@@ -160,6 +160,14 @@ object Runner {
         library.copyOp -> copyP
       )
 
+      def showPattern(ind: MultiStateInd, memoryLimit: Long): String ={
+        representation.individualToPattern(ind).takeWhile{
+          case (MemoryUsage(mem), _) => mem < memoryLimit
+        }.take(runnerConfig.previewPatternLen).toList.map {
+          case (_, v) => escapeStrings(displayValue(v))
+        }.mkString(", ")
+      }
+
       val generations = optimizer.optimize(
         populationSize = populationSize, tournamentSize = tournamentSize,
         initOperator = library.initOp(maxDepth = 3),
@@ -170,15 +178,14 @@ object Runner {
           } catch {
             case _: TimeoutException =>
               println("Evaluation timed out!")
-              val firstSevenInputs = representation.individualToPattern(ind).take(runnerConfig.previewPatternLen).toList.map {
-                case (_, v) => escapeStrings(displayValue(v))
-              }.mkString(", ")
               representation.printIndividualMultiLine(println)(ind)
-              println(s"Individual Pattern: $firstSevenInputs, ...")
+              println{
+                showPattern(ind, memoryLimit)
+              }
               FileInteraction.saveObjectToFile(s"$recordDirPath/timeoutIndividual.serialized")(ind)
 
               // We might also be interested in the value
-              MultiStateRepresentation.saveExtrapolation(problemConfig ,ind, sizeOfInterest, Long.MaxValue,
+              MultiStateRepresentation.saveExtrapolation(problemConfig ,ind, sizeOfInterest, memoryLimit,
                 s"$recordDirPath/timeoutValue")
 
               System.exit(0)
@@ -215,19 +222,19 @@ object Runner {
       generations.takeWhile(pop => {
         val shouldContinue = bestSoFar match {
           case Some(previousBest) =>
-            if (pop.bestIndividual.evaluation.fitness > previousBest.evaluation.fitness) {
+            if (pop.bestIndData.evaluation.fitness > previousBest.evaluation.fitness) {
               nonIncreasingTime = 0
-              setBestInd(pop.bestIndividual)
+              setBestInd(pop.bestIndData)
             }
             nonIncreasingTime <= maxNonIncreaseTime
           case None =>
-            setBestInd(pop.bestIndividual)
+            setBestInd(pop.bestIndData)
             true
         }
         nonIncreasingTime += 1
         shouldContinue
       }).zipWithIndex.foreach { case (pop, i) =>
-        val best = pop.bestIndividual
+        val best = pop.bestIndData
         val data = MonitoringData(pop.averageFitness, best.evaluation.fitness, best.evaluation.performance)
         monitorCallback(data)
 
@@ -236,10 +243,7 @@ object Runner {
         println(s"Generation ${i + 1}")
         println(s"Best Result: ${best.evaluation.showAsLinearExpr}, Created by ${best.history.birthOp}")
         representation.printIndividualMultiLine(println)(best.ind)
-        val firstSevenInputs = representation.individualToPattern(best.ind).take(7).toList.map {
-          case (_, v) => escapeStrings(displayValue(v))
-        }.mkString(", ")
-        println(s"Best Individual Pattern: $firstSevenInputs, ...")
+        println(s"Best Individual Pattern: ${showPattern(best.ind, memoryLimit)}, ...")
         println(s"Diversity: ${pop.fitnessMap.keySet.size}")
         println(s"Average Size: ${representation.populationAverageSize(pop)}")
         println(s"Average Fitness: ${pop.averageFitness}")

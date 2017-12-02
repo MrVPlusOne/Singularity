@@ -13,12 +13,15 @@ trait EvolutionRepresentation[Individual] {
 
   def sizePenaltyFactor(ind: Individual): Double
 
+  def isTooLarge(ind: Individual): Boolean
+
   def evaluation: PerformanceEvaluation
 
   def fitnessEvaluation(ind: Individual): (IndividualEvaluation, Stream[IS[EValue]]) = {
     val inputStream = individualToPattern(ind)
     val performance = evaluation.evaluateAPattern(inputStream)
-    val fitness = sizePenaltyFactor(ind) * performance
+    val sp = sizePenaltyFactor(ind)
+    val fitness = sp * performance + (if(isTooLarge(ind)) -0.1 else 0.0)
     IndividualEvaluation(fitness, performance) -> inputStream.map(_._2)
   }
 
@@ -90,7 +93,7 @@ object EvolutionRepresentation{
       individuals.map(_.evaluation.performance).sum/individuals.size
     }
 
-    def bestIndividual: IndividualData[T] = {
+    def bestIndData: IndividualData[T] = {
       individuals.maxBy(_.evaluation.fitness)
     }
   }
