@@ -199,7 +199,10 @@ object FuzzingTaskProvider {
         vectIntToCharArray(v.asInstanceOf[VectValue], charSize)
       }).distinct.map(hashFunc)
 
-      hashes.groupBy(identity).values.map(e => e.length * e.length).sum
+      hashes.groupBy(identity).values.map{g =>
+        val c = g.length - 1
+        c*c
+      }.sum
     }
 
     def outputTypes = IS(EVect(EVect(EInt)))

@@ -71,7 +71,7 @@ object Sledgehammer{
       singleSizeTolerance = singleTolerance.toInt,
       mutateP = inter(0.4,0.7),
       crossoverP = 0.5,
-      copyP = 0.05+0.2-inter(0.0,0.2)
+      copyP = 0.04+0.11-inter(0.0,0.11)
     )
   }
 
@@ -98,7 +98,11 @@ object Sledgehammer{
   def sledgehammer(outputTypes: IS[EType], rand: Random): (GPEnvironment, GPConfig) = {
     import SimpleMath._
 
-    val ag = sigmoid(rand.nextGaussian())
+    val ag = sigmoid{
+      rand.nextDouble()
+      rand.nextDouble()
+      rand.nextGaussian()
+    }
 
     val env = genStandardEnv(rand, aggressiveness = ag)(outputTypes)
     val gpConfig = genGPConfig(rand, ag, env.stateTypes.length)
@@ -118,8 +122,9 @@ object Sledgehammer{
   }
 
   def main(args: Array[String]): Unit = {
-    val example = FuzzingTaskProvider.phpHashCollisionExample
-    val rand = new Random(0)
-    sledgehammerTask(example, RunnerConfig(), ExecutionConfig(), rand)
+    val example = FuzzingTaskProvider.hashCollisionExample(HashFunc.php, 16)
+    val seed = 6
+    val rand = new Random(seed)
+    sledgehammerTask(example, RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(), rand)
   }
 }
