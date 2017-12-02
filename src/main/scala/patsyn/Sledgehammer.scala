@@ -123,7 +123,7 @@ object Sledgehammer{
 
   def main(args: Array[String]): Unit = {
     val example = FuzzingTaskProvider.hashCollisionExample(HashFunc.php, 16)
-    val seed = 2
+    val seed = 3
     val rand = new Random(seed)
     sledgehammerTask(example, RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(), rand)
   }

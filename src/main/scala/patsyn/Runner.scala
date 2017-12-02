@@ -97,9 +97,9 @@ object Runner {
     import config.runnerConfig._
 
     val library = MultiStateGOpLibrary(gpEnv, outputTypes)
+    val dateTimeString = TimeTools.numericalDateTime()
     val recordDirPath = {
-      val dateTime = TimeTools.numericalDateTime()
-      s"results/$taskName[ioId=$ioId,seed=$randomSeed]($dateTime)"
+      s"results-running/$taskName[ioId=$ioId,seed=$randomSeed]($dateTimeString)"
     }
 
     val (evalProgressCallback, monitorCallback): (Int => Unit, MonitoringData => Unit) = {
@@ -257,8 +257,15 @@ object Runner {
       }
 
       println("Evolution Finished!")
-      if(callExitAfterFinish){
-        System.exit(0)
+      try{
+        import java.io.File
+        val performance = bestSoFar.get.evaluation.performance
+        new File(recordDirPath).renameTo(
+          new File(s"results/$taskName[performance=$performance][ioId=$ioId,seed=$randomSeed]($dateTimeString)"))
+      }finally {
+        if(callExitAfterFinish){
+          System.exit(0)
+        }
       }
     }
   }
