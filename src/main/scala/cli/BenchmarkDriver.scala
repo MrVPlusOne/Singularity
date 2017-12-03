@@ -164,7 +164,7 @@ object BenchmarkDriver {
 
       opt[Int]("max-nonincrease-gen").action((x, c) =>
         c.copy(maxNonIncreaseTime = x)).text("Stop after this number of generations if the fitness " +
-        " for the best individual does not increase. Default to 150.")
+        " for the best individual does not increase. Specifying a negative value here will make the tool run forever. Default to 150.")
 
       opt[Int]("time-limit").action((x, c) =>
         c.copy(timeLimitInMillis = x)).text("Time limit for each black-box execution (in milliseconds). Default to " +
