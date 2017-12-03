@@ -2,7 +2,8 @@ package patsyn
 
 
 /** Concrete Types */
-abstract class EType(val arguments: EType*){
+@SerialVersionUID(0)
+abstract class EType(val arguments: EType*) extends Serializable {
   def powerset: Set[EType] = {
     if(arguments.isEmpty) Set(this)
     else {

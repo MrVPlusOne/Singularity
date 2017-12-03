@@ -108,13 +108,12 @@ object FileInteraction{
   }
 
   def main(args: Array[String]): Unit = {
-    val objFile = "results/Tue Oct 03 17:15:54 CDT 2017/bestIndividual[seed=2].serialized"
-
-    val pattern = "abc".r
-    pattern.regex
-
-    val arg = readObjectFromFile[IndividualData[MultiStateInd]](objFile)
-    println(arg.ind)
+    import StandardSystem._
+    val t = EVect(EInt)
+    val path = "testSave.serialized"
+    saveObjectToFile(path)(t)
+    val t1 = readObjectFromFile[EType](path)
+    println(t == t1)
   }
 }
 

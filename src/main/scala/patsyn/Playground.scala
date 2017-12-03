@@ -62,12 +62,7 @@ object Playground {
 
 
   def main(args: Array[String]): Unit = {
-//    MultiStateRepresentation.individualToPattern(HashSample.ind).take(10).foreach{x => println(x._2(0))}
-//    MultiStateRepresentation.individualToPattern(HashSample.ind).take(20).foreach{x => println(FuzzingTaskProvider
-//      .hashCollisionExample(HashFunc.java).squareMetric(x._2(0).asInstanceOf[StandardSystem.VectValue].value))}
 
-    PatternPlot.showResourceUsageChart(FuzzingTaskProvider.javaHashCollisionExample, HashSample.ind, 4000,
-      pointDensity = 15)
   }
 
 }
