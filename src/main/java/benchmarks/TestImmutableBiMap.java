@@ -10,9 +10,13 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class TestImmutableBiMap {
-    public static <A, B> ImmutableBiMap<A,B> makeMap(Seq<Tuple2<A,B>> pairs) {
+    public static <A, B> ArrayList<ImmutablePair<A,B>> toArrayListPair(Seq<Tuple2<A,B>> pairs) {
         ArrayList<ImmutablePair<A,B>> list = new ArrayList<>();
-        pairs.foreach(p -> list.add(new ImmutablePair(p._1, p._2)));
+        pairs.foreach(p -> list.add(new ImmutablePair<>(p._1, p._2)));
+        return list;
+    }
+
+    public static <A, B> ImmutableBiMap<A,B> arrayListToBiMap(ArrayList<ImmutablePair<A,B>> list){
         return ImmutableBiMap.copyOf(list);
     }
 }

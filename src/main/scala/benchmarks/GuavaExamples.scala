@@ -20,6 +20,14 @@ object GuavaExamples {
     Cost.read()
   }
 
+  def handleException[A](default: A)(f: => A): A = {
+    try{
+      f
+    }catch {
+      case _: IllegalArgumentException => default
+    }
+  }
+
   def immutableBiMap_inverse = {
     ProblemConfig(
       outputTypes = IS(EVect(EPair(EInt, EInt))),
@@ -28,28 +36,30 @@ object GuavaExamples {
       },
       resourceUsage = {
         case IS(VectValue(pairs)) =>
-//          val list = new util.ArrayList[util.Map.Entry[Int,Int]]()
-//          pairs.foreach{
-//            case IS(PairValue((IntValue(k), IntValue(v)))) =>
-//              list.add(new ImmutablePair(k,v))
-//          }
+          //          val list = new util.ArrayList[util.Map.Entry[Int,Int]]()
+          //          pairs.foreach{
+          //            case IS(PairValue((IntValue(k), IntValue(v)))) =>
+          //              list.add(new ImmutablePair(k,v))
+          //          }
 
+          val list = TestImmutableBiMap.toArrayListPair(pairs.map {
+            case PairValue((IntValue(k), IntValue(v))) => (new Integer(k), new Integer(v))
+          })
           measureCost {
-//            val a = ImmutableBiMap.copyOf(list: java.lang.Iterable[util.Map.Entry[Int, Int]])
-            val a = TestImmutableBiMap.makeMap(pairs.map{
-              case PairValue((IntValue(k), IntValue(v))) => (k,v)
-            })
-            a.inverse()
+            handleException(()) {
+              TestImmutableBiMap.arrayListToBiMap(list)
+//              map.inverse()
+            }
           }
       }
     )
   }
 
   def main(args: Array[String]): Unit = {
-    val seed = 3
+    val seed = 8
     val rand = new Random(seed)
     sledgehammerProblem(
       immutableBiMap_inverse,
-      RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(), rand)
+      RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(sizeOfInterest = 1000), rand)
   }
 }

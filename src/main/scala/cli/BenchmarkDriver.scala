@@ -125,7 +125,9 @@ object BenchmarkDriver {
 
                 case Some(plotArg) =>
                   val ind = FileInteraction.readObjectFromFile[MultiStateInd](plotArg.indPath)
-                  PatternPlot.showResourceUsageChart(taskProvider, ind, plotArg.sizeLimit, plotArg.density)
+                  taskProvider.runAsProbConfig { config =>
+                    PatternPlot.showResourceUsageChart(config, ind, plotArg.sizeLimit, plotArg.density)
+                  }
               }
             case Some(extraArg) =>
               taskProvider.runAsProbConfig{ probConfig =>
