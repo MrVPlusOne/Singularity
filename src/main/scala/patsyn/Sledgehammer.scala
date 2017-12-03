@@ -112,11 +112,11 @@ object Sledgehammer{
 
   def sledgehammerTask(taskProvider: FuzzingTaskProvider, runnerConfig: RunnerConfig, execConfig: ExecutionConfig, rand: Random): Unit = {
     taskProvider.runAsProbConfig{ problemConfig =>
-      sledgehammerProblem(problemConfig, execConfig, runnerConfig, rand)
+      sledgehammerProblem(problemConfig, runnerConfig, execConfig, rand)
     }
   }
 
-  def sledgehammerProblem(problemConfig: ProblemConfig, execConfig: ExecutionConfig, runnerConfig: RunnerConfig, rand: Random): Unit ={
+  def sledgehammerProblem(problemConfig: ProblemConfig, runnerConfig: RunnerConfig, execConfig: ExecutionConfig, rand: Random): Unit ={
     val (env, gpConfig) = sledgehammer(problemConfig.outputTypes, rand)
     Runner.run(problemConfig, env, RunConfig(runnerConfig, gpConfig, execConfig))
   }

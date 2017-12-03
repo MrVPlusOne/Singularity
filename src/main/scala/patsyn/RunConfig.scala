@@ -5,9 +5,13 @@ import patsyn.Runner.RunnerConfig
 case class ProblemConfig(outputTypes: IS[EType],
                          sizeF: IS[EValue] => Int,
                          resourceUsage: IS[EValue] => Double,
-                         displayValue: IS[EValue] => String,
-                         saveValueWithName: (IS[EValue], String) => Unit
+                         displayValue: IS[EValue] => String = FuzzingTaskProvider.defaultDisplayValue,
+                         saveValueWithName: (IS[EValue], String) => Unit = FuzzingTaskProvider.defaultSaveValueWithName
                         )
+
+object ProblemConfig{
+
+}
 
 case class GPConfig(populationSize: Int = 500,
                     tournamentSize: Int = 7,
