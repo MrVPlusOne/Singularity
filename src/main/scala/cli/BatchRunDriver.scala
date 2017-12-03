@@ -8,12 +8,34 @@ case class BatchRunOption(benchNames: Seq[String] = Seq(),
                           benchTrials: Int = 1,
                           keepBestIndividuals: Boolean = false,
                           timeLimitInMillis: Int = 120000,
+                          jobTimeout: Option[Int] = None,
                           startIoId: Int = 0,
                           startSeed: Int = 0)
 
-case class SingleRunOption(benchName: String, ioId: Int, seed: Int, timeout: Int, keepBestIndividuals: Boolean)
+case class SingleRunOption(benchName: String, ioId: Int, seed: Int, evalTimeLimit: Int, jobTimeout: Option[Int], keepBestIndividuals: Boolean)
 
 object BatchRunDriver {
+
+  private def runCmdWithTimeout(cmd: String, sec: Int) = {
+    import sys.process._
+    import scala.concurrent._
+    import ExecutionContext.Implicits.global
+    val proc = cmd.run()
+    val f = Future(blocking(proc.exitValue()))
+    try
+      Await.result(f, duration.Duration(sec, "sec"))
+    catch {
+      case _: TimeoutException =>
+        println("TIMEOUT!")
+        proc.destroy()
+        proc.exitValue()
+    }
+  }
+
+  private def runCmdWithoutTimeout(cmd: String) = {
+    import sys.process._
+    cmd.split("\\s+").toSeq.!
+  }
 
   def runSingle(opt: SingleRunOption): Unit = {
     println(s"[JOB STARTED] $opt")
@@ -23,14 +45,20 @@ object BatchRunDriver {
     val javaPath = Paths.get(System.getProperty("java.home"), "bin", "java").toFile.getAbsolutePath
     val jarPath = new File(this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath).getAbsolutePath
 
-    val timeoutOpt = s"--time-limit ${opt.timeout}"
+    val timeoutOpt = s"--time-limit ${opt.evalTimeLimit}"
     val keepOpt = if (opt.keepBestIndividuals) "-k" else ""
-    val cmdOpts = s"-i ${opt.ioId} -s ${opt.seed} -n $timeoutOpt $keepOpt ${opt.benchName}"
+    val maxNonIncreaseOpt = if (opt.jobTimeout.isDefined) "--max-nonincrease-gen -1" else ""
+    val cmdOpts = s"-i ${opt.ioId} -s ${opt.seed} -n $timeoutOpt $keepOpt $maxNonIncreaseOpt ${opt.benchName}"
     val cmd = s"$javaPath -cp $jarPath cli.BenchmarkDriver $cmdOpts"
     println(cmd)
 
-    import sys.process._
-    cmd.split("\\s+").toSeq.!
+    opt.jobTimeout match {
+      case Some(i) =>
+        println(s"[SET JOB TIMEOUT] $i sec")
+        runCmdWithTimeout(cmd, i)
+      case None =>
+        runCmdWithoutTimeout(cmd)
+    }
 
     println(s"[JOB FINISHED] $opt")
   }
@@ -40,7 +68,7 @@ object BatchRunDriver {
       for { bench <- opt.benchNames; seed <- opt.startSeed until opt.startSeed + opt.benchTrials} yield (bench, seed)
     val singleConfigs = benchNameSeeds.zipWithIndex.map {
       case ((benchName: String, seed: Int), ioId: Int) =>
-        SingleRunOption(benchName, ioId, seed, opt.timeLimitInMillis, opt.keepBestIndividuals)
+        SingleRunOption(benchName, ioId, seed, opt.timeLimitInMillis, opt.jobTimeout, opt.keepBestIndividuals)
     }
 
     SimpleMath.parallelMap(singleConfigs, runSingle, opt.jobNumber)
@@ -67,8 +95,10 @@ object BatchRunDriver {
         "separated file instead of overwriting the file that stores the previous best one. Off by default.")
 
       opt[Int]("time-limit").action((x, c) =>
-        c.copy(timeLimitInMillis = x)).text("Time limit for each black-box execution (in milliseconds). Default to " +
-        "120000.")
+        c.copy(timeLimitInMillis = x)).text("Time limit for each black-box execution (in milliseconds). Default to 120000.")
+
+      opt[Int]("job-timeout").action((x, c) =>
+        c.copy(jobTimeout = Some(x))).text("Timeout for each job (in seconds). Default to infinity. ")
 
       opt[Int]("base-ioid").action((id, c) =>
         c.copy(startIoId = id)

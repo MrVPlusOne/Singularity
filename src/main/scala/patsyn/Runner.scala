@@ -226,13 +226,15 @@ object Runner {
               nonIncreasingTime = 0
               setBestInd(pop.bestIndData)
             }
-            nonIncreasingTime <= maxNonIncreaseTime
+            nonIncreasingTime <= maxNonIncreaseTime || maxNonIncreaseTime < 0
           case None =>
             setBestInd(pop.bestIndData)
             true
         }
-        nonIncreasingTime += 1
-        println(s"Until stabilized: ${maxNonIncreaseTime - nonIncreasingTime} generations")
+        if (maxNonIncreaseTime >= 0) {
+          println(s"Until stabilized: ${maxNonIncreaseTime - nonIncreasingTime} generations")
+          nonIncreasingTime += 1
+        }
         shouldContinue
       }).zipWithIndex.foreach { case (pop, i) =>
         val best = pop.bestIndData
