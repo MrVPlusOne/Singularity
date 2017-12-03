@@ -33,7 +33,7 @@ case class SingleStateRepresentation(seedSizeTolerance: Int, iterSizeTolerance: 
     })
 
     s.map(ys => {
-      MemoryUsage(ys.map(_.size).sum) -> ys
+      MemoryUsage(ys.map(_.memoryUsage).sum) -> ys
     })
   }
 

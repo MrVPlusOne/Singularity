@@ -535,7 +535,7 @@ object FuzzingTaskProvider {
     override def saveValueWithName(value: IS[EValue], name: String): Unit = {
       super.saveValueWithName(value, name)
       val data = value.head
-      val width = math.max(1, math.sqrt(data.size).toInt)
+      val width = math.max(1, math.sqrt(data.memoryUsage).toInt)
       val image = intsToImage(width, width, name,
         data.asInstanceOf[VectValue].value.map(_.asInstanceOf[IntValue].value))
       ImageIO.write(image, "png", new File(name + ".png"))
@@ -767,7 +767,7 @@ object FuzzingTaskProvider {
   abstract class MaxFlowFuzzingTaskProvider extends FuzzingTaskProvider {
     def sizeF = {
       case IS(IntValue(_), IntValue(_), graph: GraphValue) =>
-        graph.size.toInt
+        graph.memoryUsage.toInt
     }
 
     def graphToString(src: Int, snk: Int, graphValue: GraphValue): String = {
@@ -904,7 +904,7 @@ object FuzzingTaskProvider {
 
     override def sizeF: PartialFunction[IS[EValue], Int] = {
       case IS(IntValue(_), IntValue(_), graph: GraphValue) =>
-        graph.size.toInt
+        graph.memoryUsage.toInt
     }
 
     override def saveValueWithName(value: IS[EValue], name: String): Unit = {

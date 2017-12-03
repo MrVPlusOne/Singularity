@@ -24,7 +24,7 @@ object StandardSystem {
 
     override def toString: String = value.toString
 
-    def size: Long = 1
+    def memoryUsage: Long = 1
   }
 
   case class ByteArrayValue(value: IS[Byte]) extends EValue {
@@ -36,7 +36,7 @@ object StandardSystem {
 
     override def toString: String = s"[${value.mkString(":")}]"
 
-    override def size: Long = value.length + 1
+    override def memoryUsage: Long = value.length + 1
   }
 
   case class VectValue(value: Vector[EValue]) extends EValue{
@@ -47,13 +47,13 @@ object StandardSystem {
 
     override def toString: String = value.mkString("[",",","]")
 
-    def size: Long = value.map(_.size).sum + 1
+    def memoryUsage: Long = value.map(_.memoryUsage).sum + 1
   }
 
   case class BoolValue(value: Boolean) extends EValue{
     def hasType(ty: EType): Boolean = ty == EBool
 
-    def size: Long = 1
+    def memoryUsage: Long = 1
 
     override def toString: String = if(value)"T" else "F"
   }
@@ -64,7 +64,7 @@ object StandardSystem {
       case _ => false
     }
 
-    def size: Long = value._1.size + value._2.size
+    def memoryUsage: Long = value._1.memoryUsage + value._2.memoryUsage
 
     override def toString: String = value.toString()
   }
@@ -75,7 +75,7 @@ object StandardSystem {
       case _ => false
     }
 
-    def size: Long = nodeNum + edges.map(_._3.size).sum + 1
+    def memoryUsage: Long = nodeNum + edges.map(_._3.memoryUsage).sum + 1
 
     def shiftIndex(offset: Int): GraphValue = {
       this.copy(edges = edges.map{ case (n1, n2, v) => (n1+offset, n2+offset, v)})

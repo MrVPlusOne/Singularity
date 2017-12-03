@@ -42,7 +42,7 @@ object MultiStateRepresentation{
       iters.map { iter => Expr.evaluateWithCheck(iter, ls) }
     })
     states.map(xs => {
-      val totalSize = xs.map(_.size).sum
+      val totalSize = xs.map(_.memoryUsage).sum
       MemoryUsage(totalSize) -> ind.outputs.map(f => Expr.evaluateWithCheck(f, xs))
     })
   }
