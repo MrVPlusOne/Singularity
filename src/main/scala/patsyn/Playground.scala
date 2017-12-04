@@ -1,6 +1,8 @@
 package patsyn
 
-import visual.PatternPlot
+import benchmarks.GuavaExamples
+
+import scala.util.Random
 
 object GraphSample {
   import StandardSystem._
@@ -62,7 +64,54 @@ object Playground {
 
 
   def main(args: Array[String]): Unit = {
+    import visual.{MonitorPanel, PatternPlot, ListPlot}
 
+
+    var s0 = 403
+    var s1 = 280
+    val sizeOfInterest = 1000
+
+    val pairs = for(_ <- 0 until sizeOfInterest) yield {
+      s0 = s1
+      s1 = (226<<24) + s1
+      (s0, s1)
+    }
+
+    val config = GuavaExamples.immutableBiMap_copyOf
+    val random = new Random(1)
+    val indicies = PatternPlot.randomSelectFrom((0 until sizeOfInterest), maxPoints = 30, random = random)
+
+    import StandardSystem._
+    val points = indicies.map{
+      i =>
+        val input = VectValue(pairs.take(i).map{ case (x1,x2) => PairValue((x1,x2))}.toVector)
+        val size = config.sizeF(IS(input))
+        val resource = config.resourceUsage(IS(input))
+        (size.toDouble, resource)
+    }
+
+    import javax.swing.JFrame
+
+    import benchmarks.GuavaExamples
+    import patsyn.MultiStateRepresentation.individualToPattern
+    import patsyn._
+
+
+    val frame = new JFrame("Monitor") {
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+      setVisible(true)
+    }
+
+    var data = IndexedSeq[(Double, Double)]()
+    points.foreach{ xy =>
+      data :+= xy
+      val chart = ListPlot.plot("pattern" -> data)("test", "size", "resource")
+      frame.setContentPane(new MonitorPanel(chart, margin = 10, plotSize = (600,450)))
+      frame.pack()
+    }
+    println(data)
+
+    println("Evaluation finished.")
   }
 
 }
