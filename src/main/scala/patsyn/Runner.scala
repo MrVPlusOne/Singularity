@@ -219,11 +219,13 @@ object Runner {
 
       generations.takeWhile(pop => {
         nonIncreasingTime += 1
-        bestSoFar.foreach{ previousBest =>
-          if (pop.bestIndData.evaluation.fitness > previousBest.evaluation.fitness) {
-            nonIncreasingTime = 0
-            setBestInd(pop.bestIndData)
-          }
+        bestSoFar match {
+          case Some(previousBest) =>
+            if (pop.bestIndData.evaluation.fitness > previousBest.evaluation.fitness) {
+              nonIncreasingTime = 0
+              setBestInd(pop.bestIndData)
+            }
+          case None => setBestInd(pop.bestIndData)
         }
         println(s"Last fitness increase: $nonIncreasingTime generations ago.")
 
