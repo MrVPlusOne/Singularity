@@ -110,8 +110,8 @@ object Sledgehammer{
     (env, gpConfig)
   }
 
-  def sledgehammerTask(taskProvider: FuzzingTaskProvider, runnerConfig: RunnerConfig, execConfig: ExecutionConfig, rand: Random): Unit = {
-    taskProvider.runAsProbConfig{ problemConfig =>
+  def sledgehammerTask(name: String, taskProvider: FuzzingTaskProvider, runnerConfig: RunnerConfig, execConfig: ExecutionConfig, rand: Random): Unit = {
+    taskProvider.runAsProbConfig(name) { problemConfig =>
       sledgehammerProblem(problemConfig, runnerConfig, execConfig, rand)
     }
   }
@@ -125,6 +125,6 @@ object Sledgehammer{
     val example = FuzzingTaskProvider.hashCollisionExample(HashFunc.php, 16)
     val seed = 3
     val rand = new Random(seed)
-    sledgehammerTask(example, RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(), rand)
+    sledgehammerTask("hashCollision", example, RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(), rand)
   }
 }

@@ -74,7 +74,7 @@ object BenchmarkDriver {
   def getRunConfig(option: CliOption, sizeOfInterest: Int): RunConfig = {
     import option._
 
-    val runnerConfig = RunnerConfig(option.target, ioId, seed, !disableGui,
+    val runnerConfig = RunnerConfig(ioId, seed, !disableGui,
       keepBestIndividuals, previewPatternLen = 7, callExitAfterFinish = true //todo: more options
     )
 
@@ -110,9 +110,9 @@ object BenchmarkDriver {
                   println(s"*** Task $name started ***")
                   try {
                     if (cliOption.useSledgehammer) {
-                      Sledgehammer.sledgehammerTask(taskProvider, config.runnerConfig, config.execConfig, random)
+                      Sledgehammer.sledgehammerTask(name, taskProvider, config.runnerConfig, config.execConfig, random)
                     } else {
-                      Runner.runExample(taskProvider, config)
+                      Runner.runExample(name, taskProvider, config)
                     }
                     println(s"*** Task $name finished ***")
 
@@ -125,12 +125,12 @@ object BenchmarkDriver {
 
                 case Some(plotArg) =>
                   val ind = FileInteraction.readObjectFromFile[MultiStateInd](plotArg.indPath)
-                  taskProvider.runAsProbConfig { config =>
+                  taskProvider.runAsProbConfig(name) { config =>
                     PatternPlot.showResourceUsageChart(config, ind, plotArg.sizeLimit, plotArg.density)
                   }
               }
             case Some(extraArg) =>
-              taskProvider.runAsProbConfig{ probConfig =>
+              taskProvider.runAsProbConfig(name){ probConfig =>
                 val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
                 MultiStateRepresentation.saveExtrapolation(
                   probConfig, ind, extraArg.size, extraArg.memoryLimit, extraArg.outputName, extraArg.evaluatePerformance)

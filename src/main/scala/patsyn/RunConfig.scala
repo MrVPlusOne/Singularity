@@ -2,7 +2,8 @@ package patsyn
 
 import patsyn.Runner.RunnerConfig
 
-case class ProblemConfig(outputTypes: IS[EType],
+case class ProblemConfig(problemName: String,
+                         outputTypes: IS[EType],
                          sizeF: IS[EValue] => Int,
                          resourceUsage: IS[EValue] => Double,
                          displayValue: IS[EValue] => String = FuzzingTaskProvider.defaultDisplayValue,

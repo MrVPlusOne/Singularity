@@ -47,6 +47,7 @@ object JarTester {
 
     Sledgehammer.sledgehammerProblem(
       problemConfig = ProblemConfig(
+        problemName = method.getName,
         outputTypes = IS(EVect(EInt)),
         sizeF = {
           case IS(VectValue(v)) => v.length

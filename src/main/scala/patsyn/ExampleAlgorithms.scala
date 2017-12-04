@@ -36,9 +36,9 @@ trait FuzzingTaskProvider {
     }
   }
 
-  def runAsProbConfig[A](f: ProblemConfig => A): A = {
+  def runAsProbConfig[A](name: String)(f: ProblemConfig => A): A = {
     run{ task =>
-      val config = ProblemConfig(outputTypes, sizeF, task.resourceUsage, displayValue, saveValueWithName)
+      val config = ProblemConfig(name, outputTypes, sizeF, task.resourceUsage, displayValue, saveValueWithName)
       f(config)
     }
   }

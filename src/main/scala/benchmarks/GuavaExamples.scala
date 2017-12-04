@@ -30,6 +30,7 @@ object GuavaExamples {
 
   def immutableBiMap_inverse = {
     ProblemConfig(
+      "ImmutableBiMap.copyOf",
       outputTypes = IS(EVect(EPair(EInt, EInt))),
       sizeF = {
         case IS(v) => v.memoryUsage.toInt

@@ -14,7 +14,7 @@ object Runner {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
     val workingDir = FileInteraction.getWorkingDir(ioId)
 
-    runExample(FuzzingTaskProvider.phpHashNativeExample(workingDir), RunConfig.default.withIoIdAndSeed(ioId, ioId))
+    runExample("phpHashNative", FuzzingTaskProvider.phpHashNativeExample(workingDir), RunConfig.default.withIoIdAndSeed(ioId, ioId))
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -71,8 +71,7 @@ object Runner {
     )
   }
 
-  case class RunnerConfig(taskName: String = "untitled",
-                          ioId: Int = 0,
+  case class RunnerConfig(ioId: Int = 0,
                           randomSeed: Int = 0,
                           useGUI: Boolean = true,
                           keepBestIndividuals: Boolean = false,
@@ -80,7 +79,6 @@ object Runner {
                           callExitAfterFinish: Boolean = true){
     def show: String = {
       s"""
-         |taskName: $taskName
          |ioId: $ioId
          |randomSeed: $randomSeed
          |previewPatternLen: $previewPatternLen
@@ -99,7 +97,7 @@ object Runner {
     val library = MultiStateGOpLibrary(gpEnv, outputTypes)
     val dateTimeString = TimeTools.numericalDateTime()
     val recordDirPath = {
-      s"results-running/$taskName[ioId=$ioId,seed=$randomSeed]($dateTimeString)"
+      s"results-running/$problemName[ioId=$ioId,seed=$randomSeed]($dateTimeString)"
     }
 
     val (evalProgressCallback, monitorCallback): (Int => Unit, MonitoringData => Unit) = {
@@ -263,7 +261,7 @@ object Runner {
         import java.io.File
         val performance = bestSoFar.get.evaluation.performance
         new File(recordDirPath).renameTo(
-          new File(s"results/$taskName[performance=$performance][ioId=$ioId,seed=$randomSeed]($dateTimeString)"))
+          new File(s"results/$problemName[performance=$performance][ioId=$ioId,seed=$randomSeed]($dateTimeString)"))
       }finally {
         if(callExitAfterFinish){
           System.exit(0)
@@ -273,13 +271,13 @@ object Runner {
   }
 
 
-  def runExample(taskProvider: FuzzingTaskProvider, config: RunConfig = RunConfig.default): Unit = {
+  def runExample(taskName: String, taskProvider: FuzzingTaskProvider, config: RunConfig = RunConfig.default): Unit = {
     taskProvider.run{ task =>
       import task._
       import taskProvider._
       import config._
 
-      val problemConfig = ProblemConfig(outputTypes = outputTypes, sizeF = sizeF, resourceUsage = resourceUsage,
+      val problemConfig = ProblemConfig(taskName, outputTypes = outputTypes, sizeF = sizeF, resourceUsage = resourceUsage,
         displayValue = displayValue,
         saveValueWithName = saveValueWithName)
 

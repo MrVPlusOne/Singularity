@@ -81,7 +81,7 @@ object PatternPlot {
   }
 
   def main(args: Array[String]): Unit = {
-    val patternFile = "results/untitled[performance=46661.0][ioId=3,seed=3](17-12-03-16:20:17)/bestIndividual.serialized"
+    val patternFile = "results-running/check[performance~=6e5,ioId=4,seed=4](17-12-03-16:28:54)/bestIndividual.serialized"
     val sizeLimit = 1000
     val ind = FileInteraction.readObjectFromFile[MultiStateInd](patternFile)
     val config = GuavaExamples.immutableBiMap_inverse

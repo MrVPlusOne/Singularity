@@ -9,7 +9,7 @@ object MotivatingExample {
     FileInteraction.mkDirsAlongPath(workingDir)
 
     val defaultConfig = RunConfig.default
-    runExample(FuzzingTaskProvider.quickSortExample,
+    runExample("quickSort", FuzzingTaskProvider.quickSortExample,
       defaultConfig.copy(
         gpConfig = defaultConfig.gpConfig.copy(populationSize = 300)
       )
