@@ -71,7 +71,7 @@ object BatchRunDriver {
         SingleRunOption(benchName, ioId, seed, opt.timeLimitInMillis, opt.jobTimeout, opt.keepBestIndividuals)
     }
 
-    SimpleMath.parallelMap(singleConfigs, runSingle, opt.jobNumber)
+    SimpleMath.parallelMap(singleConfigs, opt.jobNumber)(runSingle)
   }
 
   def main(args: Array[String]): Unit = {

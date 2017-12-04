@@ -57,7 +57,7 @@ object SimpleMath {
 
   def sigmoid(x: Double) = 1.0/(1+math.exp(-x))
 
-  def parallelMap[A,B](seq: Seq[A], f: A => B, threadNum: Int): Seq[B] = {
+  def parallelMap[A,B](seq: Seq[A], threadNum: Int)(f: A => B): Seq[B] = {
     import scala.collection.parallel
     import parallel._
 
@@ -69,6 +69,36 @@ object SimpleMath {
       p.map(f).toIndexedSeq
     }else{
       seq.map(f).toIndexedSeq
+    }
+  }
+
+  def processMap(args: Array[String], tasks: IS[Int], processNum: Int, mainClass: String)(f: Int => Unit): Unit = {
+    if(args.isEmpty){
+      parallelMap(tasks, processNum){ i =>
+        println(s"[JOB STARTED] id = $i")
+
+        import java.io.File
+        import java.nio.file.Paths
+        val javaPath = Paths.get(System.getProperty("java.home"), "bin", "java").toFile.getAbsolutePath
+        val jarPath = new File(this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath).getAbsolutePath
+
+
+        val cmd = s"$javaPath -cp $jarPath $mainClass $i" //be careful not to create fork bombs!
+        println(cmd)
+
+        import sys.process._
+        cmd.split("\\s+").toSeq.!
+
+        println(s"[JOB FINISHED] id = $i")
+      }
+    }else{
+      f(args.head.toInt)
+    }
+  }
+
+  def main(args: Array[String]): Unit = {
+    processMap(args, 0 until 100, 3, mainClass = "patsyn.SimpleMath"){
+      i => println(s"*** $i ***")
     }
   }
 }
