@@ -19,6 +19,10 @@ object SimpleMath {
     xs(i)
   }
 
+  def randomGuess(random: Random)(pTrue: Double): Boolean = {
+    random.nextDouble() < pTrue
+  }
+
   def natToList(n: Int, base: Int): List[Int] = {
     require(n>=0)
     require(base > 0)

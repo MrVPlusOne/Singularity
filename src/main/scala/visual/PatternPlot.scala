@@ -35,9 +35,15 @@ object PatternPlot {
       values
     } else {
       val r = new Random(seed)
-      val p = maxPoints.toDouble / values.length
       val xs = {
-        val filtered = values.indices.filter(_ => r.nextDouble() <= p)
+        var dataPointsLeft = maxPoints
+        val filtered = values.indices.filter{i =>
+          val keep = SimpleMath.randomGuess(r)(dataPointsLeft.toDouble/(values.length-i))
+          if(keep){
+            dataPointsLeft -= 1
+          }
+          keep
+        }
         if (filtered.last != (values.length - 1)) filtered :+ (values.length - 1) else filtered
       }
       xs.map(values.apply)
@@ -55,7 +61,7 @@ object PatternPlot {
   def showResourceUsageChart(probConfig: ProblemConfig,
                              ind: MultiStateInd,
                              sizeLimit: Int,
-                             pointDensity: Int = 10,
+                             plotPoints: Int = 10,
                              lineName: String = "pattern",
                              plotName: String = "Resource Usage Chart",
                              xLabel: String = "size",
@@ -66,7 +72,7 @@ object PatternPlot {
       setVisible(true)
     }
     val xys = plotPatternPerformance(probConfig, ind, sizeLimit, maxPoints
-      = pointDensity)
+      = plotPoints)
 
     var data = IndexedSeq[(Double, Double)]()
     xys.foreach{ xy =>
@@ -82,9 +88,9 @@ object PatternPlot {
 
   def main(args: Array[String]): Unit = {
     val patternFile = "results-running/check[performance~=6e5,ioId=4,seed=4](17-12-03-16:28:54)/bestIndividual.serialized"
-    val sizeLimit = 1000
+    val sizeLimit = 500
     val ind = FileInteraction.readObjectFromFile[MultiStateInd](patternFile)
     val config = GuavaExamples.immutableBiMap_inverse
-    showResourceUsageChart(config, ind, sizeLimit)
+    showResourceUsageChart(config, ind, sizeLimit, plotPoints = 30)
   }
 }
