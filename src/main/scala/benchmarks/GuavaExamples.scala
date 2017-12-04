@@ -109,7 +109,7 @@ object GuavaExamples {
     val rand = new Random(seed)
     sledgehammerProblem(
       collect_hashing_smear,
-      RunnerConfig().copy(randomSeed = seed, ioId = seed),
+      RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = false),
       ExecutionConfig(sizeOfInterest = 1600, timeLimitInMillis = 20000), rand)
   }
 
