@@ -1,65 +1,45 @@
 package cli
 
-import patsyn.SimpleMath
+import patsyn.Runner.RunnerConfig
+import patsyn.{ExecutionConfig, SimpleMath}
 import scopt.OptionParser
 
 case class BatchRunOption(benchNames: Seq[String] = Seq(),
                           jobNumber: Int = 1,
                           benchTrials: Int = 1,
+                          execConfig: ExecutionConfig = ExecutionConfig(),
+                          sizeOfInterestOverride: Option[Int] = None,  // merely to get around with the fact that ExecutionConfig.sizeOfInterest is not an optional
                           keepBestIndividuals: Boolean = false,
-                          timeLimitInMillis: Int = 120000,
-                          jobTimeout: Option[Int] = None,
                           startIoId: Int = 0,
                           startSeed: Int = 0)
 
-case class SingleRunOption(benchName: String, ioId: Int, seed: Int, evalTimeLimit: Int, jobTimeout: Option[Int], keepBestIndividuals: Boolean)
+case class SingleRunOption(benchName: String, executionConfig: ExecutionConfig, runnerConfig: RunnerConfig, sizeOfInterestOverride: Option[Int])
 
 object BatchRunDriver {
 
-  private def runCmdWithTimeout(cmd: String, sec: Int) = {
-    import sys.process._
-    import scala.concurrent._
-    import ExecutionContext.Implicits.global
-    val proc = cmd.run()
-    val f = Future(blocking(proc.exitValue()))
-    try
-      Await.result(f, duration.Duration(sec, "sec"))
-    catch {
-      case _: TimeoutException =>
-        println("TIMEOUT!")
-        proc.destroy()
-        proc.exitValue()
-    }
-  }
-
-  private def runCmdWithoutTimeout(cmd: String) = {
+  private def runCmd(cmd: String) = {
     import sys.process._
     cmd.split("\\s+").toSeq.!
   }
 
   def runSingle(opt: SingleRunOption): Unit = {
-    println(s"[JOB STARTED] $opt")
+
 
     import java.io.File
     import java.nio.file.Paths
     val javaPath = Paths.get(System.getProperty("java.home"), "bin", "java").toFile.getAbsolutePath
     val jarPath = new File(this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath).getAbsolutePath
 
-    val timeoutOpt = s"--time-limit ${opt.evalTimeLimit}"
-    val keepOpt = if (opt.keepBestIndividuals) "-k" else ""
-    val maxNonIncreaseOpt = if (opt.jobTimeout.isDefined) "--max-nonincrease-gen -1" else ""
-    val cmdOpts = s"-i ${opt.ioId} -s ${opt.seed} -n $timeoutOpt $keepOpt $maxNonIncreaseOpt ${opt.benchName}"
+    val timeoutOpt = s"--time-limit ${opt.executionConfig.timeLimitInMillis}"
+    val keepOpt = if (opt.runnerConfig.keepBestIndividuals) "-k" else ""
+    val maxNonIncreaseOpt = opt.executionConfig.maxFuzzingTimeSec.map(gen => s"--max-nonincrease-gen $gen").getOrElse("")
+    val taskSizeOpt = opt.sizeOfInterestOverride.map(size => s"--task-size $size").getOrElse("")
+    val cmdOpts = s"-i ${opt.runnerConfig.ioId} -s ${opt.runnerConfig.randomSeed} -n $timeoutOpt $keepOpt $maxNonIncreaseOpt $taskSizeOpt ${opt.benchName}"
     val cmd = s"$javaPath -cp $jarPath cli.BenchmarkDriver $cmdOpts"
+
+    println(s"[JOB STARTED] $opt")
     println(cmd)
-
-    opt.jobTimeout match {
-      case Some(i) =>
-        println(s"[SET JOB TIMEOUT] $i sec")
-        runCmdWithTimeout(cmd, i)
-      case None =>
-        runCmdWithoutTimeout(cmd)
-    }
-
+    runCmd(cmd)
     println(s"[JOB FINISHED] $opt")
   }
 
@@ -68,7 +48,8 @@ object BatchRunDriver {
       for { bench <- opt.benchNames; seed <- opt.startSeed until opt.startSeed + opt.benchTrials} yield (bench, seed)
     val singleConfigs = benchNameSeeds.zipWithIndex.map {
       case ((benchName: String, seed: Int), ioId: Int) =>
-        SingleRunOption(benchName, ioId, seed, opt.timeLimitInMillis, opt.jobTimeout, opt.keepBestIndividuals)
+        val runnerConfig = RunnerConfig().copy(ioId = ioId, randomSeed = seed, useGUI = false, keepBestIndividuals = opt.keepBestIndividuals)
+        SingleRunOption(benchName, opt.execConfig, runnerConfig, sizeOfInterestOverride = opt.sizeOfInterestOverride)
     }
 
     SimpleMath.parallelMap(singleConfigs, opt.jobNumber)(runSingle)
@@ -95,10 +76,16 @@ object BatchRunDriver {
         "separated file instead of overwriting the file that stores the previous best one. Off by default.")
 
       opt[Int]("time-limit").action((x, c) =>
-        c.copy(timeLimitInMillis = x)).text("Time limit for each black-box execution (in milliseconds). Default to 120000.")
+        c.copy(execConfig = c.execConfig.copy(timeLimitInMillis = x))).text("Time limit for each black-box execution (in milliseconds). Default to 120000.")
 
       opt[Int]("job-timeout").action((x, c) =>
-        c.copy(jobTimeout = Some(x))).text("Timeout for each job (in seconds). Default to infinity. ")
+        c.copy(execConfig = c.execConfig.copy(maxFuzzingTimeSec = Some(x)))).text("Timeout for each job (in seconds). Default to infinity. ")
+
+      opt[Int]("max-nonincrease-gen").action((x, c) =>
+        c.copy(execConfig = c.execConfig.copy(maxNonIncreaseGen = Some(x)))).text("Stop the program if the best fitness has not increased for this number of generations. Dose not specify this value means it should never stop.")
+
+      opt[Int]("task-size").hidden().action((x, c) =>
+        c.copy(sizeOfInterestOverride = Some(x))).text("Manually override the problem size for the fuzzing task. Only specify this when you know what you are doing.")
 
       opt[Int]("base-ioid").action((id, c) =>
         c.copy(startIoId = id)
