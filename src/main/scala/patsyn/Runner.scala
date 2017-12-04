@@ -220,22 +220,21 @@ object Runner {
       }
 
       generations.takeWhile(pop => {
-        val shouldContinue = bestSoFar match {
-          case Some(previousBest) =>
-            if (pop.bestIndData.evaluation.fitness > previousBest.evaluation.fitness) {
-              nonIncreasingTime = 0
-              setBestInd(pop.bestIndData)
-            }
-            nonIncreasingTime <= maxNonIncreaseTime || maxNonIncreaseTime < 0
-          case None =>
+        nonIncreasingTime += 1
+        bestSoFar.foreach{ previousBest =>
+          if (pop.bestIndData.evaluation.fitness > previousBest.evaluation.fitness) {
+            nonIncreasingTime = 0
             setBestInd(pop.bestIndData)
-            true
+          }
         }
-        if (maxNonIncreaseTime >= 0) {
-          println(s"Until stabilized: ${maxNonIncreaseTime - nonIncreasingTime} generations")
-          nonIncreasingTime += 1
+        println(s"Last fitness increase: $nonIncreasingTime generations ago.")
+
+        val shouldStop = {
+          val timeInSec = (System.nanoTime() - startTime) / 1e9
+          maxNonIncreaseGen.exists(nonIncreasingTime > _) ||
+          maxFuzzingTimeSec.exists(timeInSec > _)
         }
-        shouldContinue
+        !shouldStop
       }).zipWithIndex.foreach { case (pop, i) =>
         val best = pop.bestIndData
         val data = MonitoringData(pop.averageFitness, best.evaluation.fitness, best.evaluation.performance)

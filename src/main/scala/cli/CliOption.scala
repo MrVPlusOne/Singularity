@@ -14,7 +14,8 @@ case class CliOption(target: String = "",
                      singleSizeTolerance: Int = 30,
                      threadNum: Int = 1,
                      timeLimitInMillis: Int = 10000,
-                     maxNonIncreaseTime: Int = 150,
+                     maxNonIncreaseGenerations: Option[Int] = None,
+                     maxFuzzingTimeSec: Option[Int] = None,
                      extrapolatePattern: Option[ExtrapolationArgs] = None,
                      plotPattern: Option[PlotArgs] = None
                     )

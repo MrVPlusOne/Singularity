@@ -83,7 +83,7 @@ object BenchmarkDriver {
                             option.evaluationTrials,
                             option.totalSizeTolerance,
                             option.singleSizeTolerance)
-    val execConfig = ExecutionConfig(sizeOfInterest, threadNum, timeLimitInMillis, maxNonIncreaseTime)
+    val execConfig = ExecutionConfig(sizeOfInterest, threadNum, timeLimitInMillis, maxNonIncreaseGenerations)
 
     RunConfig(runnerConfig, gpConfig, execConfig)
   }
@@ -165,8 +165,10 @@ object BenchmarkDriver {
         c.copy(threadNum = x)).text("Thread number to use for individual evaluation. Default to 1.")
 
       opt[Int]("max-nonincrease-gen").action((x, c) =>
-        c.copy(maxNonIncreaseTime = x)).text("Stop after this number of generations if the fitness " +
-        " for the best individual does not increase. Specifying a negative value here will make the tool run forever. Default to 150.")
+        c.copy(maxNonIncreaseGenerations = Some(x))).text("Stop the program if the best fitness has not increased for this number of generations. Dose not specify this value means it should never stop.")
+
+      opt[Int]("max-fuzzing-time").action((x, c) =>
+        c.copy(maxNonIncreaseGenerations = Some(x))).text("Stop the program after this amount of time (in seconds). Dose not specify this value means it should never stop.")
 
       opt[Int]("time-limit").action((x, c) =>
         c.copy(timeLimitInMillis = x)).text("Time limit for each black-box execution (in milliseconds). Default to " +

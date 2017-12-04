@@ -39,13 +39,15 @@ case class GPConfig(populationSize: Int = 500,
 case class ExecutionConfig(sizeOfInterest: Int = 300,
                            threadNum: Int = 1,
                            timeLimitInMillis: Int = 120000,
-                           maxNonIncreaseTime: Int = 150){
+                           maxNonIncreaseGen: Option[Int] = Some(150),
+                           maxFuzzingTimeSec: Option[Long] = None
+                          ){
   def show: String = {
     s"""
        |sizeOfInterest: $sizeOfInterest
        |threadNum：$threadNum
        |timeLimitInMillis：$timeLimitInMillis
-       |maxNonIncreaseTime：$maxNonIncreaseTime
+       |maxNonIncreaseGen：$maxNonIncreaseGen
      """.stripMargin
   }
 }
