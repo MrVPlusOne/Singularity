@@ -72,7 +72,7 @@ object SimpleMath {
     }
   }
 
-  def processMap(args: Array[String], tasks: IS[Int], processNum: Int, mainClass: String)(f: Int => Unit): Unit = {
+  def processMap(args: Array[String], tasks: IS[Int], processNum: Int, mainClass: Object)(f: Int => Unit): Unit = {
     if(args.isEmpty){
       parallelMap(tasks, processNum){ i =>
         println(s"[JOB STARTED] id = $i")
@@ -83,7 +83,13 @@ object SimpleMath {
         val jarPath = new File(this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath).getAbsolutePath
 
 
-        val cmd = s"$javaPath -cp $jarPath $mainClass $i" //be careful not to create fork bombs!
+        val mainClassName = {
+          val s = mainClass.getClass.getName
+          assert(s.last == '$')
+          s.init
+        }
+        println(s"mainClassName = ${mainClassName}")
+        val cmd = s"$javaPath -cp $jarPath $mainClassName $i" //be careful not to create fork bombs!
         println(cmd)
 
         import sys.process._
@@ -97,7 +103,7 @@ object SimpleMath {
   }
 
   def main(args: Array[String]): Unit = {
-    processMap(args, 0 until 100, 3, mainClass = "patsyn.SimpleMath"){
+    processMap(args, 0 until 100, 3, mainClass = this){
       i => println(s"*** $i ***")
     }
   }

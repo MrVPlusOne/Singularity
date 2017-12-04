@@ -262,8 +262,10 @@ object Runner {
       try{
         import java.io.File
         val performance = bestSoFar.get.evaluation.performance
+        val newDir = s"results/$problemName[performance=$performance][ioId=$ioId,seed=$randomSeed]($dateTimeString)"
+        FileInteraction.mkDirsAlongPath(newDir)
         new File(recordDirPath).renameTo(
-          new File(s"results/$problemName[performance=$performance][ioId=$ioId,seed=$randomSeed]($dateTimeString)"))
+          new File(newDir))
       }finally {
         if(callExitAfterFinish){
           System.exit(0)
