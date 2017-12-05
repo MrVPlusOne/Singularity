@@ -93,12 +93,14 @@ object PatternPlot {
 
   def main(args: Array[String]): Unit = {
     val patternFiles = Seq(
-      "ImmutableBiMap.copyOf[performance=1796418.0][ioId=103,seed=103](17-12-04-12:36:26)"
+      "ImmutableSet.copyOf[performance=369018.0][ioId=7,seed=7](17-12-05-10/33/41)",
+      "ImmutableSet.copyOf[performance=381763.0][ioId=9,seed=9](17-12-05-10/33/41)",
+      "ImmutableSet.copyOf[performance=596477.0][ioId=10,seed=10](17-12-05-10/33/41)"
     )
-    val sizeLimit = 1000
-    for(file <- patternFiles) {
-      val ind = FileInteraction.readObjectFromFile[MultiStateInd]("/Users/weijiayi/Downloads/results-running/"+file+"/bestIndividual.serialized")
-      val config = GuavaExamples.immutableBiMap_copyOf
+    val sizeLimit = 1200
+    for(n <- patternFiles; file = n.replace("/",":")) {
+      val ind = FileInteraction.readObjectFromFile[MultiStateInd]("/Users/weijiayi/Downloads/ImmutableSetInitialResults/"+file+"/bestIndividual.serialized")
+      val config = GuavaExamples.immutableSet_copyOf
       showResourceUsageChart(config, ind, sizeLimit, plotPoints = 100, plotName = file, exitOnClose = false)
     }
   }
