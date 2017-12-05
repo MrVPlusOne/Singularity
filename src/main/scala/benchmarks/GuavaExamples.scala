@@ -126,15 +126,15 @@ object GuavaExamples {
     fuzzProblem(
       immutableSet_copyOf,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
-      ExecutionConfig(sizeOfInterest = 1200, timeLimitInMillis = 20000), rand)
+      ExecutionConfig(sizeOfInterest = 1200, timeLimitInMillis = 100000), rand)
   }
 
   def main(args: Array[String]): Unit = {
-//    SimpleMath.processMap(args,
-//      0 to 100, processNum = 20,
-//      mainClass = this){
-//      i => runExample(i, useGUI = false)
-//    }
-    runExample(7, useGUI = true)
+    SimpleMath.processMap(args,
+      0 to 60, processNum = 14,
+      mainClass = this){
+      i => runExample(i, useGUI = false)
+    }
+//    runExample(7, useGUI = true)
   }
 }
