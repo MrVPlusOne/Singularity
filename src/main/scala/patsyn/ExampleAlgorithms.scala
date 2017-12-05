@@ -1196,4 +1196,40 @@ object FuzzingTaskProvider {
       }
     }
   }
+
+  def regexNativeExample(regexId: Int)(workingDir: String) = new NativeExample("pcre_str") {
+
+    def sizeF = {
+      case IS(VectValue(v)) => v.length
+    }
+
+    def outputTypes = IS(EVect(EInt))
+
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      sizeOfInterest = 100,
+      resourceUsage = {
+        case IS(VectValue(v)) =>
+          val data = toIntVect(v).map(x => x.toByte).toArray
+          writeByteArrayRunNativeGetCost(data, workingDir)
+      },
+      gpEnv = sortingEnv
+    )
+
+    override def writeByteArrayRunNativeGetCost(data: Array[Byte], workingDir: String): Double = {
+      val inputFileName = s"$workingDir/input"
+      FileInteraction.deleteIfExist(inputFileName)
+      FileInteraction.writeToBinaryFile(inputFileName)(data)
+      val cmdParams = s"$inputFileName $regexId"
+      runNativeGetCost(cmdParams)
+    }
+
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      value match {
+        case IS(VectValue(v)) =>
+          val data = toIntVect(v).map(x => x.toByte).toArray
+          val fileName = s"$name.bin"
+          FileInteraction.writeToBinaryFile(fileName)(data)
+      }
+    }
+  }
 }
