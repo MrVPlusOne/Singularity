@@ -24,7 +24,7 @@ object GuavaExamples {
   }
 
 
-  def collect_hashing_smear = {
+  def collect_hashing_smear: ProblemConfig = {
     val C1 = 0xcc9e2d51
     val C2 = 0x1b873593
 
@@ -58,11 +58,27 @@ object GuavaExamples {
     )
   }
 
-  def collect_set = {
-    ???
+  def immutableSet_copyOf: ProblemConfig = {
+    ProblemConfig(
+      "ImmutableSet.copyOf",
+      outputTypes = IS(EVect(EInt)),
+      sizeF = {
+        case IS(v) => v.memoryUsage.toInt
+      },
+      resourceUsage = {
+        case IS(VectValue(vec)) =>
+          val vecInt = vec.map(_.asInstanceOf[IntValue].value)
+          val list = TestGuava.seqToArrayList(vecInt)
+          measureCost{
+            handleException(()){
+              TestGuava.arrayListToSet(list)
+            }
+          }
+      }
+    )
   }
 
-  def immutableBiMap_copyOf = {
+  def immutableBiMap_copyOf: ProblemConfig = {
     ProblemConfig(
       "ImmutableBiMap.copyOf",
       outputTypes = IS(EVect(EPair(EInt, EInt))),
@@ -71,19 +87,19 @@ object GuavaExamples {
       },
       resourceUsage = {
         case IS(VectValue(pairs)) =>
-          val list = TestImmutableBiMap.toArrayListPair(pairs.map {
+          val list = TestGuava.toArrayListPair(pairs.map {
             case PairValue((IntValue(k), IntValue(v))) => (new Integer(k), new Integer(v))
           })
           measureCost {
             handleException(()) {
-              TestImmutableBiMap.arrayListToBiMap(list)
+              TestGuava.arrayListToBiMap(list)
             }
           }
       }
     )
   }
 
-  def immutableBiMap_inverse = {
+  def immutableBiMap_inverse: ProblemConfig = {
     ProblemConfig(
       "ImmutableBiMap.inverse",
       outputTypes = IS(EVect(EPair(EInt, EInt))),
@@ -97,7 +113,7 @@ object GuavaExamples {
           }.toMap.toVector
 
           handleException(0.0) {
-            val map = TestImmutableBiMap.arrayListToBiMap(TestImmutableBiMap.toArrayListPair(disdinctKey))
+            val map = TestGuava.arrayListToBiMap(TestGuava.toArrayListPair(disdinctKey))
             measureCost(map.inverse())
           }
       }
@@ -105,19 +121,20 @@ object GuavaExamples {
   }
 
 
-  def runExample(seed: Int): Unit = {
+  def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
     sledgehammerProblem(
-      collect_hashing_smear,
-      RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = false),
-      ExecutionConfig(sizeOfInterest = 1600, timeLimitInMillis = 20000), rand)
+      immutableBiMap_copyOf,
+      RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
+      ExecutionConfig(sizeOfInterest = 1200, timeLimitInMillis = 20000), rand)
   }
 
   def main(args: Array[String]): Unit = {
-    SimpleMath.processMap(args,
-      0 to 100, processNum = 20,
-      mainClass = this){
-      i => runExample(i)
-    }
+//    SimpleMath.processMap(args,
+//      0 to 100, processNum = 20,
+//      mainClass = this){
+//      i => runExample(i, useGUI = false)
+//    }
+    runExample(5, useGUI = true)
   }
 }
