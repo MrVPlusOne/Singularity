@@ -110,7 +110,7 @@ object BenchmarkDriver {
                   println(s"*** Task $name started ***")
                   try {
                     if (cliOption.useSledgehammer) {
-                      Sledgehammer.sledgehammerTask(name, taskProvider, config.runnerConfig, config.execConfig, random)
+                      Supernova.fuzzTask(name, taskProvider, config.runnerConfig, config.execConfig, random)
                     } else {
                       Runner.runExample(name, taskProvider, config)
                     }

@@ -1,6 +1,6 @@
 package cli
 
-import patsyn.{ProblemConfig, RunConfig, Sledgehammer}
+import patsyn.{ProblemConfig, RunConfig, Supernova}
 import scopt.OptionParser
 
 import scala.util.Random
@@ -45,7 +45,7 @@ object JarTester {
 
     val rand = new Random(runConfig.runnerConfig.randomSeed)
 
-    Sledgehammer.sledgehammerProblem(
+    Supernova.fuzzProblem(
       problemConfig = ProblemConfig(
         problemName = method.getName,
         outputTypes = IS(EVect(EInt)),

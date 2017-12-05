@@ -4,7 +4,7 @@ import edu.utexas.stac.Cost
 import patsyn.Runner.RunnerConfig
 import patsyn._
 import patsyn.StandardSystem._
-import Sledgehammer._
+import Supernova._
 
 import scala.util.Random
 
@@ -123,8 +123,8 @@ object GuavaExamples {
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
-    sledgehammerProblem(
-      immutableBiMap_copyOf,
+    fuzzProblem(
+      immutableSet_copyOf,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
       ExecutionConfig(sizeOfInterest = 1200, timeLimitInMillis = 20000), rand)
   }
@@ -135,6 +135,6 @@ object GuavaExamples {
 //      mainClass = this){
 //      i => runExample(i, useGUI = false)
 //    }
-    runExample(5, useGUI = true)
+    runExample(7, useGUI = true)
   }
 }
