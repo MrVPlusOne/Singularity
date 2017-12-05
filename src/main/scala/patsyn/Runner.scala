@@ -20,12 +20,16 @@ object Runner {
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
 
 
-  case class MonitorManager(monitorCallback: MonitoringData => Unit, evalProgressCallback: Int => Unit)
+  case class MonitorManager(monitorCallback: MonitoringData => Unit,
+                            evalProgressCallback: Int => Unit,
+                            saveMonitor: String => Unit)
 
-  def createMonitor(populationSize: Int, ioId: Int): MonitorManager = {
+  def createMonitor(populationSize: Int, ioId: Int,
+                    width: Int = 600, height: Int = 450): MonitorManager = {
     import javax.swing._
-
     import visual._
+    import org.jfree.chart.ChartUtilities
+    import java.io.File
 
     val frame = new JFrame(s"GP Monitor [ioId=$ioId]") {
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
@@ -33,7 +37,19 @@ object Runner {
     }
 
     var dataCollected = IS[MonitoringData]()
-    var monitorPanel: MonitorPanel = null
+
+    def drawChart() = {
+      import ListPlot.makeXY
+
+      val avFitLine = dataCollected.map(_.averageFitness)
+      val bestFitness = dataCollected.map(_.bestFitness)
+      val bestPerformance = dataCollected.map(_.bestPerformance)
+
+      ListPlot.plot(
+        "best performance" -> makeXY(bestPerformance),
+        "best fitness" -> makeXY(bestFitness),
+        "average fitness" -> makeXY(avFitLine))("Performance Curve", "Generations", "Evaluation")
+    }
 
     val progressLabel = new JLabel()
     val contentPane = new JPanel {
@@ -41,24 +57,15 @@ object Runner {
     }
     contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS))
     frame.setContentPane(contentPane)
-    frame.setPreferredSize(new Dimension(600, 480))
+    frame.setPreferredSize(new Dimension(width, height))
     frame.pack()
 
     MonitorManager(
       monitorCallback = d => {
-        import ListPlot.makeXY
-
         dataCollected :+= d
 
-        val avFitLine = dataCollected.map(_.averageFitness)
-        val bestFitness = dataCollected.map(_.bestFitness)
-        val bestPerformance = dataCollected.map(_.bestPerformance)
-
-        val chart = ListPlot.plot(
-          "best performance" -> makeXY(bestPerformance),
-          "best fitness" -> makeXY(bestFitness),
-          "average fitness" -> makeXY(avFitLine))("Performance Curve", "Generations", "Evaluation")
-        monitorPanel = new MonitorPanel(chart, 10, (600, 450))
+        val chart = drawChart()
+        val monitorPanel = new MonitorPanel(chart, 10, (width, height))
         if (contentPane.getComponentCount > 1) {
           contentPane.remove(1)
         }
@@ -67,6 +74,10 @@ object Runner {
       },
       evalProgressCallback = p => {
         progressLabel.setText(s"progress: $p/$populationSize")
+      },
+      saveMonitor = name => {
+        val chart = drawChart()
+        ChartUtilities.saveChartAsPNG(new File(name), chart, width, height)
       }
     )
   }
@@ -100,17 +111,18 @@ object Runner {
       s"results-running/$problemName[ioId=$ioId,seed=$randomSeed]($dateTimeString)"
     }
 
-    val (evalProgressCallback, monitorCallback): (Int => Unit, MonitoringData => Unit) = {
+    val (evalProgressCallback, monitorCallback, saveMonitor):
+      (Int => Unit, MonitoringData => Unit, String => Unit) = {
       if (useGUI) {
         val monitor = createMonitor(populationSize, ioId)
-        (monitor.evalProgressCallback, monitor.monitorCallback)
+        (monitor.evalProgressCallback, monitor.monitorCallback, monitor.saveMonitor)
       } else {
         val monitorDataPath = s"$recordDirPath/monitorData.txt"
         ((_: Int) => Unit, (data: MonitoringData) => {
           FileInteraction.writeToFile(monitorDataPath, append = true){
             s"${data.bestPerformance}, ${data.bestFitness}, ${data.averageFitness}\n"
           }
-        })
+        }, (_: String) => Unit)
       }
     }
 
@@ -239,6 +251,7 @@ object Runner {
         val best = pop.bestIndData
         val data = MonitoringData(pop.averageFitness, best.evaluation.fitness, best.evaluation.performance)
         monitorCallback(data)
+        saveMonitor(s"$recordDirPath/monitor.png")
 
         println("------------")
         print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
@@ -264,8 +277,7 @@ object Runner {
         val performance = bestSoFar.get.evaluation.performance
         val newDir = s"results/$problemName[performance=$performance][ioId=$ioId,seed=$randomSeed]($dateTimeString)"
         FileInteraction.mkDirsAlongPath(newDir)
-        new File(recordDirPath).renameTo(
-          new File(newDir))
+        new File(recordDirPath).renameTo(new File(newDir))
       }finally {
         if(callExitAfterFinish){
           System.exit(0)
