@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage
 
 import edu.utexas.stac.Cost
 import patsyn.GeneticOperator.ExprGen
-import patsyn.StandardSystem.{EInt, EVect, IntComponents, IntValue, VectComponents, VectValue, _}
+import patsyn.StandardSystem._
 
 import scala.util.Random
 
@@ -1085,7 +1085,8 @@ object FuzzingTaskProvider {
     }
   }
 
-  abstract class NativeExample(name: String) extends FuzzingTaskProvider {
+  class NativeExample(name: String) {
+
     // We need this to be lazy since we don't want to actively looking for the binary if we do not need to run it
     lazy val nativeBinaryPath: String = {
       val arch = System.getProperty("os.arch") match {
@@ -1129,7 +1130,9 @@ object FuzzingTaskProvider {
     }
   }
 
-  def sortNativeExample(name: String)(workingDir: String) = new NativeExample(name) {
+  def sortNativeExample(name: String)(workingDir: String) = new FuzzingTaskProvider {
+    val native = new NativeExample(name)
+    import native._
 
     def sizeF = {
       case IS(VectValue(v)) => v.length
@@ -1169,7 +1172,9 @@ object FuzzingTaskProvider {
 
   def slowfuzzQsortNativeExample = sortNativeExample("qsort") _
 
-  def phpHashNativeExample(workingDir: String) = new NativeExample("phphash") {
+  def phpHashNativeExample(workingDir: String) = new FuzzingTaskProvider {
+    val native = new NativeExample("phphash")
+    import native._
 
     def sizeF = {
       case IS(VectValue(v)) => v.length
@@ -1197,13 +1202,23 @@ object FuzzingTaskProvider {
     }
   }
 
-  def regexNativeExample(regexId: Int)(workingDir: String) = new NativeExample("pcre_str") {
+  def regexNativeExample(regexId: Int)(workingDir: String) = new FuzzingTaskProvider {
+    val native = new NativeExample("pcre_str")
+    import native._
 
     def sizeF = {
       case IS(VectValue(v)) => v.length
     }
 
     def outputTypes = IS(EVect(EInt))
+
+    def writeByteArrayRunNativeGetCost(data: Array[Byte], workingDir: String): Double = {
+      val inputFileName = s"$workingDir/input"
+      FileInteraction.deleteIfExist(inputFileName)
+      FileInteraction.writeToBinaryFile(inputFileName)(data)
+      val cmdParams = s"$inputFileName $regexId"
+      runNativeGetCost(cmdParams)
+    }
 
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
       sizeOfInterest = 100,
@@ -1215,13 +1230,6 @@ object FuzzingTaskProvider {
       gpEnv = sortingEnv
     )
 
-    override def writeByteArrayRunNativeGetCost(data: Array[Byte], workingDir: String): Double = {
-      val inputFileName = s"$workingDir/input"
-      FileInteraction.deleteIfExist(inputFileName)
-      FileInteraction.writeToBinaryFile(inputFileName)(data)
-      val cmdParams = s"$inputFileName $regexId"
-      runNativeGetCost(cmdParams)
-    }
 
     override def saveValueWithName(value: IS[EValue], name: String): Unit = {
       value match {
@@ -1231,5 +1239,52 @@ object FuzzingTaskProvider {
           FileInteraction.writeToBinaryFile(fileName)(data)
       }
     }
+  }
+
+  //fixme: not working
+  def bzipExample(workingDir: String, bytesNum: Int) = new FuzzingTaskProvider {
+    val native = new NativeExample("bzip")
+    import native._
+
+    protected def task = {
+      RunningFuzzingTask(
+        sizeOfInterest = 2,
+        resourceUsage = {
+          case bytes =>
+            val data = bytes.asInstanceOf[IS[ByteValue]].map(_.value).toArray
+            writeByteArrayRunNativeGetCost(data, workingDir)
+        },
+        gpEnv = GPEnvironment(
+          constMap = Map(EByte -> ExprGen(EByte, r => EConst(EByte, ByteValue(r.nextInt(256).toByte)))),
+          functions = IS(),
+          stateTypes = IS(),
+          argConstRatio = 0.5
+        )
+      )
+    }
+
+    def outputTypes = IS.fill(bytesNum)(EByte)
+
+    def sizeF = {
+      case bytes =>  bytes.length
+    }
+  }
+
+  def bzipProblem(workingDir: String) = {
+    val native = new NativeExample("bzip")
+    import native._
+
+    ProblemConfig(
+      "bzip",
+      outputTypes = IS(EVect(EInt)),
+      sizeF = {
+        case IS(vec) => vec.memoryUsage.toInt
+      },
+      resourceUsage = {
+        case IS(VectValue(vec)) =>
+          val data = toIntVect(vec).map(x => x.toByte).toArray
+          writeByteArrayRunNativeGetCost(data, workingDir)
+      }
+    )
   }
 }

@@ -75,13 +75,15 @@ object Supernova{
     )
   }
 
-  def genGPParameters(outputTypes: IS[EType], rand: Random): (GPEnvironment, GPConfig) = {
+  def genGPParameters(outputTypes: IS[EType], rand: Random, aggressiveness: Option[Double] = None): (GPEnvironment, GPConfig) = {
     import SimpleMath._
 
-    val ag = sigmoid{
-      rand.nextDouble()
-      rand.nextDouble()
-      rand.nextGaussian()
+    val ag = aggressiveness.getOrElse {
+      sigmoid {
+        rand.nextDouble()
+        rand.nextDouble()
+        rand.nextGaussian()
+      }
     }
 
     val env = genStandardEnv(rand, aggressiveness = ag)(outputTypes)
@@ -96,15 +98,22 @@ object Supernova{
     }
   }
 
-  def fuzzProblem(problemConfig: ProblemConfig, runnerConfig: RunnerConfig, execConfig: ExecutionConfig, rand: Random): Unit ={
-    val (env, gpConfig) = genGPParameters(problemConfig.outputTypes, rand)
+  def fuzzProblem(problemConfig: ProblemConfig, runnerConfig: RunnerConfig, execConfig: ExecutionConfig, rand: Random, aggressiveness: Option[Double] = None): Unit ={
+    val (env, gpConfig) = genGPParameters(problemConfig.outputTypes, rand, aggressiveness)
     Runner.run(problemConfig, env, RunConfig(runnerConfig, gpConfig, execConfig))
   }
 
   def main(args: Array[String]): Unit = {
-    val example = FuzzingTaskProvider.hashCollisionExample(HashFunc.php, 16)
     val seed = 3
+    val workingDir = FileInteraction.getWorkingDir(seed)
     val rand = new Random(seed)
-    fuzzTask("hashCollision", example, RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(), rand)
+
+//    val example = FuzzingTaskProvider.bzipExample(workingDir, 200)
+//    fuzzTask("hashCollision", example, RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(), rand)
+    val prob = FuzzingTaskProvider.bzipProblem(workingDir)
+    fuzzProblem(prob,
+      RunnerConfig().copy(randomSeed = seed, ioId = seed),
+      ExecutionConfig().copy(sizeOfInterest = 200),
+      rand, aggressiveness = Some(0.9))
   }
 }

@@ -8,7 +8,9 @@ object StandardSystem {
   // Type declarations
   case object EInt extends EType()
 
-  case class EByteArray(size: Int) extends EType()
+  case class EByteArray(byteNum: Int) extends EType()
+
+  case object EByte extends EType()
 
   case class EVect(elemT: EType) extends EType(elemT)
 
@@ -37,6 +39,15 @@ object StandardSystem {
     override def toString: String = s"[${value.mkString(":")}]"
 
     override def memoryUsage: Long = value.length + 1
+  }
+
+  case class ByteValue(value: Byte) extends EValue {
+    override def hasType(ty: EType): Boolean = ty == EByte
+
+
+    override def toString: String = s"$value"
+
+    override def memoryUsage: Long = 1
   }
 
   case class VectValue(value: Vector[EValue]) extends EValue{
