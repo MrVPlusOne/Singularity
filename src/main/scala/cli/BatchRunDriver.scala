@@ -52,7 +52,7 @@ object BatchRunDriver {
         SingleRunOption(benchName, opt.execConfig, runnerConfig, sizeOfInterestOverride = opt.sizeOfInterestOverride)
     }
 
-    SimpleMath.parallelMap(singleConfigs, opt.jobNumber)(runSingle)
+    SimpleMath.parallelMapOrdered(singleConfigs, opt.jobNumber)(runSingle)
   }
 
   def main(args: Array[String]): Unit = {

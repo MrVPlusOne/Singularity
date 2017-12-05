@@ -58,6 +58,7 @@ object SimpleMath {
   def sigmoid(x: Double) = 1.0/(1+math.exp(-x))
 
   def parallelMap[A,B](seq: Seq[A], threadNum: Int)(f: A => B): Seq[B] = {
+    require(threadNum>0)
     import scala.collection.parallel
     import parallel._
 
@@ -72,9 +73,71 @@ object SimpleMath {
     }
   }
 
+  /**
+    * Perform a map on a [[Seq]] in parallel. The order of starting each task is preserved as the [[Seq]].  */
+  def parallelMapOrdered[A,B](seq: Seq[A], threadNum: Int, timeoutSec: Int = 20474834)(f: A => B): Seq[B] = {
+    require(threadNum>0)
+
+    if(threadNum>1) {
+      import akka.actor._
+      import scala.concurrent.duration._
+
+      object StartTask
+      case class EvalTask(content: A)
+      case class EvalResult(content: B)
+
+      class MasterClass(supervisor: ActorRef, system: ActorSystem) extends Actor {
+        val slaves: IS[ActorRef] = IS.fill(threadNum)(system.actorOf(Props(new SlaveActor())))
+        var started = 0
+        var finished = 0
+        val tasks: IS[A] = seq.toIndexedSeq
+        var results: List[B] = List()
+
+        def getNextTask(): EvalTask = {
+          val t = tasks(started)
+          started += 1
+          EvalTask(t)
+        }
+
+        def receive: PartialFunction[Any, Unit] = {
+          case StartTask =>
+            (0 until math.min(threadNum, tasks.length)).foreach { case i =>
+              slaves(i) ! getNextTask()
+            }
+          case EvalResult(b) =>
+            results = b :: results
+            finished += 1
+            if(started < tasks.length){
+              sender() ! getNextTask()
+            }
+            if(finished == tasks.length)
+              supervisor ! results.reverse
+        }
+      }
+
+      class SlaveActor extends Actor {
+        def receive: PartialFunction[Any, Unit] = {
+          case EvalTask(content) =>
+            val r = f(content)
+            sender() ! EvalResult(r)
+        }
+      }
+
+      val system = ActorSystem("parallelMap-system")
+      val inbox = Inbox.create(system)
+      val master = system.actorOf(Props(new MasterClass(inbox.getRef(), system)))
+      master ! StartTask
+      val result = inbox.receive(timeoutSec.seconds).asInstanceOf[Seq[B]]
+      system.terminate().value
+      result
+    }else{
+      seq.map(f).toIndexedSeq
+    }
+  }
+
   def processMap(args: Array[String], tasks: IS[Int], processNum: Int, mainClass: Object)(f: Int => Unit): Unit = {
     if(args.isEmpty){
-      parallelMap(tasks, processNum){ i =>
+      parallelMapOrdered(tasks, processNum){ i =>
         println(s"[JOB STARTED] id = $i")
 
         import java.io.File
@@ -103,8 +166,12 @@ object SimpleMath {
   }
 
   def main(args: Array[String]): Unit = {
-    processMap(args, 0 until 100, 3, mainClass = this){
-      i => println(s"*** $i ***")
+    parallelMapOrdered(0 until 100, 6){ i =>
+//      Thread.sleep(100)
+      println(i)
     }
+//    processMap(args, 0 until 100, 3, mainClass = this){
+//      i => println(s"*** $i ***")
+//    }
   }
 }
