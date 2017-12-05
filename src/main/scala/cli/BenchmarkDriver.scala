@@ -21,7 +21,27 @@ object BenchmarkDriver {
       "slowfuzz/bsdqsort" -> bsdQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/pgqsort" -> pgQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/phpHash" -> phpHashNativeExample(FileInteraction.getWorkingDir(ioId)),
-      // TODO: slowfuzz/bzip and slowfuzz/regexes
+      "slowfuzz/regex0" -> regexNativeExample(0)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex1" -> regexNativeExample(1)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex2" -> regexNativeExample(2)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex3" -> regexNativeExample(3)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex4" -> regexNativeExample(4)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex5" -> regexNativeExample(5)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex6" -> regexNativeExample(6)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex7" -> regexNativeExample(7)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex8" -> regexNativeExample(8)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex9" -> regexNativeExample(9)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex10" -> regexNativeExample(10)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex11" -> regexNativeExample(11)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex12" -> regexNativeExample(12)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex13" -> regexNativeExample(13)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex14" -> regexNativeExample(14)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex15" -> regexNativeExample(15)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex16" -> regexNativeExample(16)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex17" -> regexNativeExample(17)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex18" -> regexNativeExample(18)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/regex19" -> regexNativeExample(19)(FileInteraction.getWorkingDir(ioId)),
+      // TODO: slowfuzz/bzip
 
       // These benchmarks have already been solved
       "slowfuzz/emu/insertionSort" -> insertionSortExample,
