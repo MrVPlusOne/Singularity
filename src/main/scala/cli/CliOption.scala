@@ -1,21 +1,14 @@
 package cli
 
+import patsyn.{ExecutionConfig, GPConfig}
+import patsyn.Runner.RunnerConfig
+
 case class CliOption(target: String = "",
-                     ioId: Int = 0,
-                     seed: Int = 0,
-                     disableGui: Boolean = false,
                      useSledgehammer: Boolean = true,
-                     keepBestIndividuals: Boolean = false,
+                     runnerConfig: RunnerConfig = RunnerConfig(),
+                     gpConfig: GPConfig = GPConfig(),
+                     execConfig: ExecutionConfig = ExecutionConfig(),
                      sizeOfInterestOverride: Option[Int] = None,
-                     populationSize: Int = 500,
-                     tournamentSize: Int = 7,
-                     evaluationTrials: Int = 3,
-                     totalSizeTolerance: Int = 50,
-                     singleSizeTolerance: Int = 30,
-                     threadNum: Int = 1,
-                     timeLimitInMillis: Int = 10000,
-                     maxNonIncreaseGenerations: Option[Int] = None,
-                     maxFuzzingTimeSec: Option[Int] = None,
                      extrapolatePattern: Option[ExtrapolationArgs] = None,
                      plotPattern: Option[PlotArgs] = None
                     )

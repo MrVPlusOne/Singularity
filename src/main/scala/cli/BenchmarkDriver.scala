@@ -15,34 +15,17 @@ object BenchmarkDriver {
     Map[String, FuzzingTaskProvider](
 
       // Evaluation section 1
-      "slowfuzz/insertionSort" -> insertionSortNativeExample(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/isort" -> insertionSortNativeExample(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/qsort" -> slowfuzzQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/appleqsort" -> appleQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/bsdqsort" -> bsdQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/pgqsort" -> pgQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/phpHash" -> phpHashNativeExample(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex0" -> regexNativeExample(0)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex1" -> regexNativeExample(1)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex2" -> regexNativeExample(2)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex3" -> regexNativeExample(3)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex4" -> regexNativeExample(4)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex5" -> regexNativeExample(5)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex6" -> regexNativeExample(6)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex7" -> regexNativeExample(7)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex8" -> regexNativeExample(8)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex9" -> regexNativeExample(9)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex10" -> regexNativeExample(10)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex11" -> regexNativeExample(11)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex12" -> regexNativeExample(12)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex13" -> regexNativeExample(13)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex14" -> regexNativeExample(14)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex15" -> regexNativeExample(15)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex16" -> regexNativeExample(16)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex17" -> regexNativeExample(17)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex18" -> regexNativeExample(18)(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/regex19" -> regexNativeExample(19)(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/phphash" -> phpHashNativeExample(FileInteraction.getWorkingDir(ioId))) ++
       // TODO: slowfuzz/bzip
-
+      (0 until 20).map(i =>
+        s"slowfuzz/pcre_regex$i" -> regexNativeExample(i)(FileInteraction.getWorkingDir(ioId))
+      ).toMap  ++
+      Map[String, FuzzingTaskProvider](
       // These benchmarks have already been solved
       "slowfuzz/emu/insertionSort" -> insertionSortExample,
       "slowfuzz/emu/quickSort" -> quickSortExample,
@@ -91,21 +74,12 @@ object BenchmarkDriver {
   }
 
 
-  def getRunConfig(option: CliOption, sizeOfInterest: Int): RunConfig = {
+  def getRunConfig(option: CliOption, size: Int): RunConfig = {
     import option._
 
-    val runnerConfig = RunnerConfig(ioId, seed, !disableGui,
-      keepBestIndividuals, previewPatternLen = 7, callExitAfterFinish = true //todo: more options
-    )
+    val execConfigOverride = option.execConfig.copy(sizeOfInterest = size)
 
-    val gpConfig = GPConfig(option.populationSize,
-                            option.tournamentSize,
-                            option.evaluationTrials,
-                            option.totalSizeTolerance,
-                            option.singleSizeTolerance)
-    val execConfig = ExecutionConfig(sizeOfInterest, threadNum, timeLimitInMillis, maxNonIncreaseGenerations)
-
-    RunConfig(runnerConfig, gpConfig, execConfig)
+    RunConfig(runnerConfig, option.gpConfig, execConfigOverride)
   }
 
   def main(args: Array[String]): Unit = {
@@ -114,10 +88,10 @@ object BenchmarkDriver {
     parser.parse(args, CliOption()).foreach {
       cliOption =>
         val name = cliOption.target
-        val ioId = cliOption.ioId
+        val ioId = cliOption.runnerConfig.ioId
         val taskProvider = benchmarks(ioId).getOrElse(name, throw new
             IllegalArgumentException("Cannot find benchmark named " + name))
-        val random = new Random(cliOption.seed)
+        val random = new Random(cliOption.runnerConfig.ioId)
 
         taskProvider.run{ task =>
           val sizeOfInterest = cliOption.sizeOfInterestOverride.getOrElse(task.sizeOfInterest)
@@ -168,34 +142,34 @@ object BenchmarkDriver {
       head("patsyn Command Line Driver", "0.1")
 
       opt[Unit]('n', "no-gui").action((_, c) =>
-        c.copy(disableGui = true)).text("Disable the GUI panel.")
+        c.copy(runnerConfig = c.runnerConfig.copy(useGUI = false))).text("Disable the GUI panel.")
 
       opt[Int]('i', "ioId").action((id, c) =>
-        c.copy(ioId = id)
+        c.copy(runnerConfig = c.runnerConfig.copy(ioId = id))
       ).text("The id used to perform IO actions. If you have n processes running at the same time, just set their idIo to 0 through n.")
 
       opt[Int]('s', "seed").action((s, c) =>
-        c.copy(seed = s)).text("The random seed to use. Default to 0.")
+        c.copy(runnerConfig = c.runnerConfig.copy(randomSeed = s))).text("The random seed to use. Default to 0.")
 
       opt[Unit]('m', "manual").action((_, c) =>
         c.copy(useSledgehammer = false)).text("Manually specify GP parameters instead of letting the tool " +
         "auto-configure them. This option is off by default.")
 
       opt[Int]("thread-num").action((x, c) =>
-        c.copy(threadNum = x)).text("Thread number to use for individual evaluation. Default to 1.")
+        c.copy(execConfig = c.execConfig.copy(threadNum = x))).text("Thread number to use for individual evaluation. Default to 1.")
 
       opt[Int]("max-nonincrease-gen").action((x, c) =>
-        c.copy(maxNonIncreaseGenerations = Some(x))).text("Stop the program if the best fitness has not increased for this number of generations. Dose not specify this value means it should never stop.")
+        c.copy(execConfig = c.execConfig.copy(maxNonIncreaseGen = Some(x)))).text("Stop the program if the best fitness has not increased for this number of generations. Dose not specify this value means it should never stop.")
 
       opt[Int]("max-fuzzing-time").action((x, c) =>
-        c.copy(maxNonIncreaseGenerations = Some(x))).text("Stop the program after this amount of time (in seconds). Dose not specify this value means it should never stop.")
+        c.copy(execConfig = c.execConfig.copy(maxFuzzingTimeSec = Some(x)))).text("Stop the program after this amount of time (in seconds). Dose not specify this value means it should never stop.")
 
       opt[Int]("time-limit").action((x, c) =>
-        c.copy(timeLimitInMillis = x)).text("Time limit for each black-box execution (in milliseconds). Default to " +
+        c.copy(execConfig = c.execConfig.copy(timeLimitInMillis = x))).text("Time limit for each black-box execution (in milliseconds). Default to " +
         "120000.")
 
       opt[Unit]('k', "keep-best-individuals").action((_, c) =>
-        c.copy(keepBestIndividuals = true)).text("Each time the tool finds a better individual, preserve it in a " +
+        c.copy(runnerConfig = c.runnerConfig.copy(keepBestIndividuals = true))).text("Each time the tool finds a better individual, preserve it in a " +
         "separated file instead of overwriting the file that stores the previous best one. Off by default.")
 
       opt[Int]("task-size").hidden().action((x, c) =>
@@ -203,19 +177,16 @@ object BenchmarkDriver {
         " specify this when you know what you are doing.")
 
       opt[Int]("population-size").hidden().action((x, c) =>
-        c.copy(tournamentSize = x)).text("[GP parameter] Population size. Default to 500.")
+        c.copy(gpConfig = c.gpConfig.copy(populationSize = x))).text("[Only used when --manual is specified] Population size. Default to 500.")
 
       opt[Int]("tournament-size").hidden().action((x, c) =>
-        c.copy(populationSize = x)).text("[GP parameter] Tournament size. Default to 7.")
-
-      opt[Int]("evaluation-trials").hidden().action((x, c) =>
-        c.copy(evaluationTrials = x)).text("[GP parameter] Number of evaluation trials. Default to 3.")
+        c.copy(gpConfig = c.gpConfig.copy(tournamentSize = x))).text("[Only used when --manual is specified] Tournament size. Default to 7.")
 
       opt[Int]("total-size-tolerance").hidden().action((x, c) =>
-        c.copy(totalSizeTolerance = x)).text("[GP parameter] Total size tolerance. Default to 50.")
+        c.copy(gpConfig = c.gpConfig.copy(totalSizeTolerance = x))).text("[Only used when --manual is specified] Total size tolerance. Default to 50.")
 
       opt[Int]("single-size-tolerance").hidden().action((x, c) =>
-        c.copy(singleSizeTolerance = x)).text("[GP parameter] Single size tolerance. Default to 30.")
+        c.copy(gpConfig = c.gpConfig.copy(singleSizeTolerance = x))).text("[Only used when --manual is specified] Single size tolerance. Default to 30.")
 
 
       def parseBool(s: String): Boolean = {
