@@ -77,9 +77,9 @@ object BenchmarkDriver {
   def getRunConfig(option: CliOption, size: Int): RunConfig = {
     import option._
 
-    val execConfigOverride = option.execConfig.copy(sizeOfInterest = size)
+    val execConfigOverride = execConfig.copy(sizeOfInterest = size)
 
-    RunConfig(runnerConfig, option.gpConfig, execConfigOverride)
+    RunConfig(runnerConfig, gpConfig, execConfigOverride)
   }
 
   def main(args: Array[String]): Unit = {
