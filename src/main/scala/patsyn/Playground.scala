@@ -1,6 +1,7 @@
 package patsyn
 
 import benchmarks.GuavaExamples
+import patsyn.Runner.RunnerConfig
 
 import scala.util.Random
 
@@ -62,8 +63,7 @@ object HashSample {
 
 object Playground {
 
-
-  def main(args: Array[String]): Unit = {
+  def previous(): Unit = {
     import visual.{MonitorPanel, PatternPlot, ListPlot}
 
 
@@ -106,7 +106,7 @@ object Playground {
     points.foreach{ xy =>
       data :+= xy
       val chart = ListPlot.plot("pattern" -> data)("test", "size", "resource")
-      frame.setContentPane(new MonitorPanel(chart, margin = 10, plotSize = (600,450)))
+      frame.setContentPane(new MonitorPanel(Some(chart), margin = 10, plotSize = (600,450)))
       frame.pack()
     }
     println(data)
@@ -114,4 +114,24 @@ object Playground {
     println("Evaluation finished.")
   }
 
+  def run(ioId: Int): Unit ={
+    val rand = new Random(ioId)
+    FuzzingTaskProvider.phpHashCollisionExample.runAsProbConfig("PhpHash"){ config =>
+      Supernova.fuzzProblem(
+        config,
+        RunnerConfig().copy(randomSeed = ioId, ioId = ioId, useGUI = true),
+        ExecutionConfig(evalSizePolicy = VariedEvalSize.choppedGaussian(rand, 200)), rand)
+    }
+  }
+
+  def main(args: Array[String]): Unit = {
+//    SimpleMath.processMap(args,
+//      0 to 40, processNum = 14,
+//      mainClass = this) {
+//      ioId =>
+//        run(ioId)
+//    }
+
+    run(0)
+  }
 }

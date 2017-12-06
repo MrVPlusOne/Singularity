@@ -41,16 +41,31 @@ case class GPConfig(populationSize: Int = 500,
 
 sealed trait EvalSizePolicy{
   def genSize(random: Random): Int
+
+  def referenceSize: Int
 }
 
 case class FixedEvalSize(sizeOfInterest: Int) extends EvalSizePolicy{
   def genSize(random: Random) = sizeOfInterest
+
+  def referenceSize: Int = sizeOfInterest
 }
 
-case class VariedEvalSize(f: Random => Int, display: String) extends EvalSizePolicy{
+case class VariedEvalSize(referenceSize: Int, f: Random => Int, display: String) extends EvalSizePolicy{
   def genSize(random: Random) = f(random)
 
   override def toString = s"VariedEvalSize: $display"
+}
+
+object VariedEvalSize{
+  def choppedGaussian(rand: Random, baseSize: Int, gaussianChop: (Double, Double) = (-1,2), expBase: Double = 2): VariedEvalSize = {
+    VariedEvalSize(
+      baseSize,
+      rand => {
+      (SimpleMath.expChoppedGaussian(gaussianChop, expBase)(rand) * baseSize).toInt
+    },
+      s"baseSize = $baseSize, chopMargin = $gaussianChop, base = $expBase")
+  }
 }
 
 case class ExecutionConfig(evalSizePolicy: EvalSizePolicy = FixedEvalSize(300),

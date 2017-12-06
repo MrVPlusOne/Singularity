@@ -16,24 +16,24 @@ object Runner {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
     val workingDir = FileInteraction.getWorkingDir(ioId)
 
-    runExample("regexNative", FuzzingTaskProvider.regexNativeExample(0)(workingDir), RunConfig.default.withIoIdAndSeed(ioId, ioId))
+    runExample("quickSortMiddle", FuzzingTaskProvider.phpHashCollisionExample, RunConfig.default.withIoIdAndSeed(ioId, ioId).copy(execConfig = ExecutionConfig(evalSizePolicy = VariedEvalSize.choppedGaussian(new Random(ioId), baseSize = 200))))
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
 
 
   case class MonitorManager(monitorCallback: MonitoringData => Unit,
-                            evalProgressCallback: Int => Unit,
+                            evalProgressCallback: String => Unit,
                             saveMonitor: String => Unit)
 
-  def createMonitor(name: String, populationSize: Int, ioId: Int,
+  def createMonitor(barTitle: String, ioId: Int,
                     width: Int = 600, height: Int = 450): MonitorManager = {
     import javax.swing._
     import visual._
     import org.jfree.chart.ChartUtilities
     import java.io.File
 
-    val frame = new JFrame(s"GP Monitor [ioId=$ioId]") {
+    val frame = new JFrame(barTitle) {
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
       setVisible(true)
     }
@@ -53,29 +53,27 @@ object Runner {
         "average fitness" -> makeXY(avFitLine))("Performance Curve", "Generations", "Evaluation")
     }
 
-    val progressLabel = new JLabel()
-    val contentPane = new JPanel {
-      add(progressLabel)
-    }
+    val progressLabel = new JLabel("Initialize...")
+    val monitorPanel = new MonitorPanel(None, 10, (width, height))
+    val contentPane = new JPanel()
     contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS))
+    contentPane.add(progressLabel)
+    contentPane.add(monitorPanel)
+    contentPane.setPreferredSize(new Dimension(width, height))
     frame.setContentPane(contentPane)
-    frame.setPreferredSize(new Dimension(width, height))
     frame.pack()
+
+
 
     MonitorManager(
       monitorCallback = d => {
         dataCollected :+= d
-
         val chart = drawChart()
-        val monitorPanel = new MonitorPanel(chart, 10, (width, height))
-        if (contentPane.getComponentCount > 1) {
-          contentPane.remove(1)
-        }
-        contentPane.add(monitorPanel)
-        frame.pack()
+        monitorPanel.chart = Some(chart)
+        monitorPanel.repaint()
       },
-      evalProgressCallback = p => {
-        progressLabel.setText(s"progress: $p/$populationSize")
+      evalProgressCallback = s => {
+        progressLabel.setText(s)
       },
       saveMonitor = name => {
         val chart = drawChart()
@@ -89,7 +87,8 @@ object Runner {
                           useGUI: Boolean = true,
                           keepBestIndividuals: Boolean = false,
                           previewPatternLen: Int = 7,
-                          callExitAfterFinish: Boolean = true){
+                          callExitAfterFinish: Boolean = true
+                         ){
     def show: String = {
       s"""
          |ioId: $ioId
@@ -116,13 +115,13 @@ object Runner {
     }
 
     val (evalProgressCallback, monitorCallback, saveMonitor):
-      (Int => Unit, MonitoringData => Unit, String => Unit) = {
+      (String => Unit, MonitoringData => Unit, String => Unit) = {
       if (useGUI) {
-        val monitor = createMonitor(problemName,populationSize, ioId)
+        val monitor = createMonitor(s"$problemName[ioId=$ioId, popSize=$populationSize]", ioId)
         (monitor.evalProgressCallback, monitor.monitorCallback, monitor.saveMonitor)
       } else {
         val monitorDataPath = s"$recordDirPath/monitorData.txt"
-        ((_: Int) => Unit, (data: MonitoringData) => {
+        ((_: String) => Unit, (data: MonitoringData) => {
           FileInteraction.writeToFile(monitorDataPath, append = true){
             s"${data.bestPerformance}, ${data.bestFitness}, ${data.averageFitness}\n"
           }
@@ -130,15 +129,45 @@ object Runner {
       }
     }
 
-    def mkRepresentation(): Unit ={
+    @throws[TimeoutException]
+    def timeLimitedResourceUsage(timeLimitInMillis: Int)(value: IS[EValue]): Double = {
+      import scala.concurrent.ExecutionContext.Implicits.global
+      import scala.concurrent._
+      import scala.concurrent.duration._
+      Await.result(
+        Future (resourceUsage(value)), timeLimitInMillis.milliseconds)
+    }
 
+    def calcMemoryLimit(sizeOfInterest: Int): Long = {
+      sizeOfInterest * 4 * gpEnv.stateTypes.length
+    }
+
+    def newEvalSize(): (Int, MemoryUsage) = {
+      val sizeOfInterest = evalSizePolicy match {
+        case FixedEvalSize(s) => s
+        case p: VariedEvalSize =>
+          p.f(rand)
+      }
+      val memoryLimit = calcMemoryLimit(sizeOfInterest)
+      (sizeOfInterest, MemoryUsage(memoryLimit))
+    }
+
+    def mkRepresentation(sizeOfInterest: Int, memoryLimit: Long): MultiStateRepresentation ={
+      val evaluation = new SimplePerformanceEvaluation(
+        sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
+        resourceUsage = timeLimitedResourceUsage(timeLimitInMillis), sizeF = sizeF, breakingMemoryUsage = memoryLimit
+      )
+      MultiStateRepresentation(
+        totalSizeTolerance = totalSizeTolerance,
+        singleSizeTolerance = singleSizeTolerance,
+        stateTypes = gpEnv.stateTypes, outputTypes = outputTypes, evaluation = evaluation)
     }
 
     FileInteraction.runWithAFileLogger(s"$recordDirPath/runLog.txt") { logger =>
       import logger._
 
       printSection("Configuration"){
-        println(s"sizeOfInterest = $evalSizePolicy")
+        println(s"[sizePolicy] $evalSizePolicy")
         println(gpEnv.show)
         println(config.show)
       }
@@ -149,28 +178,20 @@ object Runner {
         }
       }
 
-      @throws[TimeoutException]
-      def timeLimitedResourceUsage(timeLimitInMillis: Int)(value: IS[EValue]): Double = {
-        import scala.concurrent.ExecutionContext.Implicits.global
-        import scala.concurrent._
-        import scala.concurrent.duration._
-        Await.result(
-          Future {
-            resourceUsage(value)
-          }
-          , timeLimitInMillis.milliseconds
-        )
-      }
 
-      val memoryLimit = evalSizePolicy * 4 * gpEnv.stateTypes.length
-      val evaluation = new SimplePerformanceEvaluation(
-        sizeOfInterest = evalSizePolicy, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
-        resourceUsage = timeLimitedResourceUsage(timeLimitInMillis), sizeF = sizeF, breakingMemoryUsage = memoryLimit
-      )
-      val representation = MultiStateRepresentation(
-        totalSizeTolerance = totalSizeTolerance,
-        singleSizeTolerance = singleSizeTolerance,
-        stateTypes = gpEnv.stateTypes, outputTypes = outputTypes, evaluation = evaluation)
+      val refRepresentation = mkRepresentation(
+        evalSizePolicy.referenceSize,
+        calcMemoryLimit(evalSizePolicy.referenceSize))
+      var (evalSize, MemoryUsage(memoryLimit)) = newEvalSize()
+      var representation = mkRepresentation(evalSize, memoryLimit)
+
+      def updateEvalSize(): Unit = {
+        val newSize = newEvalSize()
+        println(s"new eval size = $newSize")
+        evalSize = newSize._1
+        memoryLimit = newSize._2.amount
+        representation = mkRepresentation(evalSize, memoryLimit)
+      }
 
       val operators = IS(
         library.simpleCrossOp -> crossoverP,
@@ -178,7 +199,9 @@ object Runner {
         library.copyOp -> copyP
       )
 
-      def showPattern(ind: MultiStateInd, memoryLimit: Long): String ={
+      def showPattern(ind: MultiStateInd): String ={
+        val memoryLimit = representation.evaluation.breakingMemoryUsage
+
         representation.individualToPattern(ind).takeWhile{
           case (MemoryUsage(mem), _) => mem < memoryLimit
         }.take(runnerConfig.previewPatternLen).toList.map {
@@ -198,12 +221,12 @@ object Runner {
               println("Evaluation timed out!")
               representation.printIndividualMultiLine(println)(ind)
               println{
-                showPattern(ind, memoryLimit)
+                showPattern(ind)
               }
               FileInteraction.saveMultiIndToFile(s"$recordDirPath/timeoutIndividual.serialized")(ind)
 
               // We might also be interested in the value
-              MultiStateRepresentation.saveExtrapolation(problemConfig ,ind, evalSizePolicy, memoryLimit,
+              MultiStateRepresentation.saveExtrapolation(problemConfig ,ind, evalSize, memoryLimit,
                 s"$recordDirPath/timeoutValue")
 
               System.exit(0)
@@ -211,8 +234,14 @@ object Runner {
           }
         },
         threadNum = threadNum,
-        rand = rand,
-        evalProgressCallback = evalProgressCallback
+        random = rand,
+        evalProgressCallback = { i =>
+          evalProgressCallback(s"GP Evaluation progress: $i")
+        },
+        bufferEvaluation = evalSizePolicy match {
+          case _: FixedEvalSize => true
+          case _: VariedEvalSize => false
+        }
       )
 
 
@@ -234,10 +263,12 @@ object Runner {
         FileInteraction.saveMultiIndToFile(s"$recordDirPath/bestIndividual$timeString.serialized")(indData.ind)
 
         MultiStateRepresentation.saveExtrapolation(problemConfig, indData.ind,
-          evalSizePolicy, memoryLimit, s"$recordDirPath/bestInput$timeString")
+          evalSize, memoryLimit, s"$recordDirPath/bestInput$timeString")
       }
 
       generations.takeWhile(pop => {
+        updateEvalSize()
+
         nonIncreasingTime += 1
         bestSoFar match {
           case Some(previousBest) =>
@@ -255,18 +286,32 @@ object Runner {
           maxFuzzingTimeSec.exists(timeInSec > _)
         }
         !shouldStop
-      }).zipWithIndex.foreach { case (pop, i) =>
-        val best = pop.bestIndData
-        val data = MonitoringData(pop.averageFitness, best.evaluation.fitness, best.evaluation.performance)
-        monitorCallback(data)
+      }).zipWithIndex.foreach { case (originalPop, i) =>
+        val pop = evalSizePolicy match {
+          case _: VariedEvalSize =>
+            val inds = originalPop.individuals.zipWithIndex.map { case (indData, i) =>
+              val eval = refRepresentation.fitnessEvaluation(indData.ind)._1
+              evalProgressCallback(s"Ref evaluation progress: $i")
+              indData.copy(evaluation = eval)
+            }
+            EvolutionRepresentation.Population(inds, Map()) //todo: Empty Map
+          case _: FixedEvalSize => originalPop
+        }
+        val bestData = pop.bestIndData
+        val bestEval = {
+          val bestInd = bestData.ind
+          refRepresentation.fitnessEvaluation(bestInd)._1
+        }
+
+        monitorCallback(MonitoringData(pop.averageFitness, bestEval.fitness, bestEval.performance))
         saveMonitor(s"$recordDirPath/monitor.png")
 
         println("------------")
         print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
         println(s"Generation ${i + 1}")
-        println(s"Best Result: ${best.evaluation.showAsLinearExpr}, Created by ${best.history.birthOp}")
-        representation.printIndividualMultiLine(println)(best.ind)
-        println(s"Best Individual Pattern: ${showPattern(best.ind, memoryLimit)}, ...")
+        println(s"Best Result: ${bestEval.showAsLinearExpr}, Created by ${bestData.history.birthOp}")
+        representation.printIndividualMultiLine(println)(bestData.ind)
+        println(s"Best Individual Pattern: ${showPattern(bestData.ind)}, ...")
         println(s"Diversity: ${pop.fitnessMap.keySet.size}")
         println(s"Average Size: ${representation.populationAverageSize(pop)}")
         println(s"Average Fitness: ${pop.averageFitness}")

@@ -88,7 +88,7 @@ object PatternPlot {
     xys.foreach{ xy =>
       data :+= xy
       val chart = ListPlot.plot(lineName -> data)(plotName, xLabel, yLabel)
-      frame.setContentPane(new MonitorPanel(chart, margin = 10, plotSize = (600,450)))
+      frame.setContentPane(new MonitorPanel(Some(chart), margin = 10, plotSize = (600,450)))
       frame.pack()
     }
     println(data)
@@ -112,7 +112,7 @@ object PatternPlot {
         plotPoints = plotPoints, plotName = file, exitOnClose = false,
         memoryLimit = sizeLimit * ind.nStates * 4,
         patternCreationFeedback = i => {
-          if(i % 100 == 0){
+          if (i % 100 == 0) {
             println(s"input created: $i")
           }
         }

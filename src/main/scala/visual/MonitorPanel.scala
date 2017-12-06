@@ -26,7 +26,7 @@ object MonitorPanel{
       plotFromCSVString(lines)
     }
 
-    frame.setContentPane(new MonitorPanel(chart, margin = 10, plotSize = (600,450)))
+    frame.setContentPane(new MonitorPanel(Some(chart), margin = 10, plotSize = (600,450)))
     frame.pack()
   }
 
@@ -46,12 +46,12 @@ object MonitorPanel{
   }
 }
 
-class MonitorPanel(chart: JFreeChart, margin: Double, plotSize: (Int, Int)) extends JPanel {
+class MonitorPanel(var chart: Option[JFreeChart], margin: Double, plotSize: (Int, Int)) extends JPanel {
   setPreferredSize(new Dimension(plotSize._1, plotSize._2))
 
   override def paintComponent(g: Graphics) = {
     val g2d = g.asInstanceOf[Graphics2D]
-    chart.draw(g2d, new Rectangle2D.Double(margin, margin, getWidth-2*margin, getHeight-2*margin))
+    chart.foreach(_.draw(g2d, new Rectangle2D.Double(margin, margin, getWidth-2*margin, getHeight-2*margin)))
   }
 }
 

@@ -71,7 +71,7 @@ object Supernova{
       singleSizeTolerance = singleTolerance.toInt,
       mutateP = inter(0.4,0.7),
       crossoverP = 0.5,
-      copyP = 0.07+0.15-inter(0.0,0.15)
+      copyP = 0.07+0.23-inter(0.0,0.23)
     )
   }
 
@@ -107,13 +107,14 @@ object Supernova{
     val seed = 3
     val workingDir = FileInteraction.getWorkingDir(seed)
     val rand = new Random(seed)
+    val sizePolicy = FixedEvalSize(200)
 
 //    val example = FuzzingTaskProvider.bzipExample(workingDir, 200)
 //    fuzzTask("hashCollision", example, RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(), rand)
     val prob = FuzzingTaskProvider.bzipProblem(workingDir)
     fuzzProblem(prob,
       RunnerConfig().copy(randomSeed = seed, ioId = seed),
-      ExecutionConfig().copy(evalSizePolicy = 200),
+      ExecutionConfig().copy(evalSizePolicy = sizePolicy),
       rand, aggressiveness = Some(0.9))
   }
 }

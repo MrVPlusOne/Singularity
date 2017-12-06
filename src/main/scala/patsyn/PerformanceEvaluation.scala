@@ -10,6 +10,7 @@ trait PerformanceEvaluation {
   def resourceUsage: IS[EValue] => Double
   def sizeF: IS[EValue] => Int
   def nonsenseFitness: Double
+  def breakingMemoryUsage: Long
 
   def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): Double
 }
@@ -24,8 +25,11 @@ object ExtrapolatePerformanceEvaluation{
 
 }
 
+@deprecated
 class ExtrapolatePerformanceEvaluation(mamLink: MamLink, sizeOfInterest: Int, fitEndPoint: Int, minPointsToUse: Int, val resourceUsage: IS[EValue] => Double, val sizeF: IS[EValue] => Int, val nonsenseFitness: Double = 0.0) extends PerformanceEvaluation {
   import ExtrapolatePerformanceEvaluation._
+
+  def breakingMemoryUsage = ???
 
   def evaluate[T](xs: Stream[T], sizeF: T => Int, executeF: T => Double): EvaluationResult = {
     def maxSmooth(data: Seq[Double]): Seq[Double] = {
@@ -60,6 +64,8 @@ class ExtrapolatePerformanceEvaluation(mamLink: MamLink, sizeOfInterest: Int, fi
       MaxSoFarResult(largerDataSet.map{p => executeF(p._2)}.max)
     else
       fitData(largerDataSet.map{case (size, v) => size -> executeF(v)})
+
+
   }
 
 
@@ -78,7 +84,7 @@ class ExtrapolatePerformanceEvaluation(mamLink: MamLink, sizeOfInterest: Int, fi
 
 }
 
-class SimplePerformanceEvaluation(sizeOfInterest: Int, evaluationTrials: Int, val resourceUsage: (IS[EValue]) => Double, val sizeF: (IS[EValue]) => Int, breakingMemoryUsage: Long, val nonsenseFitness: Double) extends PerformanceEvaluation {
+class SimplePerformanceEvaluation(sizeOfInterest: Int, evaluationTrials: Int, val resourceUsage: (IS[EValue]) => Double, val sizeF: (IS[EValue]) => Int, val breakingMemoryUsage: Long, val nonsenseFitness: Double) extends PerformanceEvaluation {
 
 
   def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): Double = {

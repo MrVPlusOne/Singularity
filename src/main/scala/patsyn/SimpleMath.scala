@@ -23,10 +23,10 @@ object SimpleMath {
     random.nextDouble() < pTrue
   }
 
-  def expChoppedGaussian(chopRange: Double, base: Double, random: Random): Double = {
+  def expChoppedGaussian(chopMargin: (Double, Double), base: Double)(random: Random): Double = {
     val x = random.nextGaussian()
-    if(x< -chopRange || x > chopRange){
-      expChoppedGaussian(chopRange, base, random)
+    if(x< chopMargin._1 || x > chopMargin._2){
+      expChoppedGaussian(chopMargin, base)(random)
     }else{
       math.pow(base, x)
     }
