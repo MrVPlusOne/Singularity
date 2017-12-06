@@ -8,6 +8,8 @@ import measure.TimeTools
 import patsyn.EvolutionRepresentation.{IndividualData, MemoryUsage}
 import FuzzingTaskProvider.escapeStrings
 
+import scala.util.Random
+
 object Runner {
 
   def main(args: Array[String]): Unit = {
@@ -105,6 +107,8 @@ object Runner {
     import config.execConfig._
     import config.runnerConfig._
 
+    val rand = new Random(randomSeed)
+
     val library = MultiStateGOpLibrary(gpEnv, outputTypes)
     val dateTimeString = TimeTools.numericalDateTime()
     val recordDirPath = {
@@ -126,11 +130,15 @@ object Runner {
       }
     }
 
+    def mkRepresentation(): Unit ={
+
+    }
+
     FileInteraction.runWithAFileLogger(s"$recordDirPath/runLog.txt") { logger =>
       import logger._
 
       printSection("Configuration"){
-        println(s"sizeOfInterest = $sizeOfInterest")
+        println(s"sizeOfInterest = $evalSizePolicy")
         println(gpEnv.show)
         println(config.show)
       }
@@ -154,16 +162,16 @@ object Runner {
         )
       }
 
-      val memoryLimit = sizeOfInterest * 4 * gpEnv.stateTypes.length
+      val memoryLimit = evalSizePolicy * 4 * gpEnv.stateTypes.length
       val evaluation = new SimplePerformanceEvaluation(
-        sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
+        sizeOfInterest = evalSizePolicy, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
         resourceUsage = timeLimitedResourceUsage(timeLimitInMillis), sizeF = sizeF, breakingMemoryUsage = memoryLimit
       )
       val representation = MultiStateRepresentation(
         totalSizeTolerance = totalSizeTolerance,
         singleSizeTolerance = singleSizeTolerance,
         stateTypes = gpEnv.stateTypes, outputTypes = outputTypes, evaluation = evaluation)
-      val optimizer = EvolutionaryOptimizer(representation)
+
       val operators = IS(
         library.simpleCrossOp -> crossoverP,
         library.simpleMutateOp(newTreeMaxDepth = 3) -> mutateP,
@@ -178,7 +186,7 @@ object Runner {
         }.mkString(", ")
       }
 
-      val generations = optimizer.optimize(
+      val generations = EvolutionaryOptimizer[MultiStateInd]().optimize(
         populationSize = populationSize, tournamentSize = tournamentSize,
         initOperator = library.initOp(maxDepth = 3),
         operators = operators,
@@ -195,7 +203,7 @@ object Runner {
               FileInteraction.saveMultiIndToFile(s"$recordDirPath/timeoutIndividual.serialized")(ind)
 
               // We might also be interested in the value
-              MultiStateRepresentation.saveExtrapolation(problemConfig ,ind, sizeOfInterest, memoryLimit,
+              MultiStateRepresentation.saveExtrapolation(problemConfig ,ind, evalSizePolicy, memoryLimit,
                 s"$recordDirPath/timeoutValue")
 
               System.exit(0)
@@ -203,7 +211,7 @@ object Runner {
           }
         },
         threadNum = threadNum,
-        randSeed = randomSeed,
+        rand = rand,
         evalProgressCallback = evalProgressCallback
       )
 
@@ -226,7 +234,7 @@ object Runner {
         FileInteraction.saveMultiIndToFile(s"$recordDirPath/bestIndividual$timeString.serialized")(indData.ind)
 
         MultiStateRepresentation.saveExtrapolation(problemConfig, indData.ind,
-          sizeOfInterest, memoryLimit, s"$recordDirPath/bestInput$timeString")
+          evalSizePolicy, memoryLimit, s"$recordDirPath/bestInput$timeString")
       }
 
       generations.takeWhile(pop => {

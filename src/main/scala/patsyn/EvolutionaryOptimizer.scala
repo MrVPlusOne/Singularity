@@ -4,7 +4,7 @@ import patsyn.EvolutionRepresentation.{IndividualData, IndividualEvaluation, Ind
 
 import scala.util.Random
 
-case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresentation[Individual]) {
+case class EvolutionaryOptimizer[Individual]() {
   type GOp = GeneticOperator[Individual]
 
   def optimize(populationSize: Int, tournamentSize: Int, neighbourSize: Option[Int] = None,
@@ -12,8 +12,9 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
                operators: IS[(GOp, Double)],
                indEval: Individual => IndividualEvaluation,
                threadNum: Int,
-               randSeed: Int,
-               evalProgressCallback: Int => Unit
+               random: Random,
+               evalProgressCallback: Int => Unit,
+               bufferEvaluation: Boolean
                      ): Iterator[Population[Individual]] = {
 
     require(threadNum>=1)
@@ -51,8 +52,6 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
           (op, acc / normalizeFactor)
       }
     }
-
-    val random = new Random(randSeed) // used through multiple generations
 
     val initPop = {
       val individuals = (0 until populationSize).map(_ => initOperator.operate(random, IS()))
@@ -104,8 +103,12 @@ case class EvolutionaryOptimizer[Individual](representation: EvolutionRepresenta
 
       val newInds = newIndsAndHistory.map(_._1)
       val newFitnessMap = {
-        parExecute(newInds.distinct)(ind =>
-          ind -> pop.fitnessMap.getOrElse(ind, default = evaluation(ind))).toMap
+        parExecute(newInds.distinct) { ind =>
+          val eval = if (bufferEvaluation) {
+            pop.fitnessMap.getOrElse(ind, default = evaluation(ind))
+          } else evaluation(ind)
+          ind -> eval
+        }.toMap
       }
 
       val newData = newIndsAndHistory.indices.map{i =>

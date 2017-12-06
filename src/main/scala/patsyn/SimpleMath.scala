@@ -23,6 +23,15 @@ object SimpleMath {
     random.nextDouble() < pTrue
   }
 
+  def expChoppedGaussian(chopRange: Double, base: Double, random: Random): Double = {
+    val x = random.nextGaussian()
+    if(x< -chopRange || x > chopRange){
+      expChoppedGaussian(chopRange, base, random)
+    }else{
+      math.pow(base, x)
+    }
+  }
+
   def natToList(n: Int, base: Int): List[Int] = {
     require(n>=0)
     require(base > 0)

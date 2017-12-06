@@ -2,6 +2,8 @@ package patsyn
 
 import patsyn.Runner.RunnerConfig
 
+import scala.util.Random
+
 case class ProblemConfig(problemName: String,
                          outputTypes: IS[EType],
                          sizeF: IS[EValue] => Int,
@@ -37,7 +39,21 @@ case class GPConfig(populationSize: Int = 500,
   }
 }
 
-case class ExecutionConfig(sizeOfInterest: Int = 300,
+sealed trait EvalSizePolicy{
+  def genSize(random: Random): Int
+}
+
+case class FixedEvalSize(sizeOfInterest: Int) extends EvalSizePolicy{
+  def genSize(random: Random) = sizeOfInterest
+}
+
+case class VariedEvalSize(f: Random => Int, display: String) extends EvalSizePolicy{
+  def genSize(random: Random) = f(random)
+
+  override def toString = s"VariedEvalSize: $display"
+}
+
+case class ExecutionConfig(evalSizePolicy: EvalSizePolicy = FixedEvalSize(300),
                            threadNum: Int = 1,
                            timeLimitInMillis: Int = 120000,
                            maxNonIncreaseGen: Option[Int] = Some(150),
@@ -45,7 +61,7 @@ case class ExecutionConfig(sizeOfInterest: Int = 300,
                           ){
   def show: String = {
     s"""
-       |sizeOfInterest: $sizeOfInterest
+       |sizeOfInterest: $evalSizePolicy
        |threadNum：$threadNum
        |timeLimitInMillis：$timeLimitInMillis
        |maxNonIncreaseGen：$maxNonIncreaseGen

@@ -126,7 +126,7 @@ object GuavaExamples {
     fuzzProblem(
       immutableSet_copyOf,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
-      ExecutionConfig(sizeOfInterest = 1200, timeLimitInMillis = 100000), rand)
+      ExecutionConfig(evalSizePolicy = 1200, timeLimitInMillis = 100000), rand)
   }
 
   def main(args: Array[String]): Unit = {
