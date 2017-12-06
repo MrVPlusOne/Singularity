@@ -32,9 +32,10 @@ object BatchRunDriver {
 
     val timeoutOpt = s"--time-limit ${opt.executionConfig.timeLimitInMillis}"
     val keepOpt = if (opt.runnerConfig.keepBestIndividuals) "-k" else ""
-    val maxNonIncreaseOpt = opt.executionConfig.maxFuzzingTimeSec.map(gen => s"--max-nonincrease-gen $gen").getOrElse("")
+    val maxNonIncreaseOpt = opt.executionConfig.maxNonIncreaseGen.map(gen => s"--max-nonincrease-gen $gen").getOrElse("")
+    val maxFuzzingTimeOpt = opt.executionConfig.maxFuzzingTimeSec.map(t => s"--max-fuzzing-time $t").getOrElse("")
     val taskSizeOpt = opt.sizeOfInterestOverride.map(size => s"--task-size $size").getOrElse("")
-    val cmdOpts = s"-i ${opt.runnerConfig.ioId} -s ${opt.runnerConfig.randomSeed} -n $timeoutOpt $keepOpt $maxNonIncreaseOpt $taskSizeOpt ${opt.benchName}"
+    val cmdOpts = s"-i ${opt.runnerConfig.ioId} -s ${opt.runnerConfig.randomSeed} -n $timeoutOpt $keepOpt $maxNonIncreaseOpt $maxFuzzingTimeOpt $taskSizeOpt ${opt.benchName}"
     val cmd = s"$javaPath -cp $jarPath cli.BenchmarkDriver $cmdOpts"
 
     println(s"[JOB STARTED] $opt")
