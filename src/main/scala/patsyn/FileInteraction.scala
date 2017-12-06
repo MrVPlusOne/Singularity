@@ -107,6 +107,16 @@ object FileInteraction{
     workingDir
   }
 
+  def saveMultiIndToFile(path: String)(ind: MultiStateInd): Unit = ind match {
+    case MultiStateInd(exprs, nStates) =>
+      saveObjectToFile(path)(exprs.map(SExpr.mkSExpr) -> nStates)
+  }
+
+  def readMultiIndFromFile(path: String, funcMap: Map[String, EFunction]): MultiStateInd = {
+    val (sExprs, numOfStates) = readObjectFromFile[(IS[SExpr], Int)](path)
+    MultiStateInd(sExprs.map(e => SExpr.mkExpr(e, funcMap)), numOfStates)
+  }
+
   def main(args: Array[String]): Unit = {
     import StandardSystem._
     val t = EVect(EInt)

@@ -4,6 +4,9 @@ import scala.language.implicitConversions
 
 //noinspection TypeAnnotation
 object StandardSystem {
+  private var _funcMap = Map[String, EFunction]()
+  def funcMap: Map[String, EFunction] = _funcMap
+
 
   // Type declarations
   case object EInt extends EType()
@@ -114,10 +117,19 @@ object StandardSystem {
 
     def collection: IS[EFunction] = _collection
 
+    def register(f: EFunction): Unit ={
+      _collection :+= f
+      if(_funcMap.contains(f.name)){
+        throw new Exception(s"Component ${f.name} collision!")
+      }else{
+        _funcMap = _funcMap.updated(f.name, f)
+      }
+    }
+
     def mkConcrete(name: String, argTypes: IS[EType], returnType: EType,
                    eval: PartialFunction[IS[EValue], EValue]): EConcreteFunc = {
       val f = EConcreteFunc(name, argTypes, returnType, eval)
-      _collection :+= f
+      register(f)
       f
     }
 
@@ -125,12 +137,12 @@ object StandardSystem {
                    typeInstantiation: (IS[EType]) => (IS[EType], EType),
                    eval: PartialFunction[IS[EValue], EValue]): EAbstractFunc = {
       val f = EAbstractFunc(name, tyVarNum, typeInstantiation, eval)
-      _collection :+= f
+      register(f)
       f
     }
   }
 
-  object IntComponents extends ComponentSet {
+  val IntComponents = new ComponentSet {
     val inc =  mkConcrete("inc", IS(EInt), EInt, {
       case IS(IntValue(i)) => i + 1
     })
@@ -166,7 +178,7 @@ object StandardSystem {
 
   }
 
-  object BitComponents extends ComponentSet {
+  val BitComponents = new ComponentSet {
     val shiftByteLeft = mkConcrete("shiftBL", IS(EInt), EInt, {
       case IS(IntValue(a)) => a << 8
     })
@@ -189,7 +201,7 @@ object StandardSystem {
     })
   }
 
-  object VectComponents extends ComponentSet {
+  val VectComponents = new ComponentSet {
     val append = mkAbstract("append", 1, {
       case IS(e) => IS(EVect(e), e) -> EVect(e)
     }, {
@@ -226,7 +238,7 @@ object StandardSystem {
     })
   }
 
-  object AdvancedVectComponents extends ComponentSet{
+  val AdvancedVectComponents = new ComponentSet{
     val shift = mkConcrete("shift", IS(EVect(EInt), EInt), EVect(EInt), {
       case IS(VectValue(vec), IntValue(v)) => vec.map{
         case IntValue(i) => IntValue(i+v)
@@ -241,7 +253,7 @@ object StandardSystem {
     })
   }
 
-  object BoolComponents extends ComponentSet {
+  val BoolComponents = new ComponentSet {
     val not = mkConcrete("not", IS(EBool), EBool, {
       case IS(BoolValue(b)) => !b
     })
@@ -272,7 +284,7 @@ object StandardSystem {
 
   }
 
-  object PairComponents extends ComponentSet {
+  val PairComponents = new ComponentSet {
     val pair1 = mkAbstract("pair1", tyVarNum = 2,
       typeInstantiation = {
         case IS(t1,t2) => IS(EPair(t1,t2)) -> t1
@@ -299,7 +311,7 @@ object StandardSystem {
   }
 
   /** add an isolated vertex */
-  object GraphComponents extends ComponentSet {
+  val GraphComponents = new ComponentSet {
     val emptyGraph = mkAbstract("emptyGraph", tyVarNum = 1,
       typeInstantiation = {
         case IS(eT) => IS() -> EGraph(eT)

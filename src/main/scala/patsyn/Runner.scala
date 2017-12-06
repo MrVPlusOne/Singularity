@@ -192,7 +192,7 @@ object Runner {
               println{
                 showPattern(ind, memoryLimit)
               }
-              FileInteraction.saveObjectToFile(s"$recordDirPath/timeoutIndividual.serialized")(ind)
+              FileInteraction.saveMultiIndToFile(s"$recordDirPath/timeoutIndividual.serialized")(ind)
 
               // We might also be interested in the value
               MultiStateRepresentation.saveExtrapolation(problemConfig ,ind, sizeOfInterest, memoryLimit,
@@ -223,7 +223,7 @@ object Runner {
         } else {
           ""
         }
-        FileInteraction.saveObjectToFile(s"$recordDirPath/bestIndividual$timeString.serialized")(indData.ind)
+        FileInteraction.saveMultiIndToFile(s"$recordDirPath/bestIndividual$timeString.serialized")(indData.ind)
 
         MultiStateRepresentation.saveExtrapolation(problemConfig, indData.ind,
           sizeOfInterest, memoryLimit, s"$recordDirPath/bestInput$timeString")

@@ -13,7 +13,7 @@ sealed trait Expr {
   def isConst: Boolean
 }
 
-sealed trait ETerminal extends Expr {
+sealed trait ETerminal extends Expr with SExpr {
   def argTypes: IS[EType] = IS()
 
   override def astSize: Int = 1
@@ -55,7 +55,9 @@ case class ENode(f: EConcreteFunc, args: IS[Expr]) extends Expr {
   override def argTypes: IS[EType] = f.argTypes
 }
 
-sealed trait EFunction
+sealed trait EFunction{
+  def name: String
+}
 
 @SerialVersionUID(0L)
 case class EConcreteFunc(name: String, argTypes: IS[EType], returnType: EType,
@@ -146,4 +148,33 @@ object Expr {
     rec(parent, replacePoint)
   }
 
+}
+
+sealed trait SExpr
+
+case class SNode(name: String, argTypes: IS[EType], returnType: EType,
+                 args: IS[SExpr]
+                ) extends SExpr
+
+object SExpr {
+  def mkSExpr(expr: Expr): SExpr = expr match {
+    case terminal: ETerminal => terminal
+    case ENode(f, args) =>
+      SNode(f.name, f.argTypes, f.returnType, args.map(mkSExpr))
+  }
+
+  def mkExpr(sExpr: SExpr, funcMap: Map[String, EFunction]): Expr = {
+    sExpr match {
+      case SNode(name, argTypes, returnType, args) =>
+        val f = funcMap.getOrElse(name, throw new Exception(s"function $name not found."))
+        val eArgs = args.map(a => mkExpr(a, funcMap))
+        f match {
+          case cf: EConcreteFunc => ENode(cf, eArgs)
+          case af: EAbstractFunc =>
+            val cf = EConcreteFunc(name, argTypes, returnType, af.eval)
+            ENode(cf, eArgs)
+        }
+      case t: ETerminal => t
+    }
+  }
 }

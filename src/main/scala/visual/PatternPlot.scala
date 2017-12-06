@@ -100,7 +100,7 @@ object PatternPlot {
 
 
     for(file <- files) {
-      val ind = FileInteraction.readObjectFromFile[MultiStateInd](file)
+      val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
       val config = GuavaExamples.immutableSet_copyOf
       showResourceUsageChart(config, ind, sizeLimit,
         plotPoints = plotPoints, plotName = file, exitOnClose = false)

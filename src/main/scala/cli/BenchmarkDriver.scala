@@ -118,14 +118,14 @@ object BenchmarkDriver {
                   }
 
                 case Some(plotArg) =>
-                  val ind = FileInteraction.readObjectFromFile[MultiStateInd](plotArg.indPath)
+                  val ind = FileInteraction.readMultiIndFromFile(plotArg.indPath, StandardSystem.funcMap)
                   taskProvider.runAsProbConfig(name) { config =>
                     PatternPlot.showResourceUsageChart(config, ind, plotArg.sizeLimit, plotArg.density)
                   }
               }
             case Some(extraArg) =>
               taskProvider.runAsProbConfig(name){ probConfig =>
-                val ind = FileInteraction.readObjectFromFile[MultiStateInd](extraArg.indPath)
+                val ind = FileInteraction.readMultiIndFromFile(extraArg.indPath, StandardSystem.funcMap)
                 MultiStateRepresentation.saveExtrapolation(
                   probConfig, ind, extraArg.size, extraArg.memoryLimit, extraArg.outputName, extraArg.evaluatePerformance)
               }
