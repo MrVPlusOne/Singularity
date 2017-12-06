@@ -130,11 +130,11 @@ object GuavaExamples {
   }
 
   def main(args: Array[String]): Unit = {
-    SimpleMath.processMap(args,
-      0 to 60, processNum = 14,
-      mainClass = this){
-      i => runExample(i, useGUI = false)
-    }
-//    runExample(7, useGUI = true)
+//    SimpleMath.processMap(args,
+//      0 to 60, processNum = 14,
+//      mainClass = this){
+//      i => runExample(i, useGUI = false)
+//    }
+    runExample(7, useGUI = true)
   }
 }

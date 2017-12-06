@@ -40,7 +40,7 @@ case class GPConfig(populationSize: Int = 500,
 case class ExecutionConfig(sizeOfInterest: Int = 300,
                            threadNum: Int = 1,
                            timeLimitInMillis: Int = 120000,
-                           maxNonIncreaseGen: Option[Int] = None,
+                           maxNonIncreaseGen: Option[Int] = Some(150),
                            maxFuzzingTimeSec: Option[Long] = None
                           ){
   def show: String = {
