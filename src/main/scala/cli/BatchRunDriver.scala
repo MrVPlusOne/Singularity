@@ -7,7 +7,7 @@ import scopt.OptionParser
 case class BatchRunOption(benchNames: Seq[String] = Seq(),
                           jobNumber: Int = 1,
                           benchTrials: Int = 1,
-                          execConfig: ExecutionConfig = ExecutionConfig(),
+                          execConfig: ExecutionConfig = ExecutionConfig().copy(maxNonIncreaseGen = None),
                           sizeOfInterestOverride: Option[Int] = None,  // merely to get around with the fact that ExecutionConfig.sizeOfInterest is not an optional
                           keepBestIndividuals: Boolean = false,
                           startIoId: Int = 0,

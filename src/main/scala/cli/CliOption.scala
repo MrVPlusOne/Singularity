@@ -7,7 +7,7 @@ case class CliOption(target: String = "",
                      useSledgehammer: Boolean = true,
                      runnerConfig: RunnerConfig = RunnerConfig(),
                      gpConfig: GPConfig = GPConfig(),
-                     execConfig: ExecutionConfig = ExecutionConfig(),
+                     execConfig: ExecutionConfig = ExecutionConfig().copy(maxNonIncreaseGen = None),
                      sizeOfInterestOverride: Option[Int] = None,
                      extrapolatePattern: Option[ExtrapolationArgs] = None,
                      plotPattern: Option[PlotArgs] = None
