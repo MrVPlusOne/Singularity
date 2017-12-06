@@ -10,7 +10,9 @@ import scala.util.Random
 
 object PatternPlot {
   def plotPatternPerformance(probConfig: ProblemConfig, individual: MultiStateInd,
-                             sizeLimit: Int, maxPoints: Int = 10, memoryLimit: Long = Long.MaxValue, seed: Int = 0): Stream[(Double, Double)] = {
+                             sizeLimit: Int, maxPoints: Int = 10, memoryLimit: Long = Long.MaxValue,
+                             patternCreationFeedback: Int => Unit,
+                             seed: Int = 0): Stream[(Double, Double)] = {
     import EvolutionRepresentation.MemoryUsage
 
     var lastSize = Int.MinValue
@@ -18,6 +20,7 @@ object PatternPlot {
     val values = individualToPattern(individual).takeWhile {
       case (MemoryUsage(memory), value) =>
         val newSize = probConfig.sizeF(value)
+        patternCreationFeedback(newSize)
         if (newSize <= lastSize) {
           println("Warning: Can't reach specified size using this individual")
           false
@@ -67,7 +70,9 @@ object PatternPlot {
                              plotName: String = "Resource Usage Chart",
                              xLabel: String = "size",
                              yLabel: String = "R",
-                             exitOnClose: Boolean = true
+                             exitOnClose: Boolean = true,
+                             patternCreationFeedback: Int => Unit = _ => (),
+                             memoryLimit: Long = Long.MaxValue
                             ): Unit
   = {
     val frame = new JFrame("Monitor") {
@@ -77,7 +82,7 @@ object PatternPlot {
       setVisible(true)
     }
     val xys = plotPatternPerformance(probConfig, ind, sizeLimit, maxPoints
-      = plotPoints)
+      = plotPoints, memoryLimit, patternCreationFeedback = patternCreationFeedback)
 
     var data = IndexedSeq[(Double, Double)]()
     xys.foreach{ xy =>
@@ -101,9 +106,17 @@ object PatternPlot {
 
     for(file <- files) {
       val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
+      println("Individual: ")
       val config = GuavaExamples.immutableSet_copyOf
       showResourceUsageChart(config, ind, sizeLimit,
-        plotPoints = plotPoints, plotName = file, exitOnClose = false)
+        plotPoints = plotPoints, plotName = file, exitOnClose = false,
+        memoryLimit = sizeLimit * ind.nStates * 4,
+        patternCreationFeedback = i => {
+          if(i % 100 == 0){
+            println(s"input created: $i")
+          }
+        }
+      )
     }
   }
 }

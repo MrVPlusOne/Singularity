@@ -24,7 +24,7 @@ object Runner {
                             evalProgressCallback: Int => Unit,
                             saveMonitor: String => Unit)
 
-  def createMonitor(populationSize: Int, ioId: Int,
+  def createMonitor(name: String, populationSize: Int, ioId: Int,
                     width: Int = 600, height: Int = 450): MonitorManager = {
     import javax.swing._
     import visual._
@@ -114,7 +114,7 @@ object Runner {
     val (evalProgressCallback, monitorCallback, saveMonitor):
       (Int => Unit, MonitoringData => Unit, String => Unit) = {
       if (useGUI) {
-        val monitor = createMonitor(populationSize, ioId)
+        val monitor = createMonitor(problemName,populationSize, ioId)
         (monitor.evalProgressCallback, monitor.monitorCallback, monitor.saveMonitor)
       } else {
         val monitorDataPath = s"$recordDirPath/monitorData.txt"

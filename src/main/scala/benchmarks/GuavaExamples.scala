@@ -135,6 +135,6 @@ object GuavaExamples {
 //      mainClass = this){
 //      i => runExample(i, useGUI = false)
 //    }
-    runExample(7, useGUI = true)
+    runExample(10, useGUI = true)
   }
 }
