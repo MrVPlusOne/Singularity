@@ -228,7 +228,7 @@ object FuzzingTaskProvider {
     }
   }
 
-  def phpHashCollisionExample = hashCollisionExample(HashFunc.php, 8)
+  def phpHashCollisionExample = hashCollisionExample(HashFunc.php, 16)
 
   def javaHashCollisionExample = hashCollisionExample(HashFunc.java, 16)
 

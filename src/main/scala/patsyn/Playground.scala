@@ -120,7 +120,7 @@ object Playground {
       Supernova.fuzzProblem(
         config,
         RunnerConfig().copy(randomSeed = ioId, ioId = ioId, useGUI = true),
-        ExecutionConfig(evalSizePolicy = VariedEvalSize.choppedGaussian(rand, 200)), rand)
+        ExecutionConfig(evalSizePolicy = VariedEvalSize.choppedGaussian(rand, 400)), rand)
     }
   }
 
@@ -132,6 +132,6 @@ object Playground {
 //        run(ioId)
 //    }
 
-    run(0)
+    run(6)
   }
 }
