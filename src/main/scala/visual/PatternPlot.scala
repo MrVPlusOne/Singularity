@@ -104,7 +104,9 @@ object PatternPlot {
     val files = lines.toList
 
 
-    for(file <- files) {
+    for(fileLine <- files) {
+      val lastName = "bestIndividual.serialized"
+      val file = if(fileLine.endsWith(lastName)) fileLine else fileLine + "/" + lastName
       val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
       println("Individual: ")
       val config = GuavaExamples.immutableSet_copyOf

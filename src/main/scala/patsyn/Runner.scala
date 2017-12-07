@@ -5,7 +5,7 @@ import java.awt.Dimension
 import java.util.concurrent.TimeoutException
 
 import measure.TimeTools
-import patsyn.EvolutionRepresentation.{IndividualData, MemoryUsage}
+import patsyn.EvolutionRepresentation.{IndividualData, IndividualEvaluation, MemoryUsage}
 import FuzzingTaskProvider.escapeStrings
 
 import scala.util.Random
@@ -99,12 +99,37 @@ object Runner {
   }
 
 
+
   def run(problemConfig: ProblemConfig, gpEnv: GPEnvironment, config: RunConfig = RunConfig.default): Unit = {
     import problemConfig._
     import config._
     import config.gpConfig._
     import config.execConfig._
     import config.runnerConfig._
+
+    case class ReEvaluatedPop(originalData: IS[IndividualData[MultiStateInd]],
+                              refEvaluations: IS[IndividualData[MultiStateInd]]){
+      val populationSize: Int = refEvaluations.length
+
+      lazy val averageFitness: Double = {
+        refEvaluations.map(_.evaluation.fitness).sum/populationSize
+      }
+
+      lazy val fitnessStdDiv: Double = {
+        val aveFit = averageFitness
+        math.sqrt{
+          refEvaluations.map(e => SimpleMath.square(e.evaluation.fitness - aveFit)).sum / populationSize
+        }
+      }
+
+      lazy val averagePerformance: Double = {
+        refEvaluations.map(_.evaluation.performance).sum/populationSize
+      }
+
+      def bestInd: IndividualData[MultiStateInd] = {
+        refEvaluations.maxBy(_.evaluation.fitness)
+      }
+    }
 
     val rand = new Random(randomSeed)
 
@@ -152,10 +177,11 @@ object Runner {
       (sizeOfInterest, MemoryUsage(memoryLimit))
     }
 
-    def mkRepresentation(sizeOfInterest: Int, memoryLimit: Long): MultiStateRepresentation ={
+    def mkRepresentation(sizeOfInterest: Int, memoryLimit: Long): MultiStateRepresentation = {
       val evaluation = new SimplePerformanceEvaluation(
         sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
-        resourceUsage = timeLimitedResourceUsage(timeLimitInMillis), sizeF = sizeF, breakingMemoryUsage = memoryLimit
+        resourceUsage = timeLimitedResourceUsage(timeLimitInMillis),
+        sizeF = sizeF, breakingMemoryUsage = memoryLimit
       )
       MultiStateRepresentation(
         totalSizeTolerance = totalSizeTolerance,
@@ -242,7 +268,19 @@ object Runner {
           case _: FixedEvalSize => true
           case _: VariedEvalSize => false
         }
-      )
+      ).map{ pop =>
+        evalSizePolicy match {
+          case _: VariedEvalSize =>
+            val inds = pop.individuals.zipWithIndex.map { case (indData, p) =>
+              val eval = refRepresentation.fitnessEvaluation(indData.ind)._1
+              evalProgressCallback(s"Ref evaluation progress: $p")
+              indData.copy(evaluation = eval)
+            }
+            ReEvaluatedPop(pop.individuals, inds)
+          case _: FixedEvalSize =>
+            ReEvaluatedPop(pop.individuals, pop.individuals)
+        }
+      }
 
 
       val startTime = System.nanoTime()
@@ -272,11 +310,11 @@ object Runner {
         nonIncreasingTime += 1
         bestSoFar match {
           case Some(previousBest) =>
-            if (pop.bestIndData.evaluation.fitness > previousBest.evaluation.fitness) {
+            if (pop.bestInd.evaluation.fitness > previousBest.evaluation.fitness) {
               nonIncreasingTime = 0
-              setBestInd(pop.bestIndData)
+              setBestInd(pop.bestInd)
             }
-          case None => setBestInd(pop.bestIndData)
+          case None => setBestInd(pop.bestInd)
         }
         println(s"Last fitness increase: $nonIncreasingTime generations ago.")
 
@@ -286,18 +324,9 @@ object Runner {
           maxFuzzingTimeSec.exists(timeInSec > _)
         }
         !shouldStop
-      }).zipWithIndex.foreach { case (originalPop, i) =>
-        val pop = evalSizePolicy match {
-          case _: VariedEvalSize =>
-            val inds = originalPop.individuals.zipWithIndex.map { case (indData, i) =>
-              val eval = refRepresentation.fitnessEvaluation(indData.ind)._1
-              evalProgressCallback(s"Ref evaluation progress: $i")
-              indData.copy(evaluation = eval)
-            }
-            EvolutionRepresentation.Population(inds, Map()) //todo: Empty Map
-          case _: FixedEvalSize => originalPop
-        }
-        val bestData = pop.bestIndData
+      }).zipWithIndex.foreach { case (pop, i) =>
+
+        val bestData = pop.bestInd
         val bestEval = {
           val bestInd = bestData.ind
           refRepresentation.fitnessEvaluation(bestInd)._1
@@ -312,13 +341,12 @@ object Runner {
         println(s"Best Result: ${bestEval.showAsLinearExpr}, Created by ${bestData.history.birthOp}")
         representation.printIndividualMultiLine(println)(bestData.ind)
         println(s"Best Individual Pattern: ${showPattern(bestData.ind)}, ...")
-        println(s"Diversity: ${pop.fitnessMap.keySet.size}")
-        println(s"Average Size: ${representation.populationAverageSize(pop)}")
+        println(s"Average Size: ${representation.populationAverageSize(pop.refEvaluations.map(_.ind))}")
         println(s"Average Fitness: ${pop.averageFitness}")
         println(s"Fitness Variation: ${pop.fitnessStdDiv}")
         print("Distribution: ")
         println {
-          representation.frequencyRatioStat(pop.individuals.map(_.ind)).take(10).map {
+          representation.frequencyRatioStat(pop.refEvaluations.map(_.ind)).take(10).map {
             case (s, f) => s"$s -> ${"%.3f".format(f)}"
           }.mkString(", ")
         }

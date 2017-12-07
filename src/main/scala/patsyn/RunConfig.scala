@@ -58,11 +58,13 @@ case class VariedEvalSize(referenceSize: Int, f: Random => Int, display: String)
 }
 
 object VariedEvalSize{
-  def choppedGaussian(rand: Random, baseSize: Int, gaussianChop: (Double, Double) = (-1,2), expBase: Double = 2): VariedEvalSize = {
+  def choppedGaussian(rand: Random, baseSize: Int,
+                      gaussianChop: (Double, Double) = (-2,2),
+                      expBase: Double = 2, powerE: Double = 0.5): VariedEvalSize = {
     VariedEvalSize(
       baseSize,
       rand => {
-      (SimpleMath.expChoppedGaussian(gaussianChop, expBase)(rand) * baseSize).toInt
+      (SimpleMath.expChoppedGaussian(gaussianChop, expBase, powerE)(rand) * baseSize).toInt
     },
       s"baseSize = $baseSize, chopMargin = $gaussianChop, base = $expBase")
   }

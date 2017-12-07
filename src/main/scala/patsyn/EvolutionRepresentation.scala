@@ -33,10 +33,10 @@ trait EvolutionRepresentation[Individual] {
     pop.individuals.map {showIndData}.mkString("{",",","}")
   }
 
-  def populationAverageSize(pop: Population[Individual]): Double = {
-    pop.individuals.map{ eval =>
-      representationSize(eval.ind)
-    }.sum/pop.individuals.size
+  def populationAverageSize(individuals: IS[Individual]): Double = {
+    individuals.map{ ind =>
+      representationSize(ind)
+    }.sum/individuals.size
   }
 
   def frequencyStat(individuals: IS[Individual]): IS[(String, Int)] = {
@@ -76,27 +76,7 @@ object EvolutionRepresentation{
 
   case class IndividualData[T](ind: T, history: IndividualHistory, evaluation: IndividualEvaluation)
 
-  case class Population[T](individuals: IS[IndividualData[T]], fitnessMap: Map[T, IndividualEvaluation]){
-
-    lazy val averageFitness: Double = {
-      individuals.map(_.evaluation.fitness).sum/individuals.size
-    }
-
-    lazy val fitnessStdDiv: Double = {
-      val aveFit = averageFitness
-      math.sqrt{
-        individuals.map(e => SimpleMath.square(e.evaluation.fitness - aveFit)).sum / individuals.length
-      }
-    }
-
-    lazy val averagePerformance: Double = {
-      individuals.map(_.evaluation.performance).sum/individuals.size
-    }
-
-    def bestIndData: IndividualData[T] = {
-      individuals.maxBy(_.evaluation.fitness)
-    }
-  }
+  case class Population[T](individuals: IS[IndividualData[T]], fitnessMap: Map[T, IndividualEvaluation])
 
   case class MemoryUsage(amount: Long)
 }
