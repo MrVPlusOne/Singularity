@@ -119,19 +119,27 @@ object Playground {
     FuzzingTaskProvider.phpHashCollisionExample.runAsProbConfig("PhpHash"){ config =>
       Supernova.fuzzProblem(
         config,
-        RunnerConfig().copy(randomSeed = ioId, ioId = ioId, useGUI = true),
+        RunnerConfig().copy(randomSeed = ioId, ioId = ioId, useGUI = false),
         ExecutionConfig(evalSizePolicy = VariedEvalSize.choppedGaussian(rand, 400)), rand)
     }
   }
 
   def main(args: Array[String]): Unit = {
-//    SimpleMath.processMap(args,
-//      0 to 40, processNum = 14,
-//      mainClass = this) {
-//      ioId =>
-//        run(ioId)
-//    }
+    SimpleMath.processMap(args,
+      0 to 50, processNum = 10,
+      mainClass = this) {
+      ioId =>
+        run(ioId)
+    }
 
-    run(6)
+//    import StandardSystem._
+//    val vec = for(i <- 0 until 100) yield {
+//      val x = 0
+//      VectValue(Vector(x-i, x+33*i))
+//    }
+//    println{
+//      FuzzingTaskProvider.phpHashCollisionExample.squareMetric(vec.toVector)
+//    }
+//    run(6)
   }
 }

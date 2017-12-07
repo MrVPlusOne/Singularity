@@ -109,16 +109,18 @@ object PatternPlot {
       val file = if(fileLine.endsWith(lastName)) fileLine else fileLine + "/" + lastName
       val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
       println("Individual: ")
-      val config = GuavaExamples.immutableSet_copyOf
-      showResourceUsageChart(config, ind, sizeLimit,
-        plotPoints = plotPoints, plotName = file, exitOnClose = false,
-        memoryLimit = sizeLimit * ind.nStates * 4,
-        patternCreationFeedback = i => {
-          if (i % 100 == 0) {
-            println(s"input created: $i")
+//      val config = GuavaExamples.
+      FuzzingTaskProvider.phpHashCollisionExample.runAsProbConfig("phpHash16") { config =>
+        showResourceUsageChart(config, ind, sizeLimit,
+          plotPoints = plotPoints, plotName = file, exitOnClose = false,
+          memoryLimit = sizeLimit * ind.nStates * 4,
+          patternCreationFeedback = i => {
+            if (i % 100 == 0) {
+              println(s"input created: $i")
+            }
           }
-        }
-      )
+        )
+      }
     }
   }
 }
