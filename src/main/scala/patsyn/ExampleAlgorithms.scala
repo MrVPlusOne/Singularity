@@ -1172,8 +1172,8 @@ object FuzzingTaskProvider {
 
   def slowfuzzQsortNativeExample = sortNativeExample("qsort") _
 
-  def phpHashNativeExample(workingDir: String) = new FuzzingTaskProvider {
-    val native = new NativeExample("phphash")
+  def sortIntNativeExample(name: String)(inputSize: Int)(workingDir: String) = new FuzzingTaskProvider {
+    val native = new NativeExample(s"${name}_int")
     import native._
 
     def sizeF = {
@@ -1183,7 +1183,7 @@ object FuzzingTaskProvider {
     def outputTypes = IS(EVect(EInt))
 
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      sizeOfInterest = 128, // 64 insertions and char_size is 2
+      sizeOfInterest = inputSize,
       resourceUsage = {
         case IS(VectValue(v)) =>
           val data = toIntVect(v).map(x => x.toByte).toArray
@@ -1202,7 +1202,49 @@ object FuzzingTaskProvider {
     }
   }
 
-  def regexNativeExample(regexId: Int)(workingDir: String) = new FuzzingTaskProvider {
+  def insertionSortIntNativeExample = sortIntNativeExample("isort") _
+
+  def appleQsortIntNativeExample = sortIntNativeExample("appleqsort") _
+
+  def bsdQsortIntNativeExample = sortIntNativeExample("bsdqsort") _
+
+  def gnuQsortIntNativeExample = sortIntNativeExample("gnuqsort") _
+
+  def pgQsortIntNativeExample = sortIntNativeExample("pgqsort") _
+
+  def slowfuzzQsortIntNativeExample = sortIntNativeExample("qsort") _
+
+  def phpHashNativeExample(inputSize: Int)(workingDir: String) = new FuzzingTaskProvider {
+    val native = new NativeExample("phphash")
+    import native._
+
+    def sizeF = {
+      case IS(VectValue(v)) => v.length
+    }
+
+    def outputTypes = IS(EVect(EInt))
+
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      sizeOfInterest = inputSize, // 64 insertions and char_size is 2
+      resourceUsage = {
+        case IS(VectValue(v)) =>
+          val data = toIntVect(v).map(x => x.toByte).toArray
+          writeByteArrayRunNativeGetCost(data, workingDir)
+      },
+      gpEnv = sortingEnv
+    )
+
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      value match {
+        case IS(VectValue(v)) =>
+          val data = toIntVect(v).map(x => x.toByte).toArray
+          val fileName = s"$name.bin"
+          FileInteraction.writeToBinaryFile(fileName)(data)
+      }
+    }
+  }
+
+  def regexNativeExample(regexId: Int, inputSize: Int)(workingDir: String) = new FuzzingTaskProvider {
     val native = new NativeExample("pcre_str")
     import native._
 
@@ -1221,7 +1263,7 @@ object FuzzingTaskProvider {
     }
 
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      sizeOfInterest = 100,
+      sizeOfInterest = inputSize,
       resourceUsage = {
         case IS(VectValue(v)) =>
           val data = toIntVect(v).map(x => x.toByte).toArray

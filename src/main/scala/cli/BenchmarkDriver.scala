@@ -1,6 +1,5 @@
 package cli
 
-import patsyn.Runner.RunnerConfig
 import patsyn._
 import scopt.OptionParser
 import visual.PatternPlot
@@ -14,20 +13,34 @@ object BenchmarkDriver {
 
     Map[String, FuzzingTaskProvider](
 
-      // Evaluation section 1
+      // Evaluation 1 of section 1
       "slowfuzz/isort" -> insertionSortNativeExample(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/qsort" -> slowfuzzQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/appleqsort" -> appleQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/bsdqsort" -> bsdQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/pgqsort" -> pgQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/gnuqsort" -> gnuQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/phphash" -> phpHashNativeExample(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/phphash" -> phpHashNativeExample(128)(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/bzip" -> bzipExample(FileInteraction.getWorkingDir(ioId))) ++
       // TODO: slowfuzz/bzip
       (0 until 20).map(i =>
-        s"slowfuzz/pcre_regex$i" -> regexNativeExample(i)(FileInteraction.getWorkingDir(ioId))
-      ).toMap  ++
-      Map[String, FuzzingTaskProvider](
+        s"slowfuzz/pcre_regex$i" -> regexNativeExample(i, 100)(FileInteraction.getWorkingDir(ioId))
+      ).toMap ++
+    // Evaluation 2 of section 1
+    Seq(256, 512, 1024).flatMap(i => Seq(
+      s"slowfuzz/isort_int_$i" -> insertionSortIntNativeExample(i)(FileInteraction.getWorkingDir(ioId)),
+      s"slowfuzz/qsort_int_$i" -> slowfuzzQsortIntNativeExample(i)(FileInteraction.getWorkingDir(ioId)),
+      s"slowfuzz/appleqsort_int_$i" -> appleQsortIntNativeExample(i)(FileInteraction.getWorkingDir(ioId)),
+      s"slowfuzz/bsdqsort_int_$i" -> bsdQsortIntNativeExample(i)(FileInteraction.getWorkingDir(ioId)),
+      s"slowfuzz/pgqsort_int_$i" -> pgQsortIntNativeExample(i)(FileInteraction.getWorkingDir(ioId)),
+      s"slowfuzz/gnuqsort_int_$i" -> gnuQsortIntNativeExample(i)(FileInteraction.getWorkingDir(ioId))
+    )).toMap ++
+    Seq(400, 800, 1200).flatMap(s =>
+      (0 until 20).map(i =>
+        "slowfuzz/pcre_regex$i_int" -> regexNativeExample(i, s)(FileInteraction.getWorkingDir(ioId))
+      )).toMap ++
+    // Evaluations not included in the paper
+    Map[String, FuzzingTaskProvider](
       // These benchmarks have already been solved
       "slowfuzz/emu/insertionSort" -> insertionSortExample,
       "slowfuzz/emu/quickSort" -> quickSortExample,
