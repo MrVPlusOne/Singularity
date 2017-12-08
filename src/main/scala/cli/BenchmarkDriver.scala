@@ -33,11 +33,12 @@ object BenchmarkDriver {
       s"slowfuzz/appleqsort_int_$i" -> appleQsortIntNativeExample(i)(FileInteraction.getWorkingDir(ioId)),
       s"slowfuzz/bsdqsort_int_$i" -> bsdQsortIntNativeExample(i)(FileInteraction.getWorkingDir(ioId)),
       s"slowfuzz/pgqsort_int_$i" -> pgQsortIntNativeExample(i)(FileInteraction.getWorkingDir(ioId)),
-      s"slowfuzz/gnuqsort_int_$i" -> gnuQsortIntNativeExample(i)(FileInteraction.getWorkingDir(ioId))
+      s"slowfuzz/gnuqsort_int_$i" -> gnuQsortIntNativeExample(i)(FileInteraction.getWorkingDir(ioId)),
+      s"slowfuzz/phphash_int_$i" -> phpHashNativeExample(i)(FileInteraction.getWorkingDir(ioId))
     )).toMap ++
     Seq(400, 800, 1200).flatMap(s =>
       (0 until 20).map(i =>
-        "slowfuzz/pcre_regex$i_int" -> regexNativeExample(i, s)(FileInteraction.getWorkingDir(ioId))
+        "slowfuzz/pcre_regex$i_int_$s" -> regexNativeExample(i, s)(FileInteraction.getWorkingDir(ioId))
       )).toMap ++
     // Evaluations not included in the paper
     Map[String, FuzzingTaskProvider](
