@@ -20,7 +20,9 @@ object BenchmarkDriver {
       "slowfuzz/appleqsort" -> appleQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/bsdqsort" -> bsdQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
       "slowfuzz/pgqsort" -> pgQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
-      "slowfuzz/phphash" -> phpHashNativeExample(FileInteraction.getWorkingDir(ioId))) ++
+      "slowfuzz/gnuqsort" -> gnuQsortNativeExample(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/phphash" -> phpHashNativeExample(FileInteraction.getWorkingDir(ioId)),
+      "slowfuzz/bzip" -> bzipExample(FileInteraction.getWorkingDir(ioId))) ++
       // TODO: slowfuzz/bzip
       (0 until 20).map(i =>
         s"slowfuzz/pcre_regex$i" -> regexNativeExample(i)(FileInteraction.getWorkingDir(ioId))

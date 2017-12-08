@@ -1242,31 +1242,37 @@ object FuzzingTaskProvider {
   }
 
   //fixme: not working
-  def bzipExample(workingDir: String, bytesNum: Int) = new FuzzingTaskProvider {
+  def bzipExample(workingDir: String) = new FuzzingTaskProvider {
     val native = new NativeExample("bzip")
     import native._
 
     protected def task = {
       RunningFuzzingTask(
-        sizeOfInterest = 2,
+        sizeOfInterest = 250,
         resourceUsage = {
-          case bytes =>
-            val data = bytes.asInstanceOf[IS[ByteValue]].map(_.value).toArray
+          case IS(VectValue(vec)) =>
+            val data = toIntVect(vec).map(x => x.toByte).toArray
             writeByteArrayRunNativeGetCost(data, workingDir)
         },
-        gpEnv = GPEnvironment(
-          constMap = Map(EByte -> ExprGen(EByte, r => EConst(EByte, ByteValue(r.nextInt(256).toByte)))),
-          functions = IS(),
-          stateTypes = IS(),
-          argConstRatio = 0.5
-        )
+        gpEnv = {
+          val constMap = makeConstMap(
+            EInt -> (r => r.nextInt(255)),
+            EInt -> (r => r.nextInt(255)),
+            EInt -> (r => r.nextInt(255)),
+            EVect(EInt) -> (_ => Vector()),
+            EVect(EInt) -> (_ => Vector())
+          )
+          val functions = IntComponents.collection ++ BitComponents.collection ++ VectComponents.collection ++ AdvancedVectComponents.collection
+          val stateTypes = constMap.keys.toIndexedSeq
+          GPEnvironment(constMap, functions, stateTypes)
+        }
       )
     }
 
-    def outputTypes = IS.fill(bytesNum)(EByte)
+    def outputTypes = IS(EVect(EInt))
 
     def sizeF = {
-      case bytes =>  bytes.length
+      case IS(vec) => vec.memoryUsage.toInt
     }
   }
 
