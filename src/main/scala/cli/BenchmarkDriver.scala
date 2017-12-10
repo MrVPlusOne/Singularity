@@ -38,7 +38,7 @@ object BenchmarkDriver {
     )).toMap ++
     Seq(400, 800, 1200).flatMap(s =>
       (0 until 20).map(i =>
-        "slowfuzz/pcre_regex$i_int_$s" -> regexNativeExample(i, s)(FileInteraction.getWorkingDir(ioId))
+        s"slowfuzz/pcre_regex${i}_int_$s" -> regexNativeExample(i, s)(FileInteraction.getWorkingDir(ioId))
       )).toMap ++
     // Evaluations not included in the paper
     Map[String, FuzzingTaskProvider](
