@@ -1117,9 +1117,15 @@ object FuzzingTaskProvider {
       import sys.process._
 
       val cmd = s"$nativeBinaryPath $cmdParams"
-      val results = cmd.split("\\s+").toSeq.lineStream
-      val cost = parseCost(results.last)
-      cost.toDouble
+      try {
+        val results = cmd.split("\\s+").toSeq.lineStream
+        val cost = parseCost(results.last)
+        cost.toDouble
+      } catch {
+        case _: RuntimeException =>
+          // Program crashes are not interesting to us
+          0
+      }
     }
 
     def writeByteArrayRunNativeGetCost(data: Array[Byte], workingDir: String): Double = {
