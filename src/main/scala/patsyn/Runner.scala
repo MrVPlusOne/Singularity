@@ -16,7 +16,7 @@ object Runner {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
     val workingDir = FileInteraction.getWorkingDir(ioId)
 
-    runExample("bzip", FuzzingTaskProvider.bzipExample(workingDir), RunConfig.default.withIoIdAndSeed(ioId, ioId))
+    runExample("javahash", FuzzingTaskProvider.javaHashCollisionExample, RunConfig.default.withIoIdAndSeed(ioId, ioId))
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)

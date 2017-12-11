@@ -196,7 +196,7 @@ object FuzzingTaskProvider {
 
     def squareMetric(vec: Vector[EValue]): Double = {
       val hashes = vec.map(v => {
-        vectIntToCharArray(v.asInstanceOf[VectValue], charSize)
+        vectIntToCharArray(v.asInstanceOf[VectValue], charSize).takeWhile(ch => ch.toInt != 0)
       }).distinct.map(hashFunc)
 
       hashes.groupBy(identity).values.map{g =>
@@ -213,8 +213,7 @@ object FuzzingTaskProvider {
         case IS(VectValue(vec)) =>
           squareMetric(vec)
       },
-      gpEnv = hashEnv,
-      sizeOfInterest = 600
+      gpEnv = hashEnv
     )
 
     def sizeF = {
@@ -228,7 +227,7 @@ object FuzzingTaskProvider {
     }
   }
 
-  def phpHashCollisionExample = hashCollisionExample(HashFunc.php, 16)
+  def phpHashCollisionExample = hashCollisionExample(HashFunc.php, 8)
 
   def javaHashCollisionExample = hashCollisionExample(HashFunc.java, 16)
 
