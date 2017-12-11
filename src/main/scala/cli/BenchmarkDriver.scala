@@ -45,7 +45,6 @@ object BenchmarkDriver {
       // These benchmarks have already been solved
       "slowfuzz/emu/insertionSort" -> insertionSortExample,
       "slowfuzz/emu/quickSort" -> quickSortExample,
-      "slowfuzz/emu/phpHash" -> phpHashCollisionExample,
       "slowfuzz/emu/regex1" -> slowFuzzRegexExample1,
       "slowfuzz/emu/regex2" -> slowFuzzRegexExample2,
       "slowfuzz/emu/regex3" -> slowFuzzRegexExample3,
@@ -57,9 +56,9 @@ object BenchmarkDriver {
       "stac/airplan2" -> airplan2Example(FileInteraction.getWorkingDir(ioId)),
       "redos/cookie" -> regexExample("^(([^=;]+))\\s*=\\s*([^\\n\\r\\00]*)", defaultRegexDic),
       "quicksortMiddle" -> quickSortMiddlePivotExample,
-      "hashperf/php" -> phpHashPerformanceExample,
 
       // These benchmarks are yet to be solved
+      "hashcol/php" -> phpHashCollisionExample,
       "hashcol/java" -> javaHashCollisionExample,
       "hashcol/ruby" -> rubyHashCollisionExample,
       "hashcol/asp.net" -> aspDotNetHashCollisionExample,
@@ -69,6 +68,7 @@ object BenchmarkDriver {
       "stac/textCrunchr" -> textCrunchrExample(FileInteraction.getWorkingDir(ioId)),
       "stac/gabfeed4" -> gabfeed4Example(FileInteraction.getWorkingDir(ioId)),
       "stac/airplan3" -> airplan3Example(FileInteraction.getWorkingDir(ioId)),
+      "hashperf/php" -> phpHashPerformanceExample,
       "hashperf/java" -> javaHashPerformanceExample,
       "hashperf/ruby" -> rubyHashPerformanceExample,
       "hashperf/asp.net" -> aspDotNetHashPerformanceExample,
