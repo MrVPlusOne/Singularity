@@ -5,7 +5,7 @@ import java.awt.Dimension
 import java.util.concurrent.TimeoutException
 
 import measure.TimeTools
-import patsyn.EvolutionRepresentation.{IndividualData, IndividualEvaluation, MemoryUsage}
+import patsyn.EvolutionRepresentation.{IndividualData, MemoryUsage}
 import FuzzingTaskProvider.escapeStrings
 
 import scala.util.Random
@@ -138,6 +138,13 @@ object Runner {
     val recordDirPath = {
       s"results-running/$problemName[ioId=$ioId,seed=$randomSeed]($dateTimeString)"
     }
+    def renameResultDir(perf: String) = {
+      import java.io.File
+
+      val newDir = s"results/$problemName[performance=$perf][ioId=$ioId,seed=$randomSeed]($dateTimeString)"
+      FileInteraction.mkDirsAlongPath(newDir)
+      new File(recordDirPath).renameTo(new File(newDir))
+    }
 
     val (evalProgressCallback, monitorCallback, saveMonitor):
       (String => Unit, MonitoringData => Unit, String => Unit) = {
@@ -254,6 +261,7 @@ object Runner {
               // We might also be interested in the value
               MultiStateRepresentation.saveExtrapolation(problemConfig ,ind, evalSize, memoryLimit,
                 s"$recordDirPath/timeoutValue")
+              renameResultDir("timeout")
 
               System.exit(0)
               throw new Exception("Timed out!")
@@ -354,11 +362,8 @@ object Runner {
 
       println("Evolution Finished!")
       try{
-        import java.io.File
         val performance = bestSoFar.get.evaluation.performance
-        val newDir = s"results/$problemName[performance=$performance][ioId=$ioId,seed=$randomSeed]($dateTimeString)"
-        FileInteraction.mkDirsAlongPath(newDir)
-        new File(recordDirPath).renameTo(new File(newDir))
+        renameResultDir(s"$performance")
       }finally {
         if(callExitAfterFinish){
           System.exit(0)
