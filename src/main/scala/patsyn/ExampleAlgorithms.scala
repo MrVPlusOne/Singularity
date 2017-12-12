@@ -1084,7 +1084,7 @@ object FuzzingTaskProvider {
     }
   }
 
-  class NativeExample(name: String) {
+  class NativeExample(name: String, workingDir: String) {
 
     // We need this to be lazy since we don't want to actively looking for the binary if we do not need to run it
     lazy val nativeBinaryPath: String = {
@@ -1127,16 +1127,20 @@ object FuzzingTaskProvider {
       }
     }
 
-    def writeByteArrayRunNativeGetCost(data: Array[Byte], workingDir: String): Double = {
-      val inputFileName = s"$workingDir/input"
+    def withWriteByteArray[T](data: Array[Byte], fileName: String, action: String => T): T = {
+      val inputFileName = s"$workingDir/$fileName"
       FileInteraction.deleteIfExist(inputFileName)
       FileInteraction.writeToBinaryFile(inputFileName)(data)
-      runNativeGetCost(inputFileName)
+      action(inputFileName)
+    }
+
+    def writeByteArrayRunNativeGetCost(data: Array[Byte]): Double = {
+      withWriteByteArray(data, "input", runNativeGetCost)
     }
   }
 
   def sortNativeExample(name: String)(workingDir: String) = new FuzzingTaskProvider {
-    val native = new NativeExample(name)
+    val native = new NativeExample(name, workingDir)
     import native._
 
     def sizeF = {
@@ -1150,7 +1154,7 @@ object FuzzingTaskProvider {
       resourceUsage = {
         case IS(VectValue(v)) =>
           val data = toIntVect(v).map(x => x.toByte).toArray
-          writeByteArrayRunNativeGetCost(data, workingDir)
+          writeByteArrayRunNativeGetCost(data)
       },
       gpEnv = sortingEnv
     )
@@ -1177,50 +1181,8 @@ object FuzzingTaskProvider {
 
   def slowfuzzQsortNativeExample = sortNativeExample("qsort") _
 
-  def sortIntNativeExample(name: String)(inputSize: Int)(workingDir: String) = new FuzzingTaskProvider {
-    val native = new NativeExample(s"${name}_int")
-    import native._
-
-    def sizeF = {
-      case IS(VectValue(v)) => v.length
-    }
-
-    def outputTypes = IS(EVect(EInt))
-
-    protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      sizeOfInterest = inputSize,
-      resourceUsage = {
-        case IS(VectValue(v)) =>
-          val data = toIntVect(v).map(x => x.toByte).toArray
-          writeByteArrayRunNativeGetCost(data, workingDir)
-      },
-      gpEnv = sortingEnv
-    )
-
-    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
-      value match {
-        case IS(VectValue(v)) =>
-          val data = toIntVect(v).map(x => x.toByte).toArray
-          val fileName = s"$name.bin"
-          FileInteraction.writeToBinaryFile(fileName)(data)
-      }
-    }
-  }
-
-  def insertionSortIntNativeExample = sortIntNativeExample("isort") _
-
-  def appleQsortIntNativeExample = sortIntNativeExample("appleqsort") _
-
-  def bsdQsortIntNativeExample = sortIntNativeExample("bsdqsort") _
-
-  def gnuQsortIntNativeExample = sortIntNativeExample("gnuqsort") _
-
-  def pgQsortIntNativeExample = sortIntNativeExample("pgqsort") _
-
-  def slowfuzzQsortIntNativeExample = sortIntNativeExample("qsort") _
-
   def phpHashNativeExample(inputSize: Int)(workingDir: String) = new FuzzingTaskProvider {
-    val native = new NativeExample("phphash")
+    val native = new NativeExample("phphash", workingDir)
     import native._
 
     def sizeF = {
@@ -1234,7 +1196,7 @@ object FuzzingTaskProvider {
       resourceUsage = {
         case IS(VectValue(v)) =>
           val data = toIntVect(v).map(x => x.toByte).toArray
-          writeByteArrayRunNativeGetCost(data, workingDir)
+          writeByteArrayRunNativeGetCost(data)
       },
       gpEnv = sortingEnv
     )
@@ -1250,7 +1212,7 @@ object FuzzingTaskProvider {
   }
 
   def regexNativeExample(regexId: Int, inputSize: Int)(workingDir: String) = new FuzzingTaskProvider {
-    val native = new NativeExample("pcre_str")
+    val native = new NativeExample("pcre_str", workingDir)
     import native._
 
     def sizeF = {
@@ -1259,12 +1221,11 @@ object FuzzingTaskProvider {
 
     def outputTypes = IS(EVect(EInt))
 
-    def writeByteArrayRunNativeGetCost(data: Array[Byte], workingDir: String): Double = {
-      val inputFileName = s"$workingDir/input"
-      FileInteraction.deleteIfExist(inputFileName)
-      FileInteraction.writeToBinaryFile(inputFileName)(data)
-      val cmdParams = s"$inputFileName $regexId"
-      runNativeGetCost(cmdParams)
+    def writeByteArrayRunNativeGetCost(data: Array[Byte]): Double = {
+      withWriteByteArray(data, "input", (inputFileName: String) => {
+        val cmdParams = s"$inputFileName $regexId"
+        runNativeGetCost(cmdParams)
+      })
     }
 
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
@@ -1272,7 +1233,7 @@ object FuzzingTaskProvider {
       resourceUsage = {
         case IS(VectValue(v)) =>
           val data = toIntVect(v).map(x => x.toByte).toArray
-          writeByteArrayRunNativeGetCost(data, workingDir)
+          writeByteArrayRunNativeGetCost(data)
       },
       gpEnv = sortingEnv
     )
@@ -1290,7 +1251,7 @@ object FuzzingTaskProvider {
 
   //fixme: not working
   def bzipExample(workingDir: String) = new FuzzingTaskProvider {
-    val native = new NativeExample("bzip")
+    val native = new NativeExample("bzip", workingDir)
     import native._
 
     protected def task = {
@@ -1299,7 +1260,7 @@ object FuzzingTaskProvider {
         resourceUsage = {
           case IS(VectValue(vec)) =>
             val data = toIntVect(vec).map(x => x.toByte).toArray
-            writeByteArrayRunNativeGetCost(data, workingDir)
+            writeByteArrayRunNativeGetCost(data)
         },
         gpEnv = {
           val constMap = makeConstMap(
@@ -1324,7 +1285,7 @@ object FuzzingTaskProvider {
   }
 
   def bzipProblem(workingDir: String) = {
-    val native = new NativeExample("bzip")
+    val native = new NativeExample("bzip", workingDir)
     import native._
 
     ProblemConfig(
@@ -1336,7 +1297,7 @@ object FuzzingTaskProvider {
       resourceUsage = {
         case IS(VectValue(vec)) =>
           val data = toIntVect(vec).map(x => x.toByte).toArray
-          writeByteArrayRunNativeGetCost(data, workingDir)
+          writeByteArrayRunNativeGetCost(data)
       }
     )
   }
