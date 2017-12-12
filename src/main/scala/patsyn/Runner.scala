@@ -16,7 +16,7 @@ object Runner {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
     val workingDir = FileInteraction.getWorkingDir(ioId)
 
-    runExample("quickSortMiddle", FuzzingTaskProvider.phpHashCollisionExample, RunConfig.default.withIoIdAndSeed(ioId, ioId).copy(execConfig = ExecutionConfig(evalSizePolicy = VariedEvalSize.choppedGaussian(new Random(ioId), baseSize = 200))))
+    runExample("javahash", FuzzingTaskProvider.javaHashCollisionExample, RunConfig.default.withIoIdAndSeed(ioId, ioId))
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)

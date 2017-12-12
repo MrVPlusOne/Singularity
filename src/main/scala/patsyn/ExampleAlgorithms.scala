@@ -196,7 +196,7 @@ object FuzzingTaskProvider {
 
     def squareMetric(vec: Vector[EValue]): Double = {
       val hashes = vec.map(v => {
-        vectIntToCharArray(v.asInstanceOf[VectValue], charSize)
+        vectIntToCharArray(v.asInstanceOf[VectValue], charSize).takeWhile(ch => ch.toInt != 0)
       }).distinct.map(hashFunc)
 
       hashes.groupBy(identity).values.map{g =>
@@ -213,8 +213,7 @@ object FuzzingTaskProvider {
         case IS(VectValue(vec)) =>
           squareMetric(vec)
       },
-      gpEnv = hashEnv,
-      sizeOfInterest = 600
+      gpEnv = hashEnv
     )
 
     def sizeF = {
@@ -228,7 +227,7 @@ object FuzzingTaskProvider {
     }
   }
 
-  def phpHashCollisionExample = hashCollisionExample(HashFunc.php, 16)
+  def phpHashCollisionExample = hashCollisionExample(HashFunc.php, 8)
 
   def javaHashCollisionExample = hashCollisionExample(HashFunc.java, 16)
 
@@ -1117,9 +1116,15 @@ object FuzzingTaskProvider {
       import sys.process._
 
       val cmd = s"$nativeBinaryPath $cmdParams"
-      val results = cmd.split("\\s+").toSeq.lineStream
-      val cost = parseCost(results.last)
-      cost.toDouble
+      try {
+        val results = cmd.split("\\s+").toSeq.lineStream
+        val cost = parseCost(results.last)
+        cost.toDouble
+      } catch {
+        case _: RuntimeException =>
+          // Program crashes are not interesting to us
+          0
+      }
     }
 
     def writeByteArrayRunNativeGetCost(data: Array[Byte], workingDir: String): Double = {
@@ -1172,8 +1177,8 @@ object FuzzingTaskProvider {
 
   def slowfuzzQsortNativeExample = sortNativeExample("qsort") _
 
-  def phpHashNativeExample(workingDir: String) = new FuzzingTaskProvider {
-    val native = new NativeExample("phphash")
+  def sortIntNativeExample(name: String)(inputSize: Int)(workingDir: String) = new FuzzingTaskProvider {
+    val native = new NativeExample(s"${name}_int")
     import native._
 
     def sizeF = {
@@ -1183,7 +1188,7 @@ object FuzzingTaskProvider {
     def outputTypes = IS(EVect(EInt))
 
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      sizeOfInterest = 128, // 64 insertions and char_size is 2
+      sizeOfInterest = inputSize,
       resourceUsage = {
         case IS(VectValue(v)) =>
           val data = toIntVect(v).map(x => x.toByte).toArray
@@ -1202,7 +1207,49 @@ object FuzzingTaskProvider {
     }
   }
 
-  def regexNativeExample(regexId: Int)(workingDir: String) = new FuzzingTaskProvider {
+  def insertionSortIntNativeExample = sortIntNativeExample("isort") _
+
+  def appleQsortIntNativeExample = sortIntNativeExample("appleqsort") _
+
+  def bsdQsortIntNativeExample = sortIntNativeExample("bsdqsort") _
+
+  def gnuQsortIntNativeExample = sortIntNativeExample("gnuqsort") _
+
+  def pgQsortIntNativeExample = sortIntNativeExample("pgqsort") _
+
+  def slowfuzzQsortIntNativeExample = sortIntNativeExample("qsort") _
+
+  def phpHashNativeExample(inputSize: Int)(workingDir: String) = new FuzzingTaskProvider {
+    val native = new NativeExample("phphash")
+    import native._
+
+    def sizeF = {
+      case IS(VectValue(v)) => v.length
+    }
+
+    def outputTypes = IS(EVect(EInt))
+
+    protected def task: RunningFuzzingTask = RunningFuzzingTask(
+      sizeOfInterest = inputSize, // 64 insertions and char_size is 2
+      resourceUsage = {
+        case IS(VectValue(v)) =>
+          val data = toIntVect(v).map(x => x.toByte).toArray
+          writeByteArrayRunNativeGetCost(data, workingDir)
+      },
+      gpEnv = sortingEnv
+    )
+
+    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
+      value match {
+        case IS(VectValue(v)) =>
+          val data = toIntVect(v).map(x => x.toByte).toArray
+          val fileName = s"$name.bin"
+          FileInteraction.writeToBinaryFile(fileName)(data)
+      }
+    }
+  }
+
+  def regexNativeExample(regexId: Int, inputSize: Int)(workingDir: String) = new FuzzingTaskProvider {
     val native = new NativeExample("pcre_str")
     import native._
 
@@ -1221,7 +1268,7 @@ object FuzzingTaskProvider {
     }
 
     protected def task: RunningFuzzingTask = RunningFuzzingTask(
-      sizeOfInterest = 100,
+      sizeOfInterest = inputSize,
       resourceUsage = {
         case IS(VectValue(v)) =>
           val data = toIntVect(v).map(x => x.toByte).toArray
@@ -1242,31 +1289,37 @@ object FuzzingTaskProvider {
   }
 
   //fixme: not working
-  def bzipExample(workingDir: String, bytesNum: Int) = new FuzzingTaskProvider {
+  def bzipExample(workingDir: String) = new FuzzingTaskProvider {
     val native = new NativeExample("bzip")
     import native._
 
     protected def task = {
       RunningFuzzingTask(
-        sizeOfInterest = 2,
+        sizeOfInterest = 250,
         resourceUsage = {
-          case bytes =>
-            val data = bytes.asInstanceOf[IS[ByteValue]].map(_.value).toArray
+          case IS(VectValue(vec)) =>
+            val data = toIntVect(vec).map(x => x.toByte).toArray
             writeByteArrayRunNativeGetCost(data, workingDir)
         },
-        gpEnv = GPEnvironment(
-          constMap = Map(EByte -> ExprGen(EByte, r => EConst(EByte, ByteValue(r.nextInt(256).toByte)))),
-          functions = IS(),
-          stateTypes = IS(),
-          argConstRatio = 0.5
-        )
+        gpEnv = {
+          val constMap = makeConstMap(
+            EInt -> (r => r.nextInt(255)),
+            EInt -> (r => r.nextInt(255)),
+            EInt -> (r => r.nextInt(255)),
+            EVect(EInt) -> (_ => Vector()),
+            EVect(EInt) -> (_ => Vector())
+          )
+          val functions = IntComponents.collection ++ BitComponents.collection ++ VectComponents.collection ++ AdvancedVectComponents.collection
+          val stateTypes = constMap.keys.toIndexedSeq
+          GPEnvironment(constMap, functions, stateTypes)
+        }
       )
     }
 
-    def outputTypes = IS.fill(bytesNum)(EByte)
+    def outputTypes = IS(EVect(EInt))
 
     def sizeF = {
-      case bytes =>  bytes.length
+      case IS(vec) => vec.memoryUsage.toInt
     }
   }
 

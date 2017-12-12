@@ -1,6 +1,6 @@
 package cli
 
-import patsyn.{ProblemConfig, RunConfig, Supernova}
+import patsyn.RunConfig
 import scopt.OptionParser
 
 import scala.util.Random
@@ -40,24 +40,34 @@ object JarTester {
 
     import patsyn.StandardSystem._
     import patsyn._
-    import edu.utexas.stac.Cost
-    import FuzzingTaskProvider.toIntVect
+    import FuzzingTaskProvider.vectIntToString
 
     val rand = new Random(runConfig.runnerConfig.randomSeed)
+
+    def squareMetric(vec: Vector[EValue]): Double = {
+      val hashes = vec.map(v => {
+        vectIntToString(v.asInstanceOf[VectValue])
+      }).distinct.map(str =>
+        method.invoke(null, str)
+      )
+
+      hashes.groupBy(identity).values.map{g =>
+        val c = g.length - 1
+        c*c
+      }.sum
+    }
 
     Supernova.fuzzProblem(
       problemConfig = ProblemConfig(
         problemName = method.getName,
-        outputTypes = IS(EVect(EInt)),
+        outputTypes = IS(EVect(EVect(EInt))),
         sizeF = {
-          case IS(VectValue(v)) => v.length
+          case IS(VectValue(strings)) =>
+            strings.map(s => s.asInstanceOf[VectValue].value.length + 1).sum
         },
         resourceUsage = {
           case IS(VectValue(vec)) =>
-            val intArray = toIntVect(vec).toArray
-            Cost.reset()
-            method.invoke(null, intArray)
-            Cost.read()
+            squareMetric(vec)
         },
         displayValue = FuzzingTaskProvider.defaultDisplayValue,
         saveValueWithName = FuzzingTaskProvider.defaultSaveValueWithName
