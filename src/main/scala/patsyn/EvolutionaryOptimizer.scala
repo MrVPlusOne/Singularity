@@ -43,15 +43,8 @@ case class EvolutionaryOptimizer[Individual]() {
       }
     }
 
-    val operatorPCF: IS[(GOp, Double)] = {
-      val normalizeFactor = operators.map(_._2).sum
-      var acc = 0.0
-      operators.map{
-        case (op, p) =>
-          acc += p
-          (op, acc / normalizeFactor)
-      }
-    }
+    val operatorPCF = SimpleMath.PCF(operators)
+
 
     val initPop = {
       val individuals = (0 until populationSize).map(_ => initOperator.operate(random, IS()))
@@ -83,13 +76,7 @@ case class EvolutionaryOptimizer[Individual]() {
 
       val newIndsAndHistory = {
         for (i <- 0 until populationSize) yield {
-          val geneticOp = {
-            val x = random.nextDouble()
-
-            operatorPCF.find {
-              case (op, pAcc) => x < pAcc
-            }.getOrElse(operatorPCF.last)._1
-          }
+          val geneticOp = operatorPCF.sample(random)
 
           val participates = IS.fill(geneticOp.arity) {
             tournamentResult(i)

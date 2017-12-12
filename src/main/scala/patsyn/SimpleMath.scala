@@ -174,6 +174,26 @@ object SimpleMath {
     }
   }
 
+  case class PCF[A](pdf: IS[(A,Double)]){
+    val pcf: IS[(A, Double)] = {
+      val normalizeFactor = pdf.map(_._2).sum
+      var acc = 0.0
+      pdf.map{
+        case (op, p) =>
+          acc += p
+          (op, acc / normalizeFactor)
+      }
+    }
+
+    def sample(random: Random): A = {
+      val x = random.nextDouble()
+
+      pcf.find {
+        case (a, pAcc) => x < pAcc
+      }.getOrElse(pcf.last)._1
+    }
+  }
+
   def main(args: Array[String]): Unit = {
     parallelMapOrdered(0 until 100, 6){ i =>
 //      Thread.sleep(100)
