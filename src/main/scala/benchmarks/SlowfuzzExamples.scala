@@ -50,7 +50,7 @@ object SlowfuzzExamples {
   def pcreExample(regexId: Int)(inputSize: Int)(workingDir: String) = {
     val native = new FuzzingTaskProvider.NativeExample("pcre_str", workingDir)
     ProblemConfig(
-      problemName = "pcre_str",
+      problemName = s"pcre_regex${regexId}_int_$inputSize",
       outputTypes = IS(EVect(EInt)),
       sizeF = {
         case IS(VectValue(v)) => v.length

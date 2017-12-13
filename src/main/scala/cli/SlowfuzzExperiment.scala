@@ -39,7 +39,8 @@ object SlowfuzzExperiment {
     ExecutionConfig(
       evalSizePolicy = FixedEvalSize(cliOption.size),
       maxNonIncreaseGen = None,
-      maxFuzzingTimeSec = Some(cliOption.fuzzingTime)
+      maxFuzzingTimeSec = Some(cliOption.fuzzingTime),
+      timeLimitInMillis = 900000  // Be lenient about this as strange timeouts occurs frequently
     )
   }
 
