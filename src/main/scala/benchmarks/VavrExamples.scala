@@ -10,13 +10,9 @@ import visual.PatternPlot.showResourceUsageChart
 
 object VavrExamples {
 
-  def vectIntToPriorityQueue(vec: IS[EValue]) = {
-    vec.map { case IntValue(i) => new Integer(i) }.foldLeft(patbench.vavr.collection.PriorityQueue.empty[Integer]())((q, i) => q.enqueue(i))
-  }
-
-  def group: ProblemConfig = {
+  def pqGroup: ProblemConfig = {
     ProblemConfig(
-      "vavr.group",
+      "vavr.pq.group",
       outputTypes = IS(EVect(EInt), EInt),
       sizeF = {
         case IS(v, _) =>
@@ -24,10 +20,11 @@ object VavrExamples {
       },
       resourceUsage = {
         case IS(VectValue(vec), IntValue(s)) =>
-          val pq = vectIntToPriorityQueue(vec)
+          val arr = vec.map { case IntValue(i) => i }.toArray
+          val pq = TestVavr.arrayToPriorityQueue(arr)
           try {
             Cost.reset()
-            pq.grouped(math.abs(s))
+            pq.grouped(Math.floorMod(s, pq.size()))
             Cost.read()
           } catch {
             case _: Throwable => 0
@@ -36,47 +33,62 @@ object VavrExamples {
     )
   }
 
-  def merge: ProblemConfig = {
+  def treeSetAdd: ProblemConfig = {
     ProblemConfig(
-      "vavr.merge",
-      outputTypes = IS(EVect(EInt), EVect(EInt)),
+      "vavr.treeset.add",
+      outputTypes = IS(EVect(EInt), EInt),
       sizeF = {
-        case IS(v0, v1) =>
-          v0.memoryUsage.toInt + v1.memoryUsage.toInt
-      },
-      resourceUsage = {
-        case IS(VectValue(vec0), VectValue(vec1)) =>
-          val pq0 = vectIntToPriorityQueue(vec0)
-          val pq1 = vectIntToPriorityQueue(vec1)
-          try {
-            Cost.reset()
-            pq0.merge(pq1)
-            Cost.read()
-          } catch {
-            case _: Throwable => 0
-          }
-      }
-    )
-  }
-
-  def toList: ProblemConfig = {
-    ProblemConfig(
-      "vavr.tolist",
-      outputTypes = IS(EVect(EInt)),
-      sizeF = {
-        case IS(v) =>
+        case IS(v, _) =>
           v.memoryUsage.toInt
       },
       resourceUsage = {
-        case IS(VectValue(vec)) =>
-          val pq = vectIntToPriorityQueue(vec)
-          try {
-            Cost.reset()
-            pq.toList()
-            Cost.read()
-          } catch {
-            case _: Throwable => 0
-          }
+        case IS(VectValue(vec), IntValue(s)) =>
+          val nums = vec.map { case IntValue(i) => i }.toArray
+          val set = TestVavr.arrayToTreeSet(nums)
+
+          Cost.reset()
+          set.add(s)
+          Cost.read()
+      }
+    )
+  }
+
+  def hashSetAdd: ProblemConfig = {
+    ProblemConfig(
+      "vavr.hashset.add",
+      outputTypes = IS(EVect(EInt), EInt),
+      sizeF = {
+        case IS(v, _) =>
+          v.memoryUsage.toInt
+      },
+      resourceUsage = {
+        case IS(VectValue(vec), IntValue(s)) =>
+          val nums = vec.map { case IntValue(i) => i }.toArray
+          val set = TestVavr.arrayToHashSet(nums)
+
+          Cost.reset()
+          set.add(s)
+          Cost.read()
+      }
+    )
+  }
+
+  def linkedHashSetAdd: ProblemConfig = {
+    ProblemConfig(
+      "vavr.linkedhashset.add",
+      outputTypes = IS(EVect(EInt), EInt),
+      sizeF = {
+        case IS(v, _) =>
+          v.memoryUsage.toInt
+      },
+      resourceUsage = {
+        case IS(VectValue(vec), IntValue(s)) =>
+          val nums = vec.map { case IntValue(i) => i }.toArray
+          val set = TestVavr.arrayToLinkedHashSet(nums)
+
+          Cost.reset()
+          set.add(s)
+          Cost.read()
       }
     )
   }
@@ -84,14 +96,14 @@ object VavrExamples {
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
     Supernova.fuzzProblem(
-      toList,
+      linkedHashSetAdd,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
-      ExecutionConfig(evalSizePolicy = FixedEvalSize(200)), rand)
+      ExecutionConfig(evalSizePolicy = FixedEvalSize(500)), rand)
   }
 
   def main(args: Array[String]): Unit = {
     runExample(0, true)
-//    val ind = FileInteraction.readMultiIndFromFile("results/vavr.merge[performance=218.0][ioId=0,seed=0](17-12-12-15:44:57)/bestIndividual.serialized", StandardSystem.funcMap)
-//    showResourceUsageChart(merge, ind, 2000)
+//    val ind = FileInteraction.readMultiIndFromFile("results/vavr.hashset.add[performance=111.0][ioId=2,seed=2](17-12-13-17:28:10)/bestIndividual.serialized", StandardSystem.funcMap)
+//    showResourceUsageChart(hashSetAdd, ind, 2000, 50)
   }
 }
