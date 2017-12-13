@@ -8,7 +8,11 @@ object SlowfuzzExamples {
   def nativeExample(execName: String)(inputSize: Int)(workingDir: String) = {
     val native = new FuzzingTaskProvider.NativeExample(execName, workingDir)
     ProblemConfig(
-      problemName = execName,
+      problemName =
+        if (execName.endsWith("_int"))
+          s"${execName}_$inputSize"
+        else
+          s"${execName}_int_$inputSize",
       outputTypes = IS(EVect(EInt)),
       sizeF = {
         case IS(VectValue(v)) => v.length
@@ -30,11 +34,17 @@ object SlowfuzzExamples {
   }
 
   def insertionSortIntExample = nativeExample("isort_int") _
+
   def appleQsortIntExample = nativeExample("appleqsort_int") _
+
   def bsdQsortIntExample = nativeExample("bsdqsort_int") _
+
   def gnuQsortIntExample = nativeExample("gnuqsort_int") _
+
   def pgQsortIntExample = nativeExample("pgqsort_int") _
+
   def slowfuzzQsortIntExample = nativeExample("qsort_int") _
+
   def phpHashExample = nativeExample("phphash") _
 
   def pcreExample(regexId: Int)(inputSize: Int)(workingDir: String) = {
