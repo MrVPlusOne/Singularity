@@ -98,8 +98,8 @@ object StandardSystem {
 
   implicit def intValue(v: Int): IntValue = IntValue(v)
 
-  implicit def vectValue[E](v: Vector[E])(implicit convE: E => EValue): VectValue = {
-    VectValue(v.map(convE))
+  implicit def vectValue[E](v: Vector[EValue]): VectValue = {
+    VectValue(v)
   }
 
   implicit def boolValue(b: Boolean): BoolValue = BoolValue(b)
