@@ -102,9 +102,10 @@ object FileInteraction{
   }
 
   def getWorkingDir(ioId: Int): String = {
-    val workingDir = s"workingDir$ioId"
-    FileInteraction.mkDirsAlongPath(workingDir)
-    workingDir
+    val workingDirPrefix = s"workingDir$ioId"
+    val workingDirPath = java.nio.file.Files.createTempDirectory(workingDirPrefix)
+    workingDirPath.toFile.deleteOnExit()
+    workingDirPath.toString
   }
 
   def saveMultiIndToFile(path: String)(ind: MultiStateInd): Unit = ind match {
