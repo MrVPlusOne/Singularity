@@ -574,8 +574,6 @@ object FuzzingTaskProvider {
     import java.io._
     import java.util.zip._
 
-    import sys.process._
-
     def outputAsZip(outPath: String, content: String, contentFileName: String = "content.txt") = {
       val f = new File(outPath)
       val zipStream = new ZipOutputStream(new FileOutputStream(f))
@@ -601,11 +599,9 @@ object FuzzingTaskProvider {
             val zipPath = s"$workDir/input.zip"
             outputAsZip(zipPath, content)
 
-            val cost = parseCost(Seq("java", "-Xint", "-cp", "benchmarks/textChrunchr/textChrunchr_3.jar",
-              "com.cyberpointllc.stac.host.Main", zipPath).lineStream.last)
-
-            println(s"Cost = $cost")
-            cost.toDouble
+            Cost.reset()
+            patbench.textcrunchr3.com.cyberpointllc.stac.host.Main.main(Array(zipPath))
+            Cost.read()
         },
         gpEnv = abcRegexEnv.copy(
           stateTypes = abcRegexEnv.stateTypes ++ IS(EInt, EVect(EInt)),
