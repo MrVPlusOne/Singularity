@@ -67,6 +67,7 @@ object FuzzingTaskProvider {
     } finally {
       fw.close()
     }
+    FileInteraction.saveObjectToFile(name+".serialized")(value)
   }
 
   def emptyAction(): Unit = ()
