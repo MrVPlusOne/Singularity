@@ -500,7 +500,7 @@ object FuzzingTaskProvider {
     GPEnvironment(constMap, functions, stateTypes)
   }
 
-  def intsToImage(imageWidth: Int, imageHeight: Int, name: String, data: IS[Int]): BufferedImage = {
+  def intsToImage(imageWidth: Int, imageHeight: Int, data: IS[Int]): BufferedImage = {
     import java.awt.image.BufferedImage
 
     val imageDataSize = imageWidth * imageHeight
@@ -525,8 +525,6 @@ object FuzzingTaskProvider {
     import java.io.File
     import javax.imageio.ImageIO
 
-    import sys.process._
-
     def sizeF = {
       case IS(VectValue(data)) => data.length
     }
@@ -535,7 +533,7 @@ object FuzzingTaskProvider {
       super.saveValueWithName(value, name)
       val data = value.head
       val width = math.max(1, math.sqrt(data.memoryUsage).toInt)
-      val image = intsToImage(width, width, name,
+      val image = intsToImage(width, width,
         data.asInstanceOf[VectValue].value.map(_.asInstanceOf[IntValue].value))
       ImageIO.write(image, "png", new File(name + ".png"))
     }
@@ -552,20 +550,12 @@ object FuzzingTaskProvider {
           case IS(VectValue(data)) =>
             if (data.isEmpty) 0.0
             else {
-              val imageName = s"$workingDir/genImage"
-              val imagePath = imageName + ".png"
-              val image = intsToImage(imageWidth, imageHeight, imageName, data.map(_.asInstanceOf[IntValue].value))
-              ImageIO.write(image, "png", new File(imagePath))
+              val image = intsToImage(imageWidth, imageHeight, data.map(_.asInstanceOf[IntValue].value))
 
-              val jarPath = "benchmarks/image_processor/challenge_program/ipchallenge-ins.jar"
-              val results = Seq("java", "-Xint", "-jar", s"$jarPath", "cluster", imagePath).lineStream
-              val cost = parseCost(results.last)
-              val performance = cost.toDouble
-              if (performance > bestPerformanceSoFar) {
-                ImageIO.write(image, "png", new File(s"$workingDir/bestImageSoFar.png"))
-                bestPerformanceSoFar = performance
-              }
-              performance
+              import patbench.imageprocessor.edu.utexas.stac.ImageProcessorNoReadFile
+              Cost.reset()
+              ImageProcessorNoReadFile.cluster(workingDir, image)
+              Cost.read()
             }
         },
         gpEnv = imageEnv
