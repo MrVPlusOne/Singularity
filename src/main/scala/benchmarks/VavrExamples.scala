@@ -10,6 +10,14 @@ import visual.PatternPlot.showResourceUsageChart
 
 object VavrExamples {
 
+  def handleException[A](default: A)(f: => A): A = {
+    try{
+      f
+    }catch {
+      case _: Throwable => default
+    }
+  }
+
   def pqGroup: ProblemConfig = {
     ProblemConfig(
       "vavr.pq.group",
@@ -33,62 +41,134 @@ object VavrExamples {
     )
   }
 
-  def treeSetAdd: ProblemConfig = {
+  def treeSetIntersect: ProblemConfig = {
     ProblemConfig(
-      "vavr.treeset.add",
-      outputTypes = IS(EVect(EInt), EInt),
+      "vavr.treeset.intersect",
+      outputTypes = IS(EVect(EInt), EVect(EInt)),
       sizeF = {
-        case IS(v, _) =>
-          v.memoryUsage.toInt
+        case IS(v0, v1) =>
+          v0.memoryUsage.toInt + v1.memoryUsage.toInt
       },
       resourceUsage = {
-        case IS(VectValue(vec), IntValue(s)) =>
-          val nums = vec.map { case IntValue(i) => i }.toArray
-          val set = TestVavr.arrayToTreeSet(nums)
+        case IS(VectValue(vec0), VectValue(vec1)) =>
+          val set0 = TestVavr.arrayToTreeSet(vec0.map { case IntValue(i) => i }.toArray)
+          val set1 = TestVavr.arrayToTreeSet(vec1.map { case IntValue(i) => i }.toArray)
 
-          Cost.reset()
-          set.add(s)
-          Cost.read()
+          handleException(0l) {
+            Cost.reset()
+            set0.intersect(set1)
+            Cost.read()
+          }
       }
     )
   }
 
-  def hashSetAdd: ProblemConfig = {
+  def treeSetUnion: ProblemConfig = {
     ProblemConfig(
-      "vavr.hashset.add",
-      outputTypes = IS(EVect(EInt), EInt),
+      "vavr.treeset.union",
+      outputTypes = IS(EVect(EInt), EVect(EInt)),
       sizeF = {
-        case IS(v, _) =>
-          v.memoryUsage.toInt
+        case IS(v0, v1) =>
+          v0.memoryUsage.toInt + v1.memoryUsage.toInt
       },
       resourceUsage = {
-        case IS(VectValue(vec), IntValue(s)) =>
-          val nums = vec.map { case IntValue(i) => i }.toArray
-          val set = TestVavr.arrayToHashSet(nums)
+        case IS(VectValue(vec0), VectValue(vec1)) =>
+          val set0 = TestVavr.arrayToTreeSet(vec0.map { case IntValue(i) => i }.toArray)
+          val set1 = TestVavr.arrayToTreeSet(vec1.map { case IntValue(i) => i }.toArray)
 
-          Cost.reset()
-          set.add(s)
-          Cost.read()
+          handleException(0l) {
+            Cost.reset()
+            set0.union(set1)
+            Cost.read()
+          }
       }
     )
   }
 
-  def linkedHashSetAdd: ProblemConfig = {
+  def hashSetIntersect: ProblemConfig = {
     ProblemConfig(
-      "vavr.linkedhashset.add",
-      outputTypes = IS(EVect(EInt), EInt),
+      "vavr.hashset.intersect",
+      outputTypes = IS(EVect(EInt), EVect(EInt)),
       sizeF = {
-        case IS(v, _) =>
-          v.memoryUsage.toInt
+        case IS(v0, v1) =>
+          v0.memoryUsage.toInt + v1.memoryUsage.toInt
       },
       resourceUsage = {
-        case IS(VectValue(vec), IntValue(s)) =>
-          val nums = vec.map { case IntValue(i) => i }.toArray
-          val set = TestVavr.arrayToLinkedHashSet(nums)
+        case IS(VectValue(vec0), VectValue(vec1)) =>
+          val set0 = TestVavr.arrayToHashSet(vec0.map { case IntValue(i) => i }.toArray)
+          val set1 = TestVavr.arrayToHashSet(vec1.map { case IntValue(i) => i }.toArray)
 
-          Cost.reset()
-          set.add(s)
-          Cost.read()
+          handleException(0l) {
+            Cost.reset()
+            set0.intersect(set1)
+            Cost.read()
+          }
+      }
+    )
+  }
+
+  def hashSetUnion: ProblemConfig = {
+    ProblemConfig(
+      "vavr.hashset.union",
+      outputTypes = IS(EVect(EInt), EVect(EInt)),
+      sizeF = {
+        case IS(v0, v1) =>
+          v0.memoryUsage.toInt + v1.memoryUsage.toInt
+      },
+      resourceUsage = {
+        case IS(VectValue(vec0), VectValue(vec1)) =>
+          val set0 = TestVavr.arrayToHashSet(vec0.map { case IntValue(i) => i }.toArray)
+          val set1 = TestVavr.arrayToHashSet(vec1.map { case IntValue(i) => i }.toArray)
+
+          handleException(0l) {
+            Cost.reset()
+            set0.union(set1)
+            Cost.read()
+          }
+      }
+    )
+  }
+
+  def linkedHashSetIntersect: ProblemConfig = {
+    ProblemConfig(
+      "vavr.linkedhashset.intersect",
+      outputTypes = IS(EVect(EInt), EVect(EInt)),
+      sizeF = {
+        case IS(v0, v1) =>
+          v0.memoryUsage.toInt + v1.memoryUsage.toInt
+      },
+      resourceUsage = {
+        case IS(VectValue(vec0), VectValue(vec1)) =>
+          val set0 = TestVavr.arrayToLinkedHashSet(vec0.map { case IntValue(i) => i }.toArray)
+          val set1 = TestVavr.arrayToLinkedHashSet(vec1.map { case IntValue(i) => i }.toArray)
+
+          handleException(0l) {
+            Cost.reset()
+            set0.intersect(set1)
+            Cost.read()
+          }
+      }
+    )
+  }
+
+  def linkedHashSetUnion: ProblemConfig = {
+    ProblemConfig(
+      "vavr.linkedhashset.union",
+      outputTypes = IS(EVect(EInt), EVect(EInt)),
+      sizeF = {
+        case IS(v0, v1) =>
+          v0.memoryUsage.toInt + v1.memoryUsage.toInt
+      },
+      resourceUsage = {
+        case IS(VectValue(vec0), VectValue(vec1)) =>
+          val set0 = TestVavr.arrayToLinkedHashSet(vec0.map { case IntValue(i) => i }.toArray)
+          val set1 = TestVavr.arrayToLinkedHashSet(vec1.map { case IntValue(i) => i }.toArray)
+
+          handleException(0l) {
+            Cost.reset()
+            set0.union(set1)
+            Cost.read()
+          }
       }
     )
   }
@@ -96,14 +176,14 @@ object VavrExamples {
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
     Supernova.fuzzProblem(
-      linkedHashSetAdd,
+      treeSetIntersect,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
-      ExecutionConfig(evalSizePolicy = FixedEvalSize(500)), rand)
+      ExecutionConfig(evalSizePolicy = FixedEvalSize(200)), rand)
   }
 
   def main(args: Array[String]): Unit = {
     runExample(0, true)
-//    val ind = FileInteraction.readMultiIndFromFile("results/vavr.hashset.add[performance=111.0][ioId=2,seed=2](17-12-13-17:28:10)/bestIndividual.serialized", StandardSystem.funcMap)
-//    showResourceUsageChart(hashSetAdd, ind, 2000, 50)
+//    val ind = FileInteraction.readMultiIndFromFile("/home/grieve/scratch/results/vavr.linkedhashset.union[performance=1048047.0][ioId=125,seed=125](17-12-15-11:26:57)/bestIndividual.serialized", StandardSystem.funcMap)
+//    showResourceUsageChart(linkedHashSetUnion, ind, 10000, 50)
   }
 }
