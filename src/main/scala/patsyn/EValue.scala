@@ -1,6 +1,6 @@
 package patsyn
 
-trait EValue {
+trait EValue extends Serializable{
   def hasType(ty: EType): Boolean
 
   def memoryUsage: Long
