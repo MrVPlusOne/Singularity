@@ -36,7 +36,7 @@ object GuavaExamples {
     }
 
     ProblemConfig(
-      "collect.Hashing.smear",
+      "guava.collect.Hashing.smear",
       outputTypes = IS(EVect(EInt)),
       sizeF = {
         case IS(v) =>
@@ -75,7 +75,7 @@ object GuavaExamples {
 
   def immutableBiMap_copyOf: ProblemConfig = {
     ProblemConfig(
-      "ImmutableBiMap.copyOf",
+      "guava.ImmutableBiMap.copyOf",
       outputTypes = IS(EVect(EPair(EInt, EInt))),
       sizeF = {
         case IS(v) => v.memoryUsage.toInt
@@ -96,7 +96,7 @@ object GuavaExamples {
 
   def immutableBiMap_inverse: ProblemConfig = {
     ProblemConfig(
-      "ImmutableBiMap.inverse",
+      "guava.ImmutableBiMap.inverse",
       outputTypes = IS(EVect(EPair(EInt, EInt))),
       sizeF = {
         case IS(v) => v.memoryUsage.toInt
@@ -115,19 +115,19 @@ object GuavaExamples {
     )
   }
 
-  def immutableSet_copyOf = arrayListInputExample("immutableSet.copyOf",
+  def immutableSet_copyOf = arrayListInputExample("guava.ImmutableSet.copyOf",
     TestGuava.arrayListToSet)
 
-  def immutableMultiset_copyOf = arrayListInputExample("immutableMultiset.copyOf",
+  def immutableMultiset_copyOf = arrayListInputExample("guava.ImmutableMultiset.copyOf",
     TestGuava.arrayListToMultiset)
 
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
     fuzzProblem(
-      immutableSet_copyOf,
+      immutableMultiset_copyOf,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
-      ExecutionConfig(evalSizePolicy = VariedEvalSize.choppedGaussian(rand, 600)), rand)
+      ExecutionConfig(evalSizePolicy = FixedEvalSize(1200)), rand)
   }
 
   def testAverage(): Unit ={
@@ -140,13 +140,13 @@ object GuavaExamples {
   }
 
   def main(args: Array[String]): Unit = {
-//    SimpleMath.processMap(args,
-//      0 to 60, processNum = 14,
-//      mainClass = this){
-//      i => runExample(i, useGUI = false)
-//    }
+    SimpleMath.processMap(args,
+      0 to 60, processNum = 14,
+      mainClass = this){
+      i => runExample(i, useGUI = false)
+    }
 //    runExample(15, useGUI = true)
 
-    testAverage()
+//    testAverage()
   }
 }
