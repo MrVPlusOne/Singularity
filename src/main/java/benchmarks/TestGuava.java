@@ -3,6 +3,8 @@ package benchmarks;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import patbench.guava.common.collect.ImmutableBiMap;
+import patbench.guava.common.collect.ImmutableMultimap;
+import patbench.guava.common.collect.ImmutableMultiset;
 import patbench.guava.common.collect.ImmutableSet;
 import scala.Tuple2;
 import scala.collection.Seq;
@@ -29,5 +31,9 @@ public class TestGuava {
 
     public static <A> ImmutableSet<A> arrayListToSet(ArrayList<A> list){
         return ImmutableSet.copyOf(list);
+    }
+
+    public static <A> ImmutableMultiset<A> arrayListToMultiset(ArrayList<A> list) {
+        return ImmutableMultiset.copyOf(list);
     }
 }

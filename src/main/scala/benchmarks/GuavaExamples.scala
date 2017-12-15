@@ -1,5 +1,6 @@
 package benchmarks
 
+
 import edu.utexas.stac.Cost
 import patsyn.Runner.RunnerConfig
 import patsyn._
@@ -58,12 +59,12 @@ object GuavaExamples {
     )
   }
 
-  def immutableSet_copyOf: ProblemConfig = {
+  def arrayListInputExample(name: String, f: java.util.ArrayList[Int] => Any): ProblemConfig = {
     ProblemConfig(
-      "ImmutableSet.copyOf",
+      name,
       outputTypes = IS(EVect(EInt)),
       sizeF = {
-        case IS(v) => v.memoryUsage.toInt
+        case IS(v: VectValue) => v.value.length
       },
       resourceUsage = {
         case IS(VectValue(vec)) =>
@@ -71,7 +72,7 @@ object GuavaExamples {
           val list = TestGuava.seqToArrayList(vecInt)
           measureCost{
             handleException(()){
-              TestGuava.arrayListToSet(list)
+              f(list)
             }
           }
       }
@@ -120,6 +121,12 @@ object GuavaExamples {
     )
   }
 
+  def immutableSet_copyOf = arrayListInputExample("immutableSet.copyOf",
+    TestGuava.arrayListToSet)
+
+  def immutableMultiset_copyOf = arrayListInputExample("immutableMultiset.copyOf",
+    TestGuava.arrayListToMultiset)
+
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
@@ -129,12 +136,23 @@ object GuavaExamples {
       ExecutionConfig(evalSizePolicy = VariedEvalSize.choppedGaussian(rand, 600)), rand)
   }
 
+  def testAverage(): Unit ={
+    import StandardSystem._
+
+    val prob = immutableBiMap_copyOf
+    val rand = new Random(1)
+    val pairs = VectValue(Vector.fill(600)((rand.nextInt(), rand.nextInt())))
+    prob.resourceUsage(IS(pairs))
+  }
+
   def main(args: Array[String]): Unit = {
-    SimpleMath.processMap(args,
-      0 to 60, processNum = 14,
-      mainClass = this){
-      i => runExample(i, useGUI = false)
-    }
+//    SimpleMath.processMap(args,
+//      0 to 60, processNum = 14,
+//      mainClass = this){
+//      i => runExample(i, useGUI = false)
+//    }
 //    runExample(15, useGUI = true)
+
+    testAverage()
   }
 }
