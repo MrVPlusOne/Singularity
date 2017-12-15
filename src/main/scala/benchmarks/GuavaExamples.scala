@@ -1,20 +1,14 @@
 package benchmarks
 
 
-import edu.utexas.stac.Cost
 import patsyn.Runner.RunnerConfig
 import patsyn._
 import patsyn.StandardSystem._
 import Supernova._
-
+import BenchmarkSet._
 import scala.util.Random
 
 object GuavaExamples {
-  def measureCost[A](f: => A): Long = {
-    Cost.reset()
-    f
-    Cost.read()
-  }
 
   def handleException[A](default: A)(f: => A): A = {
     try{
