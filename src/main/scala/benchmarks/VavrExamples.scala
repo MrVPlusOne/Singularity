@@ -2,7 +2,6 @@ package benchmarks
 
 import java.util.Random
 
-import edu.utexas.stac.Cost
 import patsyn.Runner.RunnerConfig
 import patsyn.StandardSystem._
 import patsyn._
@@ -30,12 +29,10 @@ object VavrExamples {
         case IS(VectValue(vec), IntValue(s)) =>
           val arr = vec.map { case IntValue(i) => i }.toArray
           val pq = TestVavr.arrayToPriorityQueue(arr)
-          try {
-            Cost.reset()
-            pq.grouped(Math.floorMod(s, pq.size()))
-            Cost.read()
-          } catch {
-            case _: Throwable => 0
+          handleException(0l) {
+            BenchmarkSet.measureCost {
+              pq.grouped(Math.floorMod(s, pq.size()))
+            }
           }
       }
     )
@@ -55,9 +52,9 @@ object VavrExamples {
           val set1 = TestVavr.arrayToTreeSet(vec1.map { case IntValue(i) => i }.toArray)
 
           handleException(0l) {
-            Cost.reset()
-            set0.intersect(set1)
-            Cost.read()
+            BenchmarkSet.measureCost {
+              set0.intersect(set1)
+            }
           }
       }
     )
@@ -77,9 +74,9 @@ object VavrExamples {
           val set1 = TestVavr.arrayToTreeSet(vec1.map { case IntValue(i) => i }.toArray)
 
           handleException(0l) {
-            Cost.reset()
-            set0.union(set1)
-            Cost.read()
+            BenchmarkSet.measureCost {
+              set0.union(set1)
+            }
           }
       }
     )
@@ -99,9 +96,9 @@ object VavrExamples {
           val set1 = TestVavr.arrayToHashSet(vec1.map { case IntValue(i) => i }.toArray)
 
           handleException(0l) {
-            Cost.reset()
-            set0.intersect(set1)
-            Cost.read()
+            BenchmarkSet.measureCost {
+              set0.intersect(set1)
+            }
           }
       }
     )
@@ -121,9 +118,9 @@ object VavrExamples {
           val set1 = TestVavr.arrayToHashSet(vec1.map { case IntValue(i) => i }.toArray)
 
           handleException(0l) {
-            Cost.reset()
-            set0.union(set1)
-            Cost.read()
+            BenchmarkSet.measureCost {
+              set0.union(set1)
+            }
           }
       }
     )
@@ -143,9 +140,9 @@ object VavrExamples {
           val set1 = TestVavr.arrayToLinkedHashSet(vec1.map { case IntValue(i) => i }.toArray)
 
           handleException(0l) {
-            Cost.reset()
-            set0.intersect(set1)
-            Cost.read()
+            BenchmarkSet.measureCost {
+              set0.intersect(set1)
+            }
           }
       }
     )
@@ -165,9 +162,9 @@ object VavrExamples {
           val set1 = TestVavr.arrayToLinkedHashSet(vec1.map { case IntValue(i) => i }.toArray)
 
           handleException(0l) {
-            Cost.reset()
-            set0.union(set1)
-            Cost.read()
+            BenchmarkSet.measureCost {
+              set0.union(set1)
+            }
           }
       }
     )
