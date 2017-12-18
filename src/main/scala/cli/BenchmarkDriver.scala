@@ -51,7 +51,6 @@ object BenchmarkDriver {
       "hashcol/v8" -> v8HashCollisionExample,
       "hashcol/murmur2s0" -> murmur2HashCollisionExample,
       "stac/textCrunchr" -> textCrunchrExample(FileInteraction.getWorkingDir(ioId)),
-      "stac/gabfeed4" -> gabfeed4Example(FileInteraction.getWorkingDir(ioId)),
       "stac/airplan3" -> airplan3Example(FileInteraction.getWorkingDir(ioId)),
       "hashperf/php" -> phpHashPerformanceExample,
       "hashperf/java" -> javaHashPerformanceExample,

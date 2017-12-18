@@ -1032,45 +1032,6 @@ object FuzzingTaskProvider {
     }
   }
 
-  def gabfeed4Example(workingDir: String) = new FuzzingTaskProvider {
-
-    override def sizeF: PartialFunction[IS[EValue], Int] = {
-      case IS(VectValue(chars)) => chars.length
-    }
-
-    def outputTypes = IS(EVect(EInt))
-
-    override protected def task: RunningFuzzingTask = {
-      import patbench.gabfeed4.edu.utexas.stac.GabfeedNoServer
-
-      RunningFuzzingTask(
-        sizeOfInterest = 500,
-        resourceUsage = {
-
-          case IS(chars: VectValue) =>
-            val content = vectIntToString(chars)
-
-            val dbFileName = s"$workingDir/gabfeed.db"
-            FileInteraction.deleteIfExist(dbFileName)
-
-            Cost.reset()
-            GabfeedNoServer.run("benchmarks/gabfeed/data", workingDir, content);
-            Cost.read()
-        },
-        gpEnv = abcRegexEnv.copy(stateTypes = abcRegexEnv.stateTypes ++ IS(EInt, EVect(EInt)))
-      )
-    }
-
-    override def saveValueWithName(value: IS[EValue], name: String): Unit = {
-      value match {
-        case IS(VectValue(chars)) =>
-          val str = vectIntToString(chars)
-          val fileName = s"$name.txt"
-          FileInteraction.writeToFile(fileName)(str)
-      }
-    }
-  }
-
   class NativeExample(name: String, workingDir: String) {
 
     // We need this to be lazy since we don't want to actively looking for the binary if we do not need to run it
