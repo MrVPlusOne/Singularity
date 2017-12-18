@@ -1,0 +1,43 @@
+package benchmarks;
+
+import patbench.jgrapht.Graphs;
+import patbench.jgrapht.graph.DefaultEdge;
+import patbench.jgrapht.graph.DefaultWeightedEdge;
+import patbench.jgrapht.graph.DirectedWeightedMultigraph;
+import patbench.jgrapht.graph.SimpleGraph;
+import patsyn.EValue;
+import patsyn.StandardSystem.*;
+import scala.Tuple3;
+import scala.collection.Iterator;
+
+public class TestJGraphT {
+    public static DirectedWeightedMultigraph<Integer, DefaultWeightedEdge> mkWeightedGraph(GraphValue graphValue){
+        DirectedWeightedMultigraph<Integer, DefaultWeightedEdge> g = new DirectedWeightedMultigraph<>(DefaultWeightedEdge.class);
+        int n = graphValue.nodeNum();
+        for (int i = 0; i<n; i++){
+            g.addVertex(i);
+        }
+        Iterator<Tuple3<Object, Object, EValue>> it = graphValue.edges().iterator();
+        while(it.hasNext()){
+            Tuple3<Object, Object, EValue> t3 = it.next();
+            DefaultWeightedEdge e = g.addEdge((Integer) t3._1(), (Integer) t3._2());
+            g.setEdgeWeight(e, ((IntValue)t3._3()).value());
+        }
+        return g;
+    }
+
+    public static SimpleGraph<Integer, DefaultEdge> mkSimpleGraph(GraphValue graphValue) {
+        SimpleGraph<Integer, DefaultEdge> g = new SimpleGraph<>(DefaultEdge.class);
+        int n = graphValue.nodeNum();
+        for (int i = 0; i<n; i++){
+            g.addVertex(i);
+        }
+        Iterator<Tuple3<Object, Object, EValue>> it = graphValue.edges().iterator();
+        while(it.hasNext()){
+            Tuple3<Object, Object, EValue> t3 = it.next();
+            g.addEdge((Integer) t3._1(), (Integer) t3._2());
+        }
+        return g;
+    }
+}
+

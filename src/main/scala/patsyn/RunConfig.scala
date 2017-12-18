@@ -6,8 +6,8 @@ import scala.util.Random
 
 case class ProblemConfig(problemName: String,
                          outputTypes: IS[EType],
-                         sizeF: IS[EValue] => Int,
                          resourceUsage: IS[EValue] => Double,
+                         sizeF: IS[EValue] => Int = _.map(_.memoryUsage.toInt).sum,
                          displayValue: IS[EValue] => String = FuzzingTaskProvider.defaultDisplayValue,
                          saveValueWithName: (IS[EValue], String) => Unit = FuzzingTaskProvider.defaultSaveValueWithName
                         )

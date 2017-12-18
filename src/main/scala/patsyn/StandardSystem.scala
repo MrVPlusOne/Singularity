@@ -23,6 +23,8 @@ object StandardSystem {
 
   case class EGraph(edgeT: EType) extends EType(edgeT)
 
+  case object EUnit extends EType()
+
   // Value declarations
   case class IntValue(value: Int) extends EValue {
     def hasType(ty: EType): Boolean = ty == EInt
@@ -94,6 +96,12 @@ object StandardSystem {
     def shiftIndex(offset: Int): GraphValue = {
       this.copy(edges = edges.map{ case (n1, n2, v) => (n1+offset, n2+offset, v)})
     }
+  }
+
+  case object UnitValue extends EValue{
+    def hasType(ty: EType): Boolean = ty == EUnit
+
+    def memoryUsage: Long = 1
   }
 
   implicit def intValue(v: Int): IntValue = IntValue(v)

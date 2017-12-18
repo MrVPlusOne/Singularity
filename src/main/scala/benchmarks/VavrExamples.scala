@@ -14,7 +14,7 @@ object VavrExamples {
     try{
       f
     }catch {
-      case _: Throwable => default
+      case _: Throwable => default //fixme: Change this to more specific exceptions
     }
   }
 

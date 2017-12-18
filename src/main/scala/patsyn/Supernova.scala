@@ -42,6 +42,8 @@ object Supernova{
       case EGraph(_) => _ => GraphValue.empty
       case EPair(a,b) => r => (constRule(a)(r), constRule(b)(r))
       case EByteArray(i) => r => ByteArrayValue(IS.fill(i){ r.nextInt(256).toByte})
+      case EUnit => _ => UnitValue
+      case _ => throw new Exception("Unsupported EType encountered in Supernova.")
     }
 
 
