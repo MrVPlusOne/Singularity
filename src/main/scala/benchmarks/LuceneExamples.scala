@@ -7,35 +7,10 @@ import patsyn.StandardSystem._
 import patsyn._
 
 object LuceneExamples {
-  def regexMatch: ProblemConfig = {
+  import patbench.lucene.analysis.Analyzer
+  def configFromAnalyzer(name: String, analyzer: Analyzer)= {
     ProblemConfig(
-      "lucene.regex",
-      outputTypes = IS(EVect(EInt), EVect(EInt)),
-      sizeF = {
-        case IS(v0, v1) =>
-          v0.memoryUsage.toInt + v1.memoryUsage.toInt
-      },
-      resourceUsage = {
-        case IS(VectValue(vec0), VectValue(vec1)) =>
-          import patbench.lucene.util.automaton.{RegExp, ByteRunAutomaton, TooComplexToDeterminizeException}
-          try {
-            val regex = new RegExp(FuzzingTaskProvider.vectIntToString(vec0))
-            val automaton = new ByteRunAutomaton(regex.toAutomaton)
-            val bytes = vec1.map { case IntValue(i) => i.toByte }.toArray
-            BenchmarkSet.measureCost {
-              automaton.run(bytes, 0, bytes.length)
-            }
-          }
-          catch {
-            case _: TooComplexToDeterminizeException => 0
-          }
-      }
-    )
-  }
-
-  def standardTokenizer: ProblemConfig = {
-    ProblemConfig(
-      "lucene.standardTokenizer",
+      s"lucene.analyzer.$name",
       outputTypes = IS(EVect(EInt)),
       sizeF = {
         case IS(v) =>
@@ -43,32 +18,28 @@ object LuceneExamples {
       },
       resourceUsage = {
         case IS(VectValue(vec)) =>
-          import patbench.lucene.analysis.standard.StandardTokenizer
-          try {
-            val str = FuzzingTaskProvider.vectIntToString(vec)
-            val tokenizer = new StandardTokenizer()
-            tokenizer.setReader(new java.io.StringReader(str))
-            tokenizer.reset()
-            BenchmarkSet.measureCost {
-              var tokenCount = 0
-              while (tokenizer.incrementToken) tokenCount += 1
-              tokenizer.end()
-              tokenizer.close()
-            }
+          val str = FuzzingTaskProvider.vectIntToString(vec)
+          BenchmarkSet.measureCost {
+            TestLucene.tokenizeWithAnalyzer(analyzer, str)
           }
       }
     )
   }
 
+  def standardAnalyzer = configFromAnalyzer("standard", new patbench.lucene.analysis.standard.StandardAnalyzer)
+  def chineseAnalyzer = configFromAnalyzer("smartcn", new patbench.lucene.analysis.cn.smart.SmartChineseAnalyzer)
+  def japaneseAnalyzer = configFromAnalyzer("kuromoji", new patbench.lucene.analysis.ja.JapaneseAnalyzer)
+  def polishAnalyzer = configFromAnalyzer("polish", new patbench.lucene.analysis.pl.PolishAnalyzer)
+
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
     Supernova.fuzzProblem(
-      standardTokenizer,
+      chineseAnalyzer,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
       ExecutionConfig(evalSizePolicy = FixedEvalSize(200)), rand)
   }
 
   def main(args: Array[String]): Unit = {
-    runExample(0, true)
+    runExample(1, true)
   }
 }
