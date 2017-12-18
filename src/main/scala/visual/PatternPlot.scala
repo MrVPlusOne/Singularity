@@ -2,7 +2,7 @@ package visual
 
 import javax.swing.JFrame
 
-import benchmarks.GuavaExamples
+import benchmarks.{GuavaExamples, JGraphTExamples}
 import patsyn.MultiStateRepresentation.individualToPattern
 import patsyn._
 
@@ -98,10 +98,12 @@ object PatternPlot {
 
   def main(args: Array[String]): Unit = {
     import io.Source
-    val lines = Source.fromFile(args.head).getLines()
-    val sizeLimit = lines.next().toInt
-    val plotPoints = lines.next().toInt
-    val files = lines.toList
+    val sizeLimit = 6000
+    val plotPoints = 200
+    val files =
+      """
+        |results-running/jGraphT.vertexColor.SmallestDegreeLastColoring[ioId=6,seed=6](17-12-18-15:31:20)/bestIndividual.serialized
+      """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
 
 
     for(fileLine <- files) {
@@ -109,7 +111,7 @@ object PatternPlot {
       val file = if(fileLine.endsWith(lastName)) fileLine else fileLine + "/" + lastName
       val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
       println("Individual: ")
-      val config = GuavaExamples.immutableSet_copyOf
+      val config = JGraphTExamples.vertexColor_smallestDegreeLast
 //      FuzzingTaskProvider.phpHashCollisionExample.runAsProbConfig("phpHash16") { config =>
         showResourceUsageChart(config, ind, sizeLimit,
           plotPoints = plotPoints, plotName = file, exitOnClose = false,

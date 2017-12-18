@@ -1,10 +1,8 @@
 package benchmarks;
 
+import patbench.jgrapht.Graph;
 import patbench.jgrapht.Graphs;
-import patbench.jgrapht.graph.DefaultEdge;
-import patbench.jgrapht.graph.DefaultWeightedEdge;
-import patbench.jgrapht.graph.DirectedWeightedMultigraph;
-import patbench.jgrapht.graph.SimpleGraph;
+import patbench.jgrapht.graph.*;
 import patsyn.EValue;
 import patsyn.StandardSystem.*;
 import scala.Tuple3;
@@ -26,7 +24,7 @@ public class TestJGraphT {
         return g;
     }
 
-    public static SimpleGraph<Integer, DefaultEdge> mkSimpleGraph(GraphValue graphValue) {
+    public static Graph<Integer, DefaultEdge> mkSimpleGraph(GraphValue graphValue) {
         SimpleGraph<Integer, DefaultEdge> g = new SimpleGraph<>(DefaultEdge.class);
         int n = graphValue.nodeNum();
         for (int i = 0; i<n; i++){

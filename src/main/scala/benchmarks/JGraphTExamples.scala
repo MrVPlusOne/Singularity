@@ -7,7 +7,7 @@ import patbench.jgrapht
 import patbench.jgrapht.alg.color._
 import patbench.jgrapht.alg.flow._
 import patbench.jgrapht.alg.interfaces.{MaximumFlowAlgorithm, VertexColoringAlgorithm}
-import patbench.jgrapht.graph.{DefaultEdge, DefaultWeightedEdge, DirectedWeightedMultigraph, SimpleGraph}
+import patbench.jgrapht.graph._
 import patsyn.Runner.RunnerConfig
 
 import scala.util.Random
@@ -15,11 +15,12 @@ import scala.util.Random
 object JGraphTExamples {
 
   def handleException[A](default: A)(f: => A): A = {
-    try{
-      f
-    }catch {
-      case _: IllegalArgumentException => default
-    }
+    f
+//    try{
+//      f
+//    }catch {
+//      case _: IllegalArgumentException => default
+//    }
   }
 
   def maxFlowTest(name: String,
@@ -44,22 +45,15 @@ object JGraphTExamples {
   def maxFlow_PushRelabelMFImpl= maxFlowTest("jGraphT.maxFlow.PushRelabelMFImpl",
     g => new PushRelabelMFImpl[Integer, DefaultWeightedEdge](g))
 
-  def maxFlow_GusfieldEquivalentFlowTree = maxFlowTest("jGraphT.maxFlow.GusfieldEquivalentFlowTree",
-    g => new GusfieldEquivalentFlowTree[Integer, DefaultWeightedEdge](g))
-
-  def maxFlow_GusfieldGomoryHuCutTree = maxFlowTest("jGraphT.maxFlow.GusfieldGomoryHuCutTree",
-    g => new GusfieldEquivalentFlowTree[Integer, DefaultWeightedEdge](g))
 
   val maxFlowProblems = IS(
     maxFlow_EdmondsKarp,
-    maxFlow_PushRelabelMFImpl,
-    maxFlow_GusfieldEquivalentFlowTree,
-    maxFlow_GusfieldGomoryHuCutTree
+    maxFlow_PushRelabelMFImpl
   )
 
 
   def vertexColoringTest(name: String,
-                         algorithm: SimpleGraph[Integer, DefaultEdge] => VertexColoringAlgorithm[Integer]) = ProblemConfig(
+                         algorithm: jgrapht.Graph[Integer, DefaultEdge] => VertexColoringAlgorithm[Integer]) = ProblemConfig(
     name, outputTypes = IS(EGraph(EUnit)),
     resourceUsage = {
       case IS(graphValue: GraphValue) =>
@@ -108,12 +102,13 @@ object JGraphTExamples {
 
     val problems = maxFlowProblems ++ coloringProblems
 
-//    SimpleMath.processMap(args,
-//      0 until 8, processNum = 8,
-//      mainClass = this){
-//      i => runExample(i, problems(i), useGUI = true)
-//    }
-      runExample(3, problems(3), useGUI = true)
+    val numPerExample = 50
+    SimpleMath.processMap(args,
+      0 until problems.length*numPerExample, processNum = 14,
+      mainClass = this){
+      i => runExample(i, problems(i/numPerExample), useGUI = false)
+    }
+//      runExample(3, maxFlow_EdmondsKarp, useGUI = true)
 
     //    testAverage()
   }
