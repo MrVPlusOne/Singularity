@@ -31,7 +31,7 @@ object JGraphTExamples {
       case IS(gv: GraphValue, IntValue(source), IntValue(sink)) =>
         handleException(0.0) {
           val positiveGraph = gv.copy(edges = gv.edges.map{
-            case (f,t, IntValue(v)) => (f,t, IntValue(math.abs(v)))
+            case (f,t, IntValue(v)) => (f,t, IntValue(SimpleMath.safeAbs(v)))
             case _ => throw new Exception("wrong edge type")
           })
           val g = TestJGraphT.mkWeightedGraph(positiveGraph)

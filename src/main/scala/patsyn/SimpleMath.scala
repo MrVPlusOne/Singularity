@@ -23,6 +23,8 @@ object SimpleMath {
     random.nextDouble() < pTrue
   }
 
+  def safeAbs(x: Int): Int = math.max(0, if(x<0) -x else x)
+
   def expChoppedGaussian(chopMargin: (Double, Double), base: Double, powerE: Double)(random: Random): Double = {
     val x = random.nextGaussian()
     if(x< chopMargin._1 || x > chopMargin._2){

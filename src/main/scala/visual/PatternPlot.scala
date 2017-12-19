@@ -105,7 +105,7 @@ object PatternPlot {
     val plotPoints = 100
     val files =
       """
-        |/Users/weijiayi/Downloads/timeout/jGraphT.maxFlow.PushRelabelMFImpl[performance=timeout][ioId=108,seed=108](17-12-19-14:22:59)
+        |/Users/weijiayi/Downloads/jGraphT.maxFlow.PushRelabelMFImpl[performance=timeout][ioId=105,seed=105](17-12-19-16:05:47)
       """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
 
 
@@ -121,7 +121,7 @@ object PatternPlot {
           plotPoints = plotPoints, plotName = file, exitOnClose = false,
           memoryLimit = sizeLimit * ind.nStates * 4,
           patternCreationFeedback = (i, ev) => {
-            if (i % 100 == 0) {
+            if (i % 1 == 0) {
               println(s"input created: $i")
               ev match{
                 case IS(graph: GraphValue, _, _) =>
