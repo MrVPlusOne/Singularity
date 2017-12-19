@@ -233,6 +233,16 @@ object StandardSystem {
         }
     })
 
+    val last = mkAbstract("last", 1, {
+      case IS(e) => IS(EVect(e), e) -> e
+    }, {
+      case IS(VectValue(vec), default) =>
+        if (vec.isEmpty) default
+        else {
+          vec.last
+        }
+    })
+
     val concat = mkAbstract("concat", 1, {
       case IS(e) => IS(EVect(e), EVect(e)) -> EVect(e)
     }, {
