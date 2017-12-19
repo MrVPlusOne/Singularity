@@ -5,6 +5,16 @@ import patsyn.Runner.RunnerConfig
 
 import scala.util.Random
 
+/**
+  *
+[O0: EGraph(EInt)] -> #1
+[O1: EInt] -> 0
+[O2: EInt] -> 12
+  *
+[S0: EInt]{ seed: 5 ; iter: 12; seedExpr: 5 }
+[S1: EGraph(EInt)]{ seed: GraphValue(0,Vector()) ; iter: addEdge(growEdge(growEdge(#1, neg(3), 3), 3, 10), 3); seedExpr: GraphValue(0,Vector()) }
+  */
+
 object GraphSample {
   import StandardSystem._
   import IntComponents._
@@ -17,21 +27,18 @@ object GraphSample {
   implicit def intConst(i: Int): EConst = EConst(EInt, i)
 
   val seeds: IS[Expr] = IS(
-    2,
-    bridgeEdge(addNode(addNode(emptyGraph())), 1, 0, 1)
+    addNode(emptyGraph())
   )
 
-  val arg0 = EArg(0, EInt)
-  val arg1 = EArg(1, EGraph(EInt))
+  val arg0 = EArg(0, EGraph(EInt))
 
   val iters: IS[Expr] = IS(
-    inc(arg0),
-    bridgeEdge(growEdge(arg1, dec(arg0), Int.MaxValue), arg0, 0, 1)
+    growEdge(growEdge(arg0, neg(3),3), 3, 10)
   )
 
-  val out: IS[Expr] = IS(1, 0, arg1)
+  val out: IS[Expr] = IS(arg0, 0, 12)
 
-  val ind = MultiStateInd(seeds++iters++out, nStates = 2)
+  val ind = MultiStateInd(seeds++iters++out, nStates = seeds.length)
 }
 
 object HashSample {
@@ -112,6 +119,11 @@ object Playground {
     println(data)
 
     println("Evaluation finished.")
+  }
+
+  def testGraph(): Unit ={
+
+    GraphSample.ind
   }
 
   def run(ioId: Int): Unit ={

@@ -101,17 +101,18 @@ object PatternPlot {
     import io.Source
 
     val config = JGraphTExamples.maxFlow_PushRelabelMFImpl
-    val sizeLimit = 1200
+    val sizeLimit = 400
     val plotPoints = 100
     val files =
       """
-        |/Users/weijiayi/Library/Messages/Attachments/46/06/D0A952A5-02B8-4336-A09D-9E570FC83713/results/jGraphT.maxFlow.PushRelabelMFImpl[performance=2.692744698E9][ioId=61,seed=61](17-12-18-21:31:07)
+        |/Users/weijiayi/Downloads/timeout/jGraphT.maxFlow.PushRelabelMFImpl[performance=timeout][ioId=108,seed=108](17-12-19-14:22:59)
       """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
 
 
     for(fileLine <- files) {
-      val lastName = "bestIndividual.serialized"
-      val file = if(fileLine.endsWith(lastName)) fileLine else fileLine + "/" + lastName
+      val lastName = "timeoutIndividual.serialized"
+//      val lastName = "bestIndividual.serialized"
+      val file = if(fileLine.endsWith(".serialized")) fileLine else fileLine + "/" + lastName
       val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
 
 

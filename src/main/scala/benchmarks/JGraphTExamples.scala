@@ -36,6 +36,17 @@ object JGraphTExamples {
             solver.getMaximumFlow(source, sink).getFlow()
           }
         }
+    },
+    saveValueWithName = (values, name) => values match {
+      case IS(graphValue: GraphValue, IntValue(i1), IntValue(i2)) =>
+        FuzzingTaskProvider.defaultSaveValueWithName(values, name)
+        val content =
+          s"""
+             |$i1
+             |$i2
+             |${MamFormat.showAsMamGraph(graphValue)}
+        """.stripMargin
+        FileInteraction.writeToFile(name+"-graph.txt"){content}
     }
   )
 
@@ -111,15 +122,16 @@ object JGraphTExamples {
 
   def main(args: Array[String]): Unit = {
 
-    val problems = IS(maxFlow_PushRelabelMFImpl) ++ coloringProblems
+    val problems = IS(maxFlow_PushRelabelMFImpl)// ++ coloringProblems
 
     val numPerExample = 40
+    val shift = 106
     SimpleMath.processMap(args,
-      0 until problems.length*numPerExample, processNum = 14,
+      0 until problems.length*numPerExample, processNum = 4,
       mainClass = this){
       i =>
         val size = if(i<numPerExample) 400 else 1200
-        runExample(i, problems(i/numPerExample), useGUI = false, size = size)
+        runExample(i+shift, problems(i/numPerExample), useGUI = true, size = size)
     }
 //      runExample(3, maxFlow_EdmondsKarp, useGUI = true)
 
