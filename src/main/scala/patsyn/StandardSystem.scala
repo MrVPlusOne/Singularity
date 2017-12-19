@@ -269,6 +269,16 @@ object StandardSystem {
         val b = if(base < 10) 10 else base
         SimpleMath.natToList(p, b).toVector.map(IntValue.apply)
     })
+
+    val head = mkAbstract("head", 1, {
+      case IS(e) => IS(EVect(e), e) -> e
+    }, {
+      case IS(VectValue(vec), default) =>
+        if (vec.isEmpty) default
+        else {
+          vec.head
+        }
+    })
   }
 
   val BoolComponents = new ComponentSet {
