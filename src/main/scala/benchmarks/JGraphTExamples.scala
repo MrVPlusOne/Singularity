@@ -15,12 +15,12 @@ import scala.util.Random
 object JGraphTExamples {
 
   def handleException[A](default: A)(f: => A): A = {
-    f
-//    try{
-//      f
-//    }catch {
-//      case _: IllegalArgumentException => default
-//    }
+//    f
+    try{
+      f
+    }catch {
+      case _: IllegalArgumentException => default
+    }
   }
 
   def maxFlowTest(name: String,
@@ -63,6 +63,17 @@ object JGraphTExamples {
             algorithm(g).getColoring
           }
         }
+    },
+    saveValueWithName = (values, name) => values match {
+      case IS(graphValue: GraphValue, IntValue(i1), IntValue(i2)) =>
+     FuzzingTaskProvider.defaultSaveValueWithName(values, name)
+      val content =
+        s"""
+          |$i1
+          |$i2
+          |${MamFormat.showAsMamGraph(graphValue)}
+        """.stripMargin
+      FileInteraction.writeToFile(name+"-graph.txt"){content}
     }
   )
 

@@ -1,6 +1,7 @@
 package patsyn
 
 import com.wolfram.jlink._
+import patsyn.StandardSystem.GraphValue
 
 class MamLink private(initCode: String) {
   var logInteraction = false
@@ -50,5 +51,13 @@ object MamLink{
 object MamFormat{
   def showDouble(v: Double, precision: Int = 6): String = {
     f"$v%.6e".replace("e+","*10^").replace("e-","*10^-")
+  }
+
+  def showAsMamGraph(graph: GraphValue): String = {
+    val vertexList = (0 until graph.nodeNum).mkString("{",",","}")
+    val edgeList = graph.edges.map{
+      case (from, to, value) => s"""Labeled[$from -> $to,"$value"]"""
+    }.mkString("{",",","}")
+    s"""Graph[$vertexList, $edgeList]"""
   }
 }

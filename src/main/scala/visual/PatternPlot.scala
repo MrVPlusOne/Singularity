@@ -4,6 +4,7 @@ import javax.swing.JFrame
 
 import benchmarks.{GuavaExamples, JGraphTExamples}
 import patsyn.MultiStateRepresentation.individualToPattern
+import patsyn.StandardSystem.GraphValue
 import patsyn._
 
 import scala.util.Random
@@ -11,7 +12,7 @@ import scala.util.Random
 object PatternPlot {
   def plotPatternPerformance(probConfig: ProblemConfig, individual: MultiStateInd,
                              sizeLimit: Int, maxPoints: Int = 10, memoryLimit: Long = Long.MaxValue,
-                             patternCreationFeedback: Int => Unit,
+                             patternCreationFeedback: (Int, IS[EValue]) => Unit,
                              seed: Int = 0): Stream[(Double, Double)] = {
     import EvolutionRepresentation.MemoryUsage
 
@@ -20,7 +21,7 @@ object PatternPlot {
     val values = individualToPattern(individual).takeWhile {
       case (MemoryUsage(memory), value) =>
         val newSize = probConfig.sizeF(value)
-        patternCreationFeedback(newSize)
+        patternCreationFeedback(newSize, value)
         if (newSize <= lastSize) {
           println("Warning: Can't reach specified size using this individual")
           false
@@ -71,7 +72,7 @@ object PatternPlot {
                              xLabel: String = "size",
                              yLabel: String = "R",
                              exitOnClose: Boolean = true,
-                             patternCreationFeedback: Int => Unit = _ => (),
+                             patternCreationFeedback: (Int, IS[EValue]) => Unit = (_,_) => (),
                              memoryLimit: Long = Long.MaxValue
                             ): Unit
   = {
@@ -98,11 +99,13 @@ object PatternPlot {
 
   def main(args: Array[String]): Unit = {
     import io.Source
-    val sizeLimit = 6000
-    val plotPoints = 200
+
+    val config = JGraphTExamples.maxFlow_PushRelabelMFImpl
+    val sizeLimit = 1200
+    val plotPoints = 100
     val files =
       """
-        |results-running/jGraphT.vertexColor.SmallestDegreeLastColoring[ioId=6,seed=6](17-12-18-15:31:20)/bestIndividual.serialized
+        |/Users/weijiayi/Library/Messages/Attachments/46/06/D0A952A5-02B8-4336-A09D-9E570FC83713/results/jGraphT.maxFlow.PushRelabelMFImpl[performance=2.692744698E9][ioId=61,seed=61](17-12-18-21:31:07)
       """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
 
 
@@ -110,15 +113,21 @@ object PatternPlot {
       val lastName = "bestIndividual.serialized"
       val file = if(fileLine.endsWith(lastName)) fileLine else fileLine + "/" + lastName
       val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
-      println("Individual: ")
-      val config = JGraphTExamples.vertexColor_smallestDegreeLast
+
+
 //      FuzzingTaskProvider.phpHashCollisionExample.runAsProbConfig("phpHash16") { config =>
         showResourceUsageChart(config, ind, sizeLimit,
           plotPoints = plotPoints, plotName = file, exitOnClose = false,
           memoryLimit = sizeLimit * ind.nStates * 4,
-          patternCreationFeedback = i => {
+          patternCreationFeedback = (i, ev) => {
             if (i % 100 == 0) {
               println(s"input created: $i")
+              ev match{
+                case IS(graph: GraphValue, _, _) =>
+                  println{
+                    MamFormat.showAsMamGraph(graph)
+                  }
+              }
             }
           }
         )

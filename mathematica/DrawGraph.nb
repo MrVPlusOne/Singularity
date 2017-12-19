@@ -1,0 +1,97 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.1' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      2684,         87]
+NotebookOptionsPosition[      2037,         64]
+NotebookOutlinePosition[      2392,         80]
+CellTagsIndexPosition[      2349,         77]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{"ReadString", "[", 
+  RowBox[{
+   RowBox[{"NotebookDirectory", "[", "]"}], "<>", " ", 
+   "\"\<DrawGraphData.txt\>\""}], "]"}]], "Input",
+ CellChangeTimes->{{3.722693264931176*^9, 
+  3.722693293311165*^9}},ExpressionUUID->"54e90fc3-dcf5-4692-991f-\
+bff69ad7ac37"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "NotebookDirectory","nosv",
+   "\"The notebook \
+\\!\\(\\*TemplateBox[List[FrontEndObject[LinkObject[\\\"gku8r_shm\\\", 3, \
+1]], 23, \\\"FrontEndObject[LinkObject[\\\\\\\"gku8r_shm\\\\\\\", 3, 1]]\\\", \
+\\\"23\\\", \\\"\\\\\\\"Untitled-1\\\\\\\"\\\"], \
+\\\"NotebookObjectUnsaved\\\"]\\) is not saved.\"",2,17,2,
+   18322477919627102885,"Local"},
+  "MessageTemplate"]], "Message", "MSG",
+ CellChangeTimes->{
+  3.722693304824629*^9},ExpressionUUID->"94ee3617-4871-409d-a211-\
+512adfb1117e"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "StringJoin","string",
+   "\"String expected at position \\!\\(\\*RowBox[{\\\"1\\\"}]\\) in \
+\\!\\(\\*RowBox[{\\\"$Failed\\\", \\\"<>\\\", \\\"\\\\\\\"DrawGraphData.txt\\\
+\\\\\"\\\"}]\\).\"",2,17,3,18322477919627102885,"Local"},
+  "MessageTemplate"]], "Message", "MSG",
+ CellChangeTimes->{
+  3.722693304827484*^9},ExpressionUUID->"566ff574-e780-43ca-b536-\
+d0e5f445d28b"],
+
+Cell[BoxData[
+ RowBox[{"ReadString", "[", 
+  RowBox[{"$Failed", "<>", "\<\"DrawGraphData.txt\"\>"}], "]"}]], "Output",
+ CellChangeTimes->{
+  3.722693304844027*^9},ExpressionUUID->"954ff8bd-a3fe-45ef-986c-\
+736735794008"]
+}, Open  ]]
+},
+WindowSize->{808, 643},
+WindowMargins->{{Automatic, 0}, {-29, Automatic}},
+FrontEndVersion->"11.1 for Mac OS X x86 (32-bit, 64-bit Kernel) (April 27, \
+2017)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 286, 7, 32, "Input", "ExpressionUUID" -> \
+"54e90fc3-dcf5-4692-991f-bff69ad7ac37"],
+Cell[869, 31, 522, 12, 34, "Message", "ExpressionUUID" -> \
+"94ee3617-4871-409d-a211-512adfb1117e"],
+Cell[1394, 45, 404, 9, 24, "Message", "ExpressionUUID" -> \
+"566ff574-e780-43ca-b536-d0e5f445d28b"],
+Cell[1801, 56, 220, 5, 66, "Output", "ExpressionUUID" -> \
+"954ff8bd-a3fe-45ef-986c-736735794008"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+
