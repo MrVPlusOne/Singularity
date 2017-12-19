@@ -30,7 +30,11 @@ object JGraphTExamples {
     resourceUsage = {
       case IS(gv: GraphValue, IntValue(source), IntValue(sink)) =>
         handleException(0.0) {
-          val g = TestJGraphT.mkWeightedGraph(gv)
+          val positiveGraph = gv.copy(edges = gv.edges.map{
+            case (f,t, IntValue(v)) => (f,t, IntValue(math.abs(v)))
+            case _ => throw new Exception("wrong edge type")
+          })
+          val g = TestJGraphT.mkWeightedGraph(positiveGraph)
           measureCost {
             val solver = algorithm(g)
             solver.getMaximumFlow(source, sink).getFlow()
@@ -125,13 +129,13 @@ object JGraphTExamples {
     val problems = IS(maxFlow_PushRelabelMFImpl)// ++ coloringProblems
 
     val numPerExample = 40
-    val shift = 106
+    val shift = 100
     SimpleMath.processMap(args,
-      0 until problems.length*numPerExample, processNum = 4,
+      0 until problems.length*numPerExample, processNum = 14,
       mainClass = this){
       i =>
         val size = if(i<numPerExample) 400 else 1200
-        runExample(i+shift, problems(i/numPerExample), useGUI = true, size = size)
+        runExample(i+shift, problems(i/numPerExample), useGUI = false, size = size)
     }
 //      runExample(3, maxFlow_EdmondsKarp, useGUI = true)
 
