@@ -101,23 +101,25 @@ object JGraphTExamples {
   )
 
 
-  def runExample(seed: Int, problemConfig: ProblemConfig, useGUI: Boolean): Unit = {
+  def runExample(seed: Int, problemConfig: ProblemConfig, useGUI: Boolean, size: Int): Unit = {
     val rand = new Random(seed)
     Supernova.fuzzProblem(
       problemConfig,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
-      ExecutionConfig(evalSizePolicy = FixedEvalSize(1200)), rand)
+      ExecutionConfig(evalSizePolicy = FixedEvalSize(size)), rand)
   }
 
   def main(args: Array[String]): Unit = {
 
-    val problems = maxFlowProblems ++ coloringProblems
+    val problems = IS(maxFlow_PushRelabelMFImpl) ++ coloringProblems
 
-    val numPerExample = 50
+    val numPerExample = 40
     SimpleMath.processMap(args,
       0 until problems.length*numPerExample, processNum = 14,
       mainClass = this){
-      i => runExample(i, problems(i/numPerExample), useGUI = false)
+      i =>
+        val size = if(i<numPerExample) 400 else 1200
+        runExample(i, problems(i/numPerExample), useGUI = false, size = size)
     }
 //      runExample(3, maxFlow_EdmondsKarp, useGUI = true)
 
