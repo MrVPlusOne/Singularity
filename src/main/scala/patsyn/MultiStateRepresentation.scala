@@ -35,6 +35,24 @@ case class MultiStateInd(exprs: IS[Expr], nStates: Int){
 }
 
 object MultiStateRepresentation{
+
+  def printIndividualMultiLine(println: String => Unit, stateTypes: IS[EType],
+                               outputTypes: IS[EType], ind: MultiStateInd): Unit = {
+    ind.outputs.indices.foreach { i =>
+      val t = outputTypes(i)
+      val out = ind.outputs(i)
+      println(s"[O$i: $t] -> $out")
+    }
+    println("*")
+    stateTypes.indices.foreach { i =>
+      val t = stateTypes(i)
+      val s = ind.seeds(i)
+      val iter = ind.iters(i)
+      val seedValue = Expr.evaluateWithCheck(s, IS())
+      println(s"[S$i: $t]{ seed: $seedValue ; iter: $iter; seedExpr: $s }")
+    }
+  }
+
   def individualToPattern(ind: MultiStateInd): Stream[(MemoryUsage, IS[EValue])] = {
     val iters = ind.iters
     val initStates = ind.seeds.map(seed => Expr.evaluateWithCheck(seed, IS()))
@@ -99,19 +117,7 @@ case class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType
   }
 
   def printIndividualMultiLine(println: String => Unit)(ind: MultiStateInd): Unit = {
-    ind.outputs.indices.foreach { i =>
-      val t = outputTypes(i)
-      val out = ind.outputs(i)
-      println(s"[O$i: $t] -> $out")
-    }
-    println("*")
-    stateTypes.indices.foreach { i =>
-      val t = stateTypes(i)
-      val s = ind.seeds(i)
-      val iter = ind.iters(i)
-      val seedValue = Expr.evaluateWithCheck(s, IS())
-      println(s"[S$i: $t]{ seed: $seedValue ; iter: $iter; seedExpr: $s }")
-    }
+    MultiStateRepresentation.printIndividualMultiLine(println, stateTypes, outputTypes, ind)
   }
 
   def representationSize(ind: MultiStateInd): Double = {
