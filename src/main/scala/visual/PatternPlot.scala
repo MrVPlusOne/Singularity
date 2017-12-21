@@ -101,19 +101,20 @@ object PatternPlot {
     import io.Source
 
     val config = JGraphTExamples.maxFlow_PushRelabelMFImpl
-    val sizeLimit = 400
+    val sizeLimit = 500
     val plotPoints = 100
     val files =
       """
-        |/Users/weijiayi/Downloads/jGraphT.maxFlow.PushRelabelMFImpl[performance=timeout][ioId=105,seed=105](17-12-19-16:05:47)
+        |/Users/weijiayi/Downloads/size400/jGraphT.maxFlow.PushRelabelMFImpl[performance=2.947238186E9][ioId=123,seed=123](17-12-19-23:45:36)
       """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
 
 
     for(fileLine <- files) {
-      val lastName = "timeoutIndividual.serialized"
-//      val lastName = "bestIndividual.serialized"
+//      val lastName = "timeoutIndividual.serialized"
+      val lastName = "bestIndividual.serialized"
       val file = if(fileLine.endsWith(".serialized")) fileLine else fileLine + "/" + lastName
       val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
+      println("Individual: ")
 
 
 //      FuzzingTaskProvider.phpHashCollisionExample.runAsProbConfig("phpHash16") { config =>

@@ -1,6 +1,6 @@
 package patsyn
 
-import benchmarks.GuavaExamples
+import benchmarks.{GuavaExamples, JGraphTExamples}
 import patsyn.Runner.RunnerConfig
 
 import scala.util.Random
@@ -137,12 +137,12 @@ object Playground {
   }
 
   def main(args: Array[String]): Unit = {
-    SimpleMath.processMap(args,
-      0 to 50, processNum = 10,
-      mainClass = this) {
-      ioId =>
-        run(ioId)
-    }
+//    SimpleMath.processMap(args,
+//      0 to 50, processNum = 10,
+//      mainClass = this) {
+//      ioId =>
+//        run(ioId)
+//    }
 
 //    import StandardSystem._
 //    val vec = for(i <- 0 until 100) yield {
@@ -153,5 +153,27 @@ object Playground {
 //      FuzzingTaskProvider.phpHashCollisionExample.squareMetric(vec.toVector)
 //    }
 //    run(6)
+
+    def testGraphValue(size: Int) = {
+      import StandardSystem._
+
+      val a = IntValue(3)
+      val b = IntValue(4)
+
+      val edges = (1 until size).flatMap { i =>
+        if(i%2 == 0){
+          IS((0, i, a), (i, 0, b))
+        }else{
+          IS((0, i, IntValue(0)))
+        }
+      }
+      val g = GraphValue(size, edges)
+
+      println(MamFormat.showAsMamGraph(g))
+      println{
+        JGraphTExamples.maxFlow_PushRelabelMFImpl.resourceUsage(IS(g, 2, 1))
+      }
+    }
+    testGraphValue(100)
   }
 }

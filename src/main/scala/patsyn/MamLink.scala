@@ -54,7 +54,7 @@ object MamFormat{
   }
 
   def showAsMamGraph(graph: GraphValue): String = {
-    val vertexList = (0 until graph.nodeNum).mkString("{",",","}")
+    val vertexList = (0 until graph.nodeNum).map(i => s"Labeled[$i, Style[$i,Red]]").mkString("{",",","}")
     val edgeList = graph.edges.map{
       case (from, to, value) => s"""Labeled[$from -> $to,Tooltip["$value"]]"""
     }.mkString("{",",","}")
