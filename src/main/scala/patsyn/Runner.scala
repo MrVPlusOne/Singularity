@@ -257,6 +257,9 @@ object Runner {
                 showPattern(ind)
               }
               FileInteraction.saveMultiIndToFile(s"$recordDirPath/timeoutIndividual.serialized")(ind)
+              FileInteraction.writeToFile(s"$recordDirPath/bestIndividual.txt"){
+                representation.showIndividualMultiLine(ind)
+              }
 
               // We might also be interested in the value
               MultiStateRepresentation.saveExtrapolation(problemConfig ,ind, evalSize, memoryLimit,
@@ -307,6 +310,9 @@ object Runner {
           ""
         }
         FileInteraction.saveMultiIndToFile(s"$recordDirPath/bestIndividual$timeString.serialized")(indData.ind)
+        FileInteraction.writeToFile(s"$recordDirPath/bestIndividual.txt"){
+          representation.showIndividualMultiLine(indData.ind)
+        }
 
         MultiStateRepresentation.saveExtrapolation(problemConfig, indData.ind,
           evalSize, memoryLimit, s"$recordDirPath/bestInput$timeString")

@@ -116,6 +116,15 @@ case class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType
     }).mkString("< ", " | ", " >")
   }
 
+  def showIndividualMultiLine(ind: MultiStateInd): String = {
+    val s = new StringBuilder()
+    printIndividualMultiLine(x => {
+      s.append(s)
+      s.append("\n")
+    })(ind)
+    s.mkString
+  }
+
   def printIndividualMultiLine(println: String => Unit)(ind: MultiStateInd): Unit = {
     MultiStateRepresentation.printIndividualMultiLine(println, stateTypes, outputTypes, ind)
   }
