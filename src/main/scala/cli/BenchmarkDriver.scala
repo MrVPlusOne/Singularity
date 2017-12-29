@@ -188,6 +188,18 @@ object BenchmarkDriver {
       opt[Int]("single-size-tolerance").hidden().action((x, c) =>
         c.copy(gpConfig = c.gpConfig.copy(singleSizeTolerance = x))).text("[Only used when --manual is specified] Single size tolerance. Default to 30.")
 
+      opt[Double]("crossover-p").hidden().action((x, c) =>
+        c.copy(gpConfig = c.gpConfig.copy(crossoverP = x))).text("[Only used when --manual is specified] Crossover " +
+        "probability. Default to 0.4.")
+
+      opt[Double]("mutate-p").hidden().action((x, c) =>
+        c.copy(gpConfig = c.gpConfig.copy(mutateP = x))).text("[Only used when --manual is specified] Mutation " +
+        "probability. Default to 0.5.")
+
+      opt[Double]("copy-p").hidden().action((x, c) =>
+        c.copy(gpConfig = c.gpConfig.copy(copyP = x))).text("[Only used when --manual is specified] Copy " +
+        "probability. Default to 0.1.")
+
 
       def parseBool(s: String): Boolean = {
         Set("t", "true", "yes").contains(s.trim.toLowerCase())
