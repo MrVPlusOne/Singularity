@@ -332,6 +332,24 @@ object FuzzingTaskProvider {
     GPEnvironment(constMap, functions, stateTypes)
   }
 
+  def asciiRegexEnv: GPEnvironment = {
+    val symbols = 1 until 128
+
+    def intGen(r: Random): IntValue = {
+      IntValue(SimpleMath.randomSelect(r)(symbols))
+    }
+
+    val constMap = makeConstMap(
+      EInt -> intGen,
+      EVect(EInt) -> (_ => Vector())
+    )
+
+    val functions = IntComponents.collection ++ VectComponents.collection
+
+    val stateTypes = constMap.keys.toIndexedSeq
+    GPEnvironment(constMap, functions, stateTypes)
+  }
+
   def intValueAsChar(eValue: EValue): Char = {
     eValue.asInstanceOf[IntValue].value.toChar
   }

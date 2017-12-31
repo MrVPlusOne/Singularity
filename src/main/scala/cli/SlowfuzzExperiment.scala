@@ -12,7 +12,8 @@ object SlowfuzzExperiment {
                        ioId: Int = 0,
                        seed: Int = 0,
                        fuzzingTime: Int = 3600,
-                       disableGui: Boolean = false)
+                       disableGui: Boolean = false,
+                       manualParamTuning: Boolean = false)
 
   private val problemMap = Map[String, Int => String => ProblemConfig](
     "isort" -> SlowfuzzExamples.insertionSortIntExample,
@@ -24,6 +25,21 @@ object SlowfuzzExperiment {
     "phphash" -> SlowfuzzExamples.phpHashExample
   ) ++ (0 until 20).map(i =>
     s"pcre_regex$i" -> SlowfuzzExamples.pcreExample(i) _
+  )
+
+  private val gpParamMap = Map[String, GPConfig](
+    "appleqsort" -> GPConfig(populationSize = 700, totalSizeTolerance = 70, crossoverP = 0.5, mutateP = 0.7, copyP = 0.2),
+    "bsdqsort" -> GPConfig(populationSize = 700, totalSizeTolerance = 70, crossoverP = 0.5, mutateP = 0.7, copyP = 0.2),
+    "pcre_regex2" -> GPConfig(populationSize = 1000, totalSizeTolerance = 120, crossoverP = 0.5, mutateP = 0.7, copyP = 0.2),
+    "pcre_regex13" -> GPConfig(totalSizeTolerance = 90, crossoverP = 0.5, mutateP = 0.4, copyP = 0.25),
+    "phphash" -> GPConfig(populationSize = 650, totalSizeTolerance = 70, singleSizeTolerance = 25, crossoverP = 0.5, mutateP = 0.7, copyP = 0.2)
+  )
+  private val gpConfigMap = Map[String, GPEnvironment](
+    "appleqsort" -> FuzzingTaskProvider.sortingEnv,
+    "bsdqsort" -> FuzzingTaskProvider.sortingEnv,
+    "pcre_regex2" -> FuzzingTaskProvider.asciiRegexEnv,
+    "pcre_regex13" -> FuzzingTaskProvider.asciiRegexEnv,
+    "phphash" -> FuzzingTaskProvider.hashEnv
   )
 
   def getRunnerConfig(cliOption: CliOption): RunnerConfig = {
@@ -44,6 +60,20 @@ object SlowfuzzExperiment {
     )
   }
 
+  def getGPConfig(cliOption: CliOption): GPConfig = {
+    gpParamMap.getOrElse(cliOption.name, {
+      println(s"Cannot find overriding gp params for benchmark: ${cliOption.name}")
+      sys.exit(-1)
+    })
+  }
+
+  def getGPEnv(cliOption: CliOption): GPEnvironment = {
+    gpConfigMap.getOrElse(cliOption.name, {
+      println(s"Cannot find overriding gp env for benchmark: ${cliOption.name}")
+      sys.exit(-1)
+    })
+  }
+
   def getProblem(cliOption: CliOption): ProblemConfig = {
     problemMap.getOrElse(cliOption.name, {
       println(s"Cannot find benchmark: ${cliOption.name}")
@@ -56,7 +86,14 @@ object SlowfuzzExperiment {
     val execConfig = getExecConfig(cliOption)
     val problem = getProblem(cliOption)
     println(s"*** Task $cliOption started ***")
-    Supernova.fuzzProblem(problem, runnerConfig, execConfig, new scala.util.Random(cliOption.seed))
+    if (cliOption.manualParamTuning) {
+      val gpConfig = getGPConfig(cliOption)
+      val gpEnv = getGPEnv(cliOption)
+      val config = RunConfig(runnerConfig, gpConfig, execConfig)
+      Runner.run(problem, gpEnv, config)
+    } else {
+      Supernova.fuzzProblem(problem, runnerConfig, execConfig, new scala.util.Random(cliOption.seed))
+    }
     println(s"*** Task $cliOption finished ***")
   }
 
@@ -71,6 +108,9 @@ object SlowfuzzExperiment {
 
       opt[Unit]('n', "no-gui").action((_, c) =>
         c.copy(disableGui = true)).text("Disable the GUI panel.")
+
+      opt[Unit]('m', "manual").action((_, c) =>
+        c.copy(manualParamTuning = true)).text("Try to override supernova with manually tuned GP params")
 
       opt[Int]('i', "ioId").action((id, c) =>
         c.copy(ioId = id)).text("The id used to perform IO actions. If you have n processes running at the same time, just set their idIo to 0 through n.")
