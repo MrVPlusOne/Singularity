@@ -1,6 +1,5 @@
 package patsyn
 
-import benchmarks.{GuavaExamples, JGraphTExamples}
 import patsyn.Runner.RunnerConfig
 
 import scala.util.Random
@@ -70,62 +69,6 @@ object HashSample {
 
 object Playground {
 
-  def previous(): Unit = {
-    import visual.{MonitorPanel, PatternPlot, ListPlot}
-
-
-    var s0 = 403
-    var s1 = 280
-    val sizeOfInterest = 1000
-
-    val pairs = for(_ <- 0 until sizeOfInterest) yield {
-      s0 = s1
-      s1 = (226<<24) + s1
-      (s0, s1)
-    }
-
-    val config = GuavaExamples.immutableBiMap_copyOf
-    val random = new Random(1)
-    val indicies = PatternPlot.randomSelectFrom((0 until sizeOfInterest), maxPoints = 30, random = random)
-
-    import StandardSystem._
-    val points = indicies.map{
-      i =>
-        val input = VectValue(pairs.take(i).map{ case (x1,x2) => PairValue((x1,x2))}.toVector)
-        val size = config.sizeF(IS(input))
-        val resource = config.resourceUsage(IS(input))
-        (size.toDouble, resource)
-    }
-
-    import javax.swing.JFrame
-
-    import benchmarks.GuavaExamples
-    import patsyn.MultiStateRepresentation.individualToPattern
-    import patsyn._
-
-
-    val frame = new JFrame("Monitor") {
-      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-      setVisible(true)
-    }
-
-    var data = IndexedSeq[(Double, Double)]()
-    points.foreach{ xy =>
-      data :+= xy
-      val chart = ListPlot.plot("pattern" -> data)("test", "size", "resource")
-      frame.setContentPane(new MonitorPanel(Some(chart), margin = 10, plotSize = (600,450)))
-      frame.pack()
-    }
-    println(data)
-
-    println("Evaluation finished.")
-  }
-
-  def testGraph(): Unit ={
-
-    GraphSample.ind
-  }
-
   def run(ioId: Int): Unit ={
     val rand = new Random(ioId)
     FuzzingTaskProvider.phpHashCollisionExample.runAsProbConfig("PhpHash"){ config =>
@@ -153,27 +96,5 @@ object Playground {
 //      FuzzingTaskProvider.phpHashCollisionExample.squareMetric(vec.toVector)
 //    }
 //    run(6)
-
-    def testGraphValue(size: Int) = {
-      import StandardSystem._
-
-      val a = IntValue(3)
-      val b = IntValue(4)
-
-      val edges = (1 until size).flatMap { i =>
-        if(i%2 == 0){
-          IS((0, i, a), (i, 0, b))
-        }else{
-          IS((0, i, IntValue(0)))
-        }
-      }
-      val g = GraphValue(size, edges)
-
-      println(MamFormat.showAsMamGraph(g))
-      println{
-        JGraphTExamples.maxFlow_PushRelabelMFImpl.resourceUsage(IS(g, 2, 1))
-      }
-    }
-    testGraphValue(100)
   }
 }

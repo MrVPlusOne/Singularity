@@ -2,7 +2,6 @@ package visual
 
 import javax.swing.JFrame
 
-import benchmarks.{GuavaExamples, JGraphTExamples}
 import patsyn.MultiStateRepresentation.individualToPattern
 import patsyn.StandardSystem.GraphValue
 import patsyn._
@@ -50,9 +49,9 @@ object PatternPlot {
     } else {
       val xs = {
         var dataPointsLeft = maxPoints
-        val filtered = values.indices.filter{i =>
-          val keep = SimpleMath.randomGuess(random)(dataPointsLeft.toDouble/(values.length-i))
-          if(keep){
+        val filtered = values.indices.filter { i =>
+          val keep = SimpleMath.randomGuess(random)(dataPointsLeft.toDouble / (values.length - i))
+          if (keep) {
             dataPointsLeft -= 1
           }
           keep
@@ -72,12 +71,12 @@ object PatternPlot {
                              xLabel: String = "size",
                              yLabel: String = "R",
                              exitOnClose: Boolean = true,
-                             patternCreationFeedback: (Int, IS[EValue]) => Unit = (_,_) => (),
+                             patternCreationFeedback: (Int, IS[EValue]) => Unit = (_, _) => (),
                              memoryLimit: Long = Long.MaxValue
                             ): Unit
   = {
     val frame = new JFrame("Monitor") {
-      if(exitOnClose){
+      if (exitOnClose) {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
       }
       setVisible(true)
@@ -86,10 +85,10 @@ object PatternPlot {
       = plotPoints, memoryLimit, patternCreationFeedback = patternCreationFeedback)
 
     var data = IndexedSeq[(Double, Double)]()
-    xys.foreach{ xy =>
+    xys.foreach { xy =>
       data :+= xy
       val chart = ListPlot.plot(lineName -> data)(plotName, xLabel, yLabel)
-      frame.setContentPane(new MonitorPanel(Some(chart), margin = 10, plotSize = (600,450)))
+      frame.setContentPane(new MonitorPanel(Some(chart), margin = 10, plotSize = (600, 450)))
       frame.pack()
     }
     println(data)
@@ -98,42 +97,38 @@ object PatternPlot {
   }
 
   def main(args: Array[String]): Unit = {
-    import io.Source
 
-    val config = JGraphTExamples.maxFlow_PushRelabelMFImpl
-    val sizeLimit = 500
-    val plotPoints = 100
-    val files =
-      """
-        |/Users/weijiayi/Downloads/size400/jGraphT.maxFlow.PushRelabelMFImpl[performance=2.947238186E9][ioId=123,seed=123](17-12-19-23:45:36)
-      """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
-
-
-    for(fileLine <- files) {
-//      val lastName = "timeoutIndividual.serialized"
-      val lastName = "bestIndividual.serialized"
-      val file = if(fileLine.endsWith(".serialized")) fileLine else fileLine + "/" + lastName
-      val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
-      println("Individual: ")
-
-
-//      FuzzingTaskProvider.phpHashCollisionExample.runAsProbConfig("phpHash16") { config =>
-        showResourceUsageChart(config, ind, sizeLimit,
-          plotPoints = plotPoints, plotName = file, exitOnClose = false,
-          memoryLimit = sizeLimit * ind.nStates * 4,
-          patternCreationFeedback = (i, ev) => {
-            if (i % 1 == 0) {
-              println(s"input created: $i")
-              ev match{
-                case IS(graph: GraphValue, _, _) =>
-                  println{
-                    MamFormat.showAsMamGraph(graph)
-                  }
-              }
-            }
-          }
-        )
-//      }
-    }
+//    val config = JGraphTExamples.maxFlow_PushRelabelMFImpl
+//    val sizeLimit = 500
+//    val plotPoints = 100
+//    val files =
+//      """
+//        |/Users/weijiayi/Downloads/size400/jGraphT.maxFlow.PushRelabelMFImpl[performance=2.947238186E9][ioId=123,seed=123](17-12-19-23:45:36)
+//      """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
+//
+//
+//    for (fileLine <- files) {
+//      //      val lastName = "timeoutIndividual.serialized"
+//      val lastName = "bestIndividual.serialized"
+//      val file = if (fileLine.endsWith(".serialized")) fileLine else fileLine + "/" + lastName
+//      val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
+//      println("Individual: ")
+//
+//      showResourceUsageChart(config, ind, sizeLimit,
+//        plotPoints = plotPoints, plotName = file, exitOnClose = false,
+//        memoryLimit = sizeLimit * ind.nStates * 4,
+//        patternCreationFeedback = (i, ev) => {
+//          if (i % 1 == 0) {
+//            println(s"input created: $i")
+//            ev match {
+//              case IS(graph: GraphValue, _, _) =>
+//                println {
+//                  MamFormat.showAsMamGraph(graph)
+//                }
+//            }
+//          }
+//        }
+//      )
+//    }
   }
 }
