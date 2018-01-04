@@ -113,7 +113,7 @@ object Supernova{
 
 //    val example = FuzzingTaskProvider.bzipExample(workingDir, 200)
 //    fuzzTask("hashCollision", example, RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(), rand)
-    val prob = FuzzingTaskProvider.bzipProblem(workingDir)
+    val prob = ???
     fuzzProblem(prob,
       RunnerConfig().copy(randomSeed = seed, ioId = seed),
       ExecutionConfig().copy(evalSizePolicy = sizePolicy),
