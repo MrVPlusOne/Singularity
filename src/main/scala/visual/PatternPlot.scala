@@ -100,12 +100,12 @@ object PatternPlot {
   def main(args: Array[String]): Unit = {
     import io.Source
 
-    val config = JGraphTExamples.maxFlow_PushRelabelMFImpl
-    val sizeLimit = 500
+    val config = GuavaExamples.immutableBiMap_copyOf
+    val sizeLimit = 2000
     val plotPoints = 100
     val files =
       """
-        |/Users/weijiayi/Downloads/size400/jGraphT.maxFlow.PushRelabelMFImpl[performance=2.947238186E9][ioId=123,seed=123](17-12-19-23:45:36)
+        |InterestingResults/ImmutableBiMap.copyOf[performance=1796418.0][ioId=103,seed=103](17-12-04-12:36:26)/bestIndividual.serialized
       """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
 
 
@@ -115,6 +115,7 @@ object PatternPlot {
       val file = if(fileLine.endsWith(".serialized")) fileLine else fileLine + "/" + lastName
       val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
       println("Individual: ")
+      println(ind)
 
 
 //      FuzzingTaskProvider.phpHashCollisionExample.runAsProbConfig("phpHash16") { config =>

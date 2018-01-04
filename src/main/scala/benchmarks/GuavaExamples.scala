@@ -139,14 +139,29 @@ object GuavaExamples {
     prob.resourceUsage(IS(pairs))
   }
 
-  def main(args: Array[String]): Unit = {
-    SimpleMath.processMap(args,
-      0 to 60, processNum = 14,
-      mainClass = this){
-      i => runExample(i, useGUI = false)
+  def fitCurveImmutableSet(): Unit ={
+    val input = GuavaImmutableSet.generateInput()
+    val iter = input.iterator()
+    var size = 0
+    var acc = Vector[IntValue]()
+    val prob = immutableSet_copyOf
+    while(iter.hasNext){
+      size += 1
+      acc = acc :+ IntValue(iter.next().toInt)
+      val y = prob.resourceUsage(IS(acc))
+      print((size, y) + ",")
     }
+  }
+
+  def main(args: Array[String]): Unit = {
+//    SimpleMath.processMap(args,
+//      0 to 60, processNum = 14,
+//      mainClass = this){
+//      i => runExample(i, useGUI = false)
+//    }
 //    runExample(15, useGUI = true)
 
 //    testAverage()
+    fitCurveImmutableSet()
   }
 }
