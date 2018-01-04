@@ -445,4 +445,42 @@ object StandardSystem {
       }
     )
   }
+
+  object AccountingWizard {
+    case object Command extends EType()
+
+    case class OrderCommand(itemName: IS[Int], cost: Int, quantity: Int) extends EValue {
+      def hasType(ty: EType): Boolean = ty == Command
+
+      def memoryUsage: Long = itemName.length + 2
+    }
+
+    case class UpdateHours(quatity: Int) extends EValue{
+      def hasType(ty: EType): Boolean = ty == Command
+
+      def memoryUsage: Long = 1
+    }
+
+    val componentSet = new ComponentSet {
+      val mkOrder = mkConcrete("mkOrder",
+        argTypes = IS(EVect(EInt), EInt, EInt),
+        returnType = Command,
+        eval = {
+          case IS(VectValue(vec), IntValue(c), IntValue(q)) =>
+            OrderCommand(vec.map(_.asInstanceOf[IntValue].value), c, q)
+        }
+      )
+
+      val mkUpdateHours = mkConcrete("mkUpdateHours",
+        argTypes = IS(EInt),
+        returnType = Command,
+        eval = {
+          case IS(IntValue(q)) =>
+            UpdateHours(q)
+        }
+      )
+    }
+  }
+
+
 }
