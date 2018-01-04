@@ -72,29 +72,21 @@ object Playground {
   def run(ioId: Int): Unit ={
     val rand = new Random(ioId)
     FuzzingTaskProvider.phpHashCollisionExample.runAsProbConfig("PhpHash"){ config =>
-      Supernova.fuzzProblem(
+      Supernova.standard.fuzzProblem(
         config,
         RunnerConfig().copy(randomSeed = ioId, ioId = ioId, useGUI = false),
         ExecutionConfig(evalSizePolicy = VariedEvalSize.choppedGaussian(rand, 400)), rand)
     }
   }
 
-  def main(args: Array[String]): Unit = {
-//    SimpleMath.processMap(args,
-//      0 to 50, processNum = 10,
-//      mainClass = this) {
-//      ioId =>
-//        run(ioId)
-//    }
+  def compressNumToString(num: Int): String = {
+    SimpleMath.natToList(num,26*2).map{i =>
+      val c = if(i<26) 'a' + i else 'A' + i - 26
+      c.toChar
+    }.mkString("")
+  }
 
-//    import StandardSystem._
-//    val vec = for(i <- 0 until 100) yield {
-//      val x = 0
-//      VectValue(Vector(x-i, x+33*i))
-//    }
-//    println{
-//      FuzzingTaskProvider.phpHashCollisionExample.squareMetric(vec.toVector)
-//    }
-//    run(6)
+  def main(args: Array[String]): Unit = {
+    println("create table t20 " + (1 to 120).map(i => s"${compressNumToString(i)} int").mkString("(",",",")"))
   }
 }
