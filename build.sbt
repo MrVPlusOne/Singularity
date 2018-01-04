@@ -10,7 +10,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.5.6",
   "com.typesafe.akka" %% "akka-testkit" % "2.5.6" % Test,
   "org.apache.commons" % "commons-lang3" % "3.1",
-  "com.github.scopt" %% "scopt" % "3.7.0"
+  "com.github.scopt" %% "scopt" % "3.7.0",
+  "org.scalaj" %% "scalaj-http" % "2.3.0"
 )
 
 mainClass in assembly := Some("cli.BenchmarkDriver")
