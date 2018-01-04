@@ -480,6 +480,32 @@ object StandardSystem {
         }
       )
     }
+
+    abstract class EmptyCommand extends EValue{
+      def hasType(ty: EType): Boolean = ty == Command
+
+      def memoryUsage: Long = 1
+    }
+
+    case object SwitchLocal extends EmptyCommand
+
+    case object GetHours extends EmptyCommand
+
+    case object GetFileSizes extends EmptyCommand
+
+    val additionalComponents = new ComponentSet {
+      def mkEmptyCommand(name: String, result: EmptyCommand) = mkConcrete(name,
+        argTypes = IS(),
+        returnType = Command,
+        eval = {
+          case IS() => result
+        }
+      )
+
+      val switchLocale = mkEmptyCommand("switchLocale", SwitchLocal)
+      val getHours = mkEmptyCommand("getHours", GetHours)
+      val getFileSizes = mkEmptyCommand("getFileSizes", GetFileSizes)
+    }
   }
 
 
