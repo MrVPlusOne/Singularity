@@ -1,15 +1,14 @@
 package benchmarks
 
-import java.util.Random
-
 import edu.utexas.stac.Cost
 import patsyn.ProblemConfig
 import patsyn.Runner.RunnerConfig
 import patsyn.StandardSystem.AccountingWizard.{EmptyCommand, OrderCommand, UpdateHours}
 import patsyn._
 import patsyn.StandardSystem._
+import scala.util.Random
 
-object ExternalFunc extends RemoteFunc[(Vector[EValue], Int), Option[Long]] {
+object AccountingWizardRunningTimeFunc extends RemoteFunc[(Vector[EValue], Int), Option[Long]] {
 
   def jarPath: String = this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath
 
@@ -116,6 +115,36 @@ object ExternalFunc extends RemoteFunc[(Vector[EValue], Int), Option[Long]] {
 
 object AccountingWizardExample {
 
+  val timeSupernova: Supernova = {
+    import patsyn.StandardSystem.AccountingWizard._
+    new Supernova(
+      extendedConstRule = rule => {
+        case Command => (r: Random) => componentSet.mkOrder.eval(
+          IS(rule(EVect(EInt))(r), rule(EInt)(r), rule(EInt)(r))
+        )
+      },
+      extraSafeFunctions = IS(componentSet.mkOrder),
+      extraUnsafeFunctions = IS()
+    )
+  }
+
+  val spaceSupernova: Supernova = {
+    import patsyn.StandardSystem.AccountingWizard._
+    new Supernova(
+      extendedConstRule = rule => {
+        case Command => (r: Random) =>
+          if(r.nextDouble()<0.5) {
+            componentSet.mkOrder.eval(
+              IS(rule(EVect(EInt))(r), rule(EInt)(r), rule(EInt)(r)))
+          }else{
+            SimpleMath.randomSelect(r)(IS(SwitchLocal, GetHours, GetFileSizes))
+          }
+      },
+      extraSafeFunctions = IS(componentSet.mkOrder) ++ additionalComponents.collection,
+      extraUnsafeFunctions = IS()
+    )
+  }
+
   def cmdToJson(cmdValue: EValue) = cmdValue match {
     case OrderCommand(itemNameVec, cost, quantity) =>
       val itemName = String.valueOf(itemNameVec.map{i => i.toChar}.filter{ch => ch != 0 }.toArray)
@@ -139,13 +168,13 @@ object AccountingWizardExample {
           val cmdSize = commands.map(c => cmdToJson(c).length + 250).sum
           setupSize + cmdSize
       },
-      resourceUsage = values => ExternalFunc((values.toVector, ioId), workingDir).get
+      resourceUsage = values => AccountingWizardRunningTimeFunc((values.toVector, ioId), workingDir).get
     )
   }
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
-    Supernova.accountingWizard.fuzzProblem(
+    timeSupernova.fuzzProblem(
       timingExample(seed),
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
       ExecutionConfig(evalSizePolicy = FixedEvalSize(15000)), rand)

@@ -119,18 +119,6 @@ object Supernova{
 
   val standard = new Supernova(extendedConstRule = PartialFunction.empty, IS(), IS())
 
-  val accountingWizard: Supernova = {
-    import patsyn.StandardSystem.AccountingWizard._
-    new Supernova(
-      extendedConstRule = rule => {
-        case Command => (r: Random) => componentSet.mkOrder.eval(
-          IS(rule(EVect(EInt))(r), rule(EInt)(r), rule(EInt)(r))
-        )
-      },
-      extraSafeFunctions = IS(componentSet.mkOrder),
-      extraUnsafeFunctions = IS()
-    )
-  }
 
   def main(args: Array[String]): Unit = {
     val seed = 3

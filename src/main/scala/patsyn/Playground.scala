@@ -1,5 +1,6 @@
 package patsyn
 
+import benchmarks.AccountingWizardExample
 import patsyn.Runner.RunnerConfig
 import patsyn.StandardSystem.AccountingWizard
 
@@ -89,7 +90,7 @@ object Playground {
 
   def main(args: Array[String]): Unit = {
     println{
-      Supernova.accountingWizard.genGPParameters(IS(AccountingWizard.Command), new util.Random(1))
+      AccountingWizardExample.timeSupernova.genGPParameters(IS(AccountingWizard.Command), new util.Random(1))
     }
 
     val n = 500
