@@ -8,12 +8,9 @@ import patsyn._
 import patsyn.StandardSystem._
 import scala.util.Random
 
-object AccountingWizardRunningTimeFunc extends RemoteFunc[(Vector[EValue], Int), Option[Long]] {
+object AccountingWizardFuncHelper {
 
-  def jarPath: String = this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath
-
-  def sendRequests(values: Vector[EValue], workingDir: String, portNum: Int) = {
-
+  case class ServerEnv(workingDir: String, portNum: Int) {
     def cookieFile = s"$workingDir/myCookieFile.txt"
 
     val curlPrefix = Seq("curl", "-s", "-k", "-L", "-H", "Content-Type: application/json")
@@ -40,49 +37,100 @@ object AccountingWizardRunningTimeFunc extends RemoteFunc[(Vector[EValue], Int),
       val minValue = 1000
       SimpleMath.wrapInRange(cap, maxValue - minValue) + minValue
     }
+  }
 
-    def managerSetup(projectName: String, projectCap: Int) = {
+  def managerSetup(env: ServerEnv, projectName: String, projectCap: Int) = {
+    import scala.sys.process._
+    import env._
 
-      import scala.sys.process._
+    (curlPrefix ++ postMethodPrefix ++ genCookiePrefix ++ dataPrefix("""{"username":"Burger.King", "password":"BK4CLGBG"}""") ++ loginSite).!
+    (curlPrefix ++ putMethodPrefix ++ useCookiePrefix ++ createProjectSite(projectName, wrapExpenditure(projectCap))).!
+    (curlPrefix ++ getMethodPrefix ++ logoutSite).!
 
-      (curlPrefix ++ postMethodPrefix ++ genCookiePrefix ++ dataPrefix("""{"username":"Burger.King", "password":"BK4CLGBG"}""") ++ loginSite).!
-      (curlPrefix ++ putMethodPrefix ++ useCookiePrefix ++ createProjectSite(projectName, wrapExpenditure(projectCap))).!
-      (curlPrefix ++ getMethodPrefix ++ logoutSite).!
+    FileInteraction.deleteIfExist(cookieFile)
+  }
 
-      FileInteraction.deleteIfExist(cookieFile)
+  def managerQuery(env: ServerEnv) = {
+    import scala.sys.process._
+    import env._
+
+    (curlPrefix ++ postMethodPrefix ++ genCookiePrefix ++ dataPrefix("""{"username":"Burger.King", "password":"BK4CLGBG"}""") ++ loginSite).!
+    (curlPrefix ++ getMethodPrefix ++ useCookiePrefix ++ expenditureReportSite).run( ProcessLogger(line => ()))
+    (curlPrefix ++ getMethodPrefix ++ logoutSite).!
+
+    FileInteraction.deleteIfExist(cookieFile)
+  }
+
+  def employeeRequest(env: ServerEnv, projectName: String, values: Vector[EValue]) = {
+    import scala.sys.process._
+    import env._
+
+    (curlPrefix ++ postMethodPrefix ++ genCookiePrefix ++ dataPrefix("""{"username":"Marie.Callender", "password":"MC1CRNCPNC"}""") ++ loginSite).!
+
+    values.map {
+      cmd =>
+        (curlPrefix ++ postMethodPrefix ++ useCookiePrefix ++ dataPrefix(AccountingWizardExample.cmdToJson(cmd)) ++ orderItemSite(projectName)).run(ProcessLogger(line => ()))
     }
 
-    def managerQuery() = {
-      import scala.sys.process._
+    (curlPrefix ++ getMethodPrefix ++ logoutSite).!
 
-      (curlPrefix ++ postMethodPrefix ++ genCookiePrefix ++ dataPrefix("""{"username":"Burger.King", "password":"BK4CLGBG"}""") ++ loginSite).!
-      (curlPrefix ++ getMethodPrefix ++ useCookiePrefix ++ expenditureReportSite).run( ProcessLogger(line => ()))
-      (curlPrefix ++ getMethodPrefix ++ logoutSite).!
+    FileInteraction.deleteIfExist(cookieFile)
+  }
+}
 
-      FileInteraction.deleteIfExist(cookieFile)
-    }
+object AccountingWizardRunningTimeFunc extends RemoteFunc[(Vector[EValue], Int), Option[Long]] {
 
-    def employeeRequest(projectName: String, values: Vector[EValue]) = {
-      import scala.sys.process._
+  def jarPath: String = this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath
 
-      (curlPrefix ++ postMethodPrefix ++ genCookiePrefix ++ dataPrefix("""{"username":"Marie.Callender", "password":"MC1CRNCPNC"}""") ++ loginSite).!
-
-      values.map {
-        cmd =>
-          (curlPrefix ++ postMethodPrefix ++ useCookiePrefix ++ dataPrefix(AccountingWizardExample.cmdToJson(cmd)) ++ orderItemSite(projectName)).run(ProcessLogger(line => ()))
-      }
-
-      (curlPrefix ++ getMethodPrefix ++ logoutSite).!
-
-      FileInteraction.deleteIfExist(cookieFile)
-    }
+  def sendRequests(values: Vector[EValue], workingDir: String, portNum: Int) = {
+    import AccountingWizardFuncHelper._
+    val env = ServerEnv(workingDir, portNum)
 
     values match {
       case IS(VectValue(commands), VectValue(pname), IntValue(cap)) => {
         val projectName = FuzzingTaskProvider.vectIntToString(pname).filter(ch => ch != 0)
-        managerSetup(projectName, cap)
-        employeeRequest(projectName, commands)
-        managerQuery()
+        managerSetup(env, projectName, cap)
+        employeeRequest(env, projectName, commands)
+        managerQuery(env)
+      }
+    }
+  }
+
+  def f(input: (Vector[EValue], Int), workingDir: String): Option[Long] = {
+    val values = input._1
+    val portNum = 4567 + input._2
+
+    Some(BenchmarkSet.measureCost {
+
+      // Initialize the server
+      spark.Spark.port(portNum)
+      com.bbn.accounting.wizard.AccountingWizard.main(Array())
+
+      // Translate values into requests and send them
+      BenchmarkSet.handleException(()) {
+        sendRequests(values, workingDir, portNum)
+
+        // Cleanup
+        spark.Spark.stop()
+        FileInteraction.deleteDirIfExist(".store")
+      }
+    })
+  }
+}
+
+object AccountingWizardFileSizeFunc extends RemoteFunc[(Vector[EValue], Int), Option[Long]] {
+
+  def jarPath: String = this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath
+
+  def sendRequests(values: Vector[EValue], workingDir: String, portNum: Int) = {
+    import AccountingWizardFuncHelper._
+    val env = ServerEnv(workingDir, portNum)
+
+    values match {
+      case IS(VectValue(commands), VectValue(pname), IntValue(cap)) => {
+        val projectName = FuzzingTaskProvider.vectIntToString(pname).filter(ch => ch != 0)
+        managerSetup(env, projectName, cap)
+        employeeRequest(env, projectName, commands)
       }
     }
   }
@@ -98,17 +146,19 @@ object AccountingWizardRunningTimeFunc extends RemoteFunc[(Vector[EValue], Int),
     com.bbn.accounting.wizard.AccountingWizard.main(Array())
 
     // Translate values into requests and send them
-    sendRequests(values, workingDir, portNum)
+    BenchmarkSet.handleException(()) {
+      sendRequests(values, workingDir, portNum)
+    }
+    val cost = BenchmarkSet.handleException(0L){
+      FileInteraction.measureFileSize(".store")
+    }
 
     // Cleanup
     spark.Spark.stop()
-    try {
+    BenchmarkSet.handleException(()) {
       FileInteraction.deleteDirIfExist(".store")
-    } catch {
-      case _: Exception => ()
     }
 
-    val cost: Long = Cost.read()
     Some(cost)
   }
 }
@@ -172,15 +222,46 @@ object AccountingWizardExample {
     )
   }
 
-  def runExample(seed: Int, useGUI: Boolean): Unit = {
+  def fileSizeExample(ioId: Int): ProblemConfig = {
+    val workingDir = FileInteraction.getWorkingDir(ioId)
+
+    ProblemConfig(
+      "stac.e5.accountingwizard.filesize",
+      outputTypes = IS(EVect(AccountingWizard.Command), EVect(EInt), EInt),
+      sizeF = {
+        case IS(VectValue(commands), VectValue(pname), IntValue(cap)) =>
+          val setupSize = 250 + pname.length
+          val cmdSize = commands.map(c => cmdToJson(c).length + 250).sum
+          setupSize + cmdSize
+      },
+      resourceUsage = values => AccountingWizardFileSizeFunc((values.toVector, ioId), workingDir).get
+    )
+  }
+
+  def runTimeExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
     timeSupernova.fuzzProblem(
       timingExample(seed),
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
-      ExecutionConfig(evalSizePolicy = FixedEvalSize(15000)), rand)
+      ExecutionConfig(evalSizePolicy = FixedEvalSize(10000), timeLimitInMillis = 200000), rand)
+  }
+
+  def runSpaceExample(seed: Int, useGUI: Boolean): Unit = {
+    val rand = new Random(seed)
+    spaceSupernova.fuzzProblem(
+      fileSizeExample(seed),
+      RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
+      ExecutionConfig(evalSizePolicy = FixedEvalSize(10000), timeLimitInMillis = 200000), rand)
   }
 
   def main(args: Array[String]): Unit = {
-    runExample(args(0).toInt, false)
+    SimpleMath.processMap(
+      args,
+      0 until 20,
+      10,
+      this.getClass
+    ){
+      i => runSpaceExample(i, useGUI = false)
+    }
   }
 }

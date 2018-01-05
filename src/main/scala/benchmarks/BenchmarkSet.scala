@@ -9,4 +9,12 @@ object BenchmarkSet {
     f
     Cost.read()
   }
+
+  def handleException[A](default: => A)(f: => A): A = {
+    try {
+      f
+    } catch {
+      case _: Exception => default
+    }
+  }
 }

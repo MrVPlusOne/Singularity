@@ -21,19 +21,19 @@ trait RemoteFunc[A <: Serializable, B <: Serializable] {
       assert(s.last == '$')
       s.init
     }
+
     val cmd = s"$javaPath -cp $jarPath $mainClassName $workingDir" //be careful not to create fork bombs!
 
     import sys.process._
-    cmd.split("\\s+").toSeq.!
+    Process(cmd.split("\\s+").toSeq, new java.io.File(workingDir)).!
     val (true, result) = FileInteraction.readObjectFromFile[(Boolean,B)](tempFile)
     result
   }
 
   def main(args: Array[String]): Unit = {
-    val workingDir = args(0)
-    val tempFile = s"$workingDir/$tempFileName"
+    val tempFile = s"$tempFileName"
     val (false, input) = FileInteraction.readObjectFromFile[(Boolean,A)](tempFile)
-    val result = f(input, workingDir)
+    val result = f(input, ".")
     FileInteraction.saveObjectToFile(tempFile)((true, result))
     System.exit(0)
   }
@@ -48,7 +48,7 @@ object ReverseList extends RemoteFunc[List[Int], List[Int]] {
 
 object TestRemoteFunc{
   def main(args: Array[String]): Unit = {
-    val workingDir = FileInteraction.getWorkingDir(0)
+    val workingDir = "."
     println{
       ReverseList(List(1,2,3,4,5), workingDir)
     }

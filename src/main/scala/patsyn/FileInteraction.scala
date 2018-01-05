@@ -69,6 +69,18 @@ object FileInteraction{
     deleteRecursively(new java.io.File(filePath))
   }
 
+  def measureFileSize(filePath: String): Long = {
+    def measureRecursively(file: java.io.File): Long = {
+      if (!file.exists)
+        return 0
+      if (file.isDirectory)
+        file.listFiles.map(measureRecursively).sum
+      else
+        file.length
+    }
+    measureRecursively(new java.io.File(filePath))
+  }
+
   def runWithAFileLogger[T](fileName: String, printToConsole: Boolean = true)(f: FileLogger => T): T = {
     mkDirsAlongPath(fileName.split("/").init.mkString("/"))
     val writer = new FileWriter(fileName)
