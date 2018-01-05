@@ -122,8 +122,9 @@ object Supernova{
     import patsyn.StandardSystem.AccountingWizard._
     new Supernova(
       extendedConstRule = rule => {
-        case Command => r => componentSet.mkOrder.eval(
-          IS(rule(EVect(EInt))(r)), rule(EInt)(r), rule(EInt)(r))
+        case Command => (r: Random) => componentSet.mkOrder.eval(
+          IS(rule(EVect(EInt))(r), rule(EInt)(r), rule(EInt)(r))
+        )
       },
       extraSafeFunctions = IS(componentSet.mkOrder),
       extraUnsafeFunctions = IS()
