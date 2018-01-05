@@ -3,8 +3,6 @@ package patsyn
 import java.io._
 import java.nio.file.{Files, Paths}
 
-import patsyn.EvolutionRepresentation.IndividualData
-
 class FileLogger(fileName: String, printToConsole: Boolean, writer: FileWriter) {
 
   def println(obj: Any): Unit ={
@@ -59,6 +57,18 @@ object FileInteraction{
     Files.deleteIfExists(Paths.get(filePath))
   }
 
+  def deleteDirIfExist(filePath: String): Unit = {
+    def deleteRecursively (file: java.io.File): Unit = {
+      if (!file.exists)
+        return
+      if (file.isDirectory)
+        file.listFiles.foreach(deleteRecursively)
+      if (!file.delete)
+        throw new Exception(s"Unable to delete ${file.getAbsolutePath}")
+    }
+    deleteRecursively(new java.io.File(filePath))
+  }
+
   def runWithAFileLogger[T](fileName: String, printToConsole: Boolean = true)(f: FileLogger => T): T = {
     mkDirsAlongPath(fileName.split("/").init.mkString("/"))
     val writer = new FileWriter(fileName)
@@ -99,6 +109,10 @@ object FileInteraction{
     } finally {
       ois.close()
     }
+  }
+
+  def readStringFromFile(path: String): String = {
+    new String(Files.readAllBytes(Paths.get(path)))
   }
 
   def getWorkingDir(ioId: Int): String = {
