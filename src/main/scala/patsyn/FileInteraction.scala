@@ -127,7 +127,7 @@ object FileInteraction{
     new String(Files.readAllBytes(Paths.get(path)))
   }
 
-  def getWorkingDir(ioId: Int): String = {
+  def getTempWorkingDir(ioId: Int): String = {
     val workingDirPrefix = s"workingDir$ioId"
     val workingDirPath = java.nio.file.Files.createTempDirectory(workingDirPrefix)
     workingDirPath.toFile.deleteOnExit()
@@ -142,6 +142,25 @@ object FileInteraction{
   def readMultiIndFromFile(path: String, funcMap: Map[String, EFunction]): MultiStateInd = {
     val (sExprs, numOfStates) = readObjectFromFile[(IS[SExpr], Int)](path)
     MultiStateInd(sExprs.map(e => SExpr.mkExpr(e, funcMap)), numOfStates)
+  }
+
+  def isAbsolutePath(path: String): Boolean = {
+    path.startsWith("/")
+  }
+
+  def getCurrentWorkingDir(): String = {
+    System.getProperty("user.dir")
+  }
+
+  case class ClassPath(path: String)
+
+  def getClassPath(inIDE: Boolean): ClassPath = {
+    val dir = getCurrentWorkingDir()
+    ClassPath(if(inIDE){
+      s"$dir/target/scala-2.12/PatternSynthBenchmarkDriver.jar"
+    }else{
+      this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath
+    })
   }
 
   def main(args: Array[String]): Unit = {

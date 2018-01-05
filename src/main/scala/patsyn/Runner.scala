@@ -14,7 +14,7 @@ object Runner {
 
   def main(args: Array[String]): Unit = {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
-    val workingDir = FileInteraction.getWorkingDir(ioId)
+    val workingDir = FileInteraction.getTempWorkingDir(ioId)
 
     runExample("javahash", FuzzingTaskProvider.javaHashCollisionExample, RunConfig.default.withIoIdAndSeed(ioId, ioId))
   }

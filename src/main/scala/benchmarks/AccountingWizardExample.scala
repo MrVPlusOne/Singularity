@@ -1,11 +1,13 @@
 package benchmarks
 
 import edu.utexas.stac.Cost
+import patsyn.FileInteraction.ClassPath
 import patsyn.ProblemConfig
 import patsyn.Runner.RunnerConfig
 import patsyn.StandardSystem.AccountingWizard.{EmptyCommand, OrderCommand, UpdateHours}
 import patsyn._
 import patsyn.StandardSystem._
+
 import scala.util.Random
 
 object AccountingWizardFuncHelper {
@@ -80,7 +82,7 @@ object AccountingWizardFuncHelper {
 
 object AccountingWizardRunningTimeFunc extends RemoteFunc[(Vector[EValue], Int), Option[Long]] {
 
-  def jarPath: String = this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath
+  def classPath: String = this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath
 
   def sendRequests(values: Vector[EValue], workingDir: String, portNum: Int) = {
     import AccountingWizardFuncHelper._
@@ -120,7 +122,7 @@ object AccountingWizardRunningTimeFunc extends RemoteFunc[(Vector[EValue], Int),
 
 object AccountingWizardFileSizeFunc extends RemoteFunc[(Vector[EValue], Int), Option[Long]] {
 
-  def jarPath: String = this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath
+  def classPath: String = this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath
 
   def sendRequests(values: Vector[EValue], workingDir: String, portNum: Int) = {
     import AccountingWizardFuncHelper._
@@ -205,9 +207,9 @@ object AccountingWizardExample {
       ""
   }
 
-  def timingExample(ioId: Int): ProblemConfig = {
+  def timingExample(ioId: Int)(implicit classPath: ClassPath): ProblemConfig = {
 
-    val workingDir = FileInteraction.getWorkingDir(ioId)
+    val workingDir = FileInteraction.getTempWorkingDir(ioId)
 
     ProblemConfig(
       "stac.e5.accountingwizard.timing",
@@ -222,8 +224,8 @@ object AccountingWizardExample {
     )
   }
 
-  def fileSizeExample(ioId: Int): ProblemConfig = {
-    val workingDir = FileInteraction.getWorkingDir(ioId)
+  def fileSizeExample(ioId: Int)(implicit classPath: ClassPath): ProblemConfig = {
+    val workingDir = FileInteraction.getTempWorkingDir(ioId)
 
     ProblemConfig(
       "stac.e5.accountingwizard.filesize",
@@ -238,7 +240,7 @@ object AccountingWizardExample {
     )
   }
 
-  def runTimeExample(seed: Int, useGUI: Boolean): Unit = {
+  def runTimeExample(seed: Int, useGUI: Boolean)(implicit classPath: ClassPath): Unit = {
     val rand = new Random(seed)
     timeSupernova.fuzzProblem(
       timingExample(seed),
@@ -246,7 +248,7 @@ object AccountingWizardExample {
       ExecutionConfig(evalSizePolicy = FixedEvalSize(10000), timeLimitInMillis = 200000), rand)
   }
 
-  def runSpaceExample(seed: Int, useGUI: Boolean): Unit = {
+  def runSpaceExample(seed: Int, useGUI: Boolean)(implicit classPath: ClassPath): Unit = {
     val rand = new Random(seed)
     spaceSupernova.fuzzProblem(
       fileSizeExample(seed),
@@ -254,14 +256,19 @@ object AccountingWizardExample {
       ExecutionConfig(evalSizePolicy = FixedEvalSize(10000), timeLimitInMillis = 200000), rand)
   }
 
+
   def main(args: Array[String]): Unit = {
+
+    implicit val classPath: ClassPath = FileInteraction.getClassPath(inIDE = true)
     SimpleMath.processMap(
       args,
       0 until 20,
-      10,
-      this.getClass
+      4,
+      this
     ){
-      i => runSpaceExample(i, useGUI = false)
+      i => runSpaceExample(i, useGUI = true)
     }
   }
+
+
 }

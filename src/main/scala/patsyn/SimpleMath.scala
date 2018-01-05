@@ -1,5 +1,7 @@
 package patsyn
 
+import patsyn.FileInteraction.ClassPath
+
 import scala.util.Random
 
 object SimpleMath {
@@ -146,7 +148,7 @@ object SimpleMath {
     }
   }
 
-  def processMap(args: Array[String], tasks: IS[Int], processNum: Int, mainClass: Object)(f: Int => Unit): Unit = {
+  def processMap(args: Array[String], tasks: IS[Int], processNum: Int, mainClass: Object)(f: Int => Unit)(implicit classPath: ClassPath): Unit = {
     if(args.isEmpty){
       parallelMapOrdered(tasks, processNum){ i =>
         println(s"[JOB STARTED] id = $i")
@@ -154,7 +156,7 @@ object SimpleMath {
         import java.io.File
         import java.nio.file.Paths
         val javaPath = Paths.get(System.getProperty("java.home"), "bin", "java").toFile.getAbsolutePath
-        val jarPath = new File(this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath).getAbsolutePath
+        val jarPath = classPath.path
 
 
         val mainClassName = {
@@ -163,8 +165,7 @@ object SimpleMath {
           s.init
         }
         println(s"mainClassName = ${mainClassName}")
-        val cmd = s"$javaPath -cp $jarPath $mainClassName $i" //be careful not to create fork bombs!
-        println(cmd)
+        val cmd = Debug.log("cmd in processMap")(s"$javaPath -cp $jarPath $mainClassName $i")
 
         import sys.process._
         cmd.split("\\s+").toSeq.!

@@ -1,13 +1,16 @@
 package patsyn
 
+import patsyn.FileInteraction.ClassPath
+
 trait RemoteFunc[A <: Serializable, B <: Serializable] {
   def tempFileName = "tempFile.serialized"
 
-  def jarPath: String
-
   def f(input: A, workingDir: String): B
 
-  def apply(input: A, workingDir: String) = {
+  def apply(input: A, workingDir: String)(implicit cp: ClassPath) = {
+    val classPath = cp.path
+    require(FileInteraction.isAbsolutePath(workingDir), "workingDir is required to be absolute path")
+    require(FileInteraction.isAbsolutePath(classPath), "classPath is required to be absolute path")
     import java.nio.file._
 
     val tempFile = s"$workingDir/$tempFileName"
@@ -22,7 +25,7 @@ trait RemoteFunc[A <: Serializable, B <: Serializable] {
       s.init
     }
 
-    val cmd = s"$javaPath -cp $jarPath $mainClassName $workingDir" //be careful not to create fork bombs!
+    val cmd = Debug.log("cmd")(s"$javaPath -cp $classPath $mainClassName $workingDir")
 
     import sys.process._
     Process(cmd.split("\\s+").toSeq, new java.io.File(workingDir)).!
@@ -31,9 +34,10 @@ trait RemoteFunc[A <: Serializable, B <: Serializable] {
   }
 
   def main(args: Array[String]): Unit = {
-    val tempFile = s"$tempFileName"
+    val workingDir = args.head
+    val tempFile = s"$workingDir/$tempFileName"
     val (false, input) = FileInteraction.readObjectFromFile[(Boolean,A)](tempFile)
-    val result = f(input, ".")
+    val result = f(input, workingDir)
     FileInteraction.saveObjectToFile(tempFile)((true, result))
     System.exit(0)
   }
@@ -42,13 +46,13 @@ trait RemoteFunc[A <: Serializable, B <: Serializable] {
 object ReverseList extends RemoteFunc[List[Int], List[Int]] {
 
   def f(xs: List[Int], workingDir: String) = xs.reverse
-
-  def jarPath: String = "target/scala-2.12/PatternSynthBenchmarkDriver.jar"
 }
 
 object TestRemoteFunc{
   def main(args: Array[String]): Unit = {
-    val workingDir = "."
+    val workingDir = FileInteraction.getCurrentWorkingDir()
+    implicit val classPath: FileInteraction.ClassPath = FileInteraction.getClassPath(inIDE = true)
+
     println{
       ReverseList(List(1,2,3,4,5), workingDir)
     }

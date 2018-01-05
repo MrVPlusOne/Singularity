@@ -122,7 +122,7 @@ object Supernova{
 
   def main(args: Array[String]): Unit = {
     val seed = 3
-    val workingDir = FileInteraction.getWorkingDir(seed)
+    val workingDir = FileInteraction.getTempWorkingDir(seed)
     val rand = new Random(seed)
     val sizePolicy = FixedEvalSize(200)
 
