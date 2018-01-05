@@ -2,6 +2,7 @@ package patsyn
 
 import patsyn.GeneticOperator.ExprGen
 import patsyn.Runner.RunnerConfig
+import patsyn.StandardSystem.{EInt, EVect, IntValue, VectValue}
 
 import scala.util.Random
 
@@ -31,7 +32,7 @@ case class GPEnvGenerator(constRule: PartialFunction[EType, Random => EValue],
 }
 
 
-class Supernova(extraConstRule: PartialFunction[EType, Random => EValue],
+class Supernova(extendedConstRule: (PartialFunction[EType, Random => EValue] => PartialFunction[EType, Random => EValue]),
                 extraSafeFunctions: IS[EFunction],
                 extraUnsafeFunctions: IS[EFunction]
                ){
@@ -42,7 +43,7 @@ class Supernova(extraConstRule: PartialFunction[EType, Random => EValue],
 
     val intRange = aggressiveInterpolate(aggressiveness, 5, 500)(rand.nextDouble()).toInt
     lazy val constRule: PartialFunction[EType, Random => EValue] = PartialFunction[EType, Random => EValue] {
-      case any if extraConstRule.isDefinedAt(any) => extraConstRule(any)
+      case any if extendedConstRule(constRule).isDefinedAt(any) => extendedConstRule(constRule)(any)
       case EInt => r => r.nextInt(intRange)
       case EVect(_) => _ => Vector()
       case EGraph(_) => _ => GraphValue.empty
@@ -115,7 +116,19 @@ class Supernova(extraConstRule: PartialFunction[EType, Random => EValue],
 
 object Supernova{
 
-  val standard = new Supernova(extraConstRule = PartialFunction.empty, IS(), IS())
+  val standard = new Supernova(extendedConstRule = PartialFunction.empty, IS(), IS())
+
+  val accountingWizard: Supernova = {
+    import patsyn.StandardSystem.AccountingWizard._
+    new Supernova(
+      extendedConstRule = rule => {
+        case Command => r => componentSet.mkOrder.eval(
+          IS(rule(EVect(EInt))(r)), rule(EInt)(r), rule(EInt)(r))
+      },
+      extraSafeFunctions = IS(componentSet.mkOrder),
+      extraUnsafeFunctions = IS()
+    )
+  }
 
   def main(args: Array[String]): Unit = {
     val seed = 3
