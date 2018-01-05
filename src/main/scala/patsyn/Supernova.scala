@@ -42,8 +42,9 @@ class Supernova(extendedConstRule: (PartialFunction[EType, Random => EValue] => 
     import SimpleMath.{aggressiveInterpolate, aggressiveSigmoid}
 
     val intRange = aggressiveInterpolate(aggressiveness, 5, 500)(rand.nextDouble()).toInt
+    lazy val exRule = extendedConstRule(constRule)
     lazy val constRule: PartialFunction[EType, Random => EValue] = PartialFunction[EType, Random => EValue] {
-      case any if extendedConstRule(constRule).isDefinedAt(any) => extendedConstRule(constRule)(any)
+      case any if exRule.isDefinedAt(any) => exRule(any)
       case EInt => r => r.nextInt(intRange)
       case EVect(_) => _ => Vector()
       case EGraph(_) => _ => GraphValue.empty

@@ -1,6 +1,7 @@
 package patsyn
 
 import patsyn.Runner.RunnerConfig
+import patsyn.StandardSystem.AccountingWizard
 
 import scala.util.Random
 
@@ -87,6 +88,12 @@ object Playground {
   }
 
   def main(args: Array[String]): Unit = {
-    println("create table t20 " + (1 to 120).map(i => s"${compressNumToString(i)} int").mkString("(",",",")"))
+    println{
+      Supernova.accountingWizard.genGPParameters(IS(AccountingWizard.Command), new util.Random(1))
+    }
+
+    val n = 500
+    println("create table t1 " + (1 to n).map(i => s"${compressNumToString(i)} int").mkString("(",",",")"))
+    println("insert into t1 values" + (1 to n).mkString("(",",",")"))
   }
 }
