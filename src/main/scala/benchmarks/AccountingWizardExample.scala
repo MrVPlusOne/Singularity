@@ -140,28 +140,28 @@ object AccountingWizardFileSizeFunc extends RemoteFunc[(Vector[EValue], Int), Op
   def f(input: (Vector[EValue], Int), workingDir: String): Option[Long] = {
     val values = input._1
     val portNum = 4567 + input._2
+    val ourFiles = Set(workingDir+"/tempFile.serialized", workingDir+"/myCookieFile.txt")
 
-    Cost.reset()
+    FileInteraction.deleteDirIfExist(workingDir, ourFiles + workingDir)
+
+    val size1 = FileInteraction.measureFileSize(ourFiles, workingDir)
 
     // Initialize the server
-    spark.Spark.port(portNum)
-    com.bbn.accounting.wizard.AccountingWizard.main(Array())
+    try {
+      spark.Spark.port(portNum)
+      com.bbn.accounting.wizard.AccountingWizard.main(Array())
 
-    // Translate values into requests and send them
-    BenchmarkSet.handleException(()) {
+      // Translate values into requests and send them
+
       sendRequests(values, workingDir, portNum)
-    }
-    val cost = BenchmarkSet.handleException(0L){
-      FileInteraction.measureFileSize(".store")
-    }
 
+      val cost = FileInteraction.measureFileSize(ourFiles, workingDir) - size1
+      Debug.log("File size")(cost)
+      Some(cost)
+    } finally{
+      spark.Spark.stop()
+    }
     // Cleanup
-    spark.Spark.stop()
-    BenchmarkSet.handleException(()) {
-      FileInteraction.deleteDirIfExist(".store")
-    }
-
-    Some(cost)
   }
 }
 
@@ -209,7 +209,7 @@ object AccountingWizardExample {
 
   def timingExample(ioId: Int)(implicit classPath: ClassPath): ProblemConfig = {
 
-    val workingDir = FileInteraction.getTempWorkingDir(ioId)
+    val workingDir = FileInteraction.getNormalWorkingDir(ioId) //todo
 
     ProblemConfig(
       "stac.e5.accountingwizard.timing",
@@ -225,7 +225,7 @@ object AccountingWizardExample {
   }
 
   def fileSizeExample(ioId: Int)(implicit classPath: ClassPath): ProblemConfig = {
-    val workingDir = FileInteraction.getTempWorkingDir(ioId)
+    val workingDir = FileInteraction.getNormalWorkingDir(ioId) //todo
 
     ProblemConfig(
       "stac.e5.accountingwizard.filesize",
@@ -245,7 +245,7 @@ object AccountingWizardExample {
     timeSupernova.fuzzProblem(
       timingExample(seed),
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
-      ExecutionConfig(evalSizePolicy = FixedEvalSize(10000), timeLimitInMillis = 200000), rand)
+      ExecutionConfig(evalSizePolicy = FixedEvalSize(10000), timeLimitInMillis = 120000), rand)
   }
 
   def runSpaceExample(seed: Int, useGUI: Boolean)(implicit classPath: ClassPath): Unit = {
@@ -253,22 +253,24 @@ object AccountingWizardExample {
     spaceSupernova.fuzzProblem(
       fileSizeExample(seed),
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
-      ExecutionConfig(evalSizePolicy = FixedEvalSize(10000), timeLimitInMillis = 200000), rand)
+      ExecutionConfig(evalSizePolicy = FixedEvalSize(10000), timeLimitInMillis = 120000), rand)
   }
 
 
   def main(args: Array[String]): Unit = {
 
     implicit val classPath: ClassPath = FileInteraction.getClassPath(inIDE = true)
-    SimpleMath.processMap(
-      args,
-      0 until 20,
-      4,
-      this
-    ){
-      i => runSpaceExample(i, useGUI = true)
-    }
-  }
 
+    runSpaceExample(1, useGUI = true)
+
+    //    SimpleMath.processMap(
+//      args,
+//      0 until 20,
+//      4,
+//      this
+//    ){
+//      i => runSpaceExample(i, useGUI = true)
+//    }
+  }
 
 }

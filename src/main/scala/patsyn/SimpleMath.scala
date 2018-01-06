@@ -165,7 +165,7 @@ object SimpleMath {
           s.init
         }
         println(s"mainClassName = ${mainClassName}")
-        val cmd = Debug.log("cmd in processMap")(s"$javaPath -cp $jarPath $mainClassName $i")
+        val cmd = s"$javaPath -cp $jarPath $mainClassName $i"
 
         import sys.process._
         cmd.split("\\s+").toSeq.!

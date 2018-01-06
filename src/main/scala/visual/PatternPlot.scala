@@ -2,8 +2,9 @@ package visual
 
 import javax.swing.JFrame
 
+import benchmarks.AccountingWizardExample
 import patsyn.MultiStateRepresentation.individualToPattern
-import patsyn.StandardSystem.GraphValue
+import patsyn.StandardSystem.{GraphValue, VectValue}
 import patsyn._
 
 import scala.util.Random
@@ -96,39 +97,66 @@ object PatternPlot {
     println("Evaluation finished.")
   }
 
-  def main(args: Array[String]): Unit = {
+  def timeoutTest(): Unit ={
+    implicit val classPath = FileInteraction.getClassPath(inIDE = true)
+    val config = AccountingWizardExample.fileSizeExample(ioId = 1)
 
-//    val config = JGraphTExamples.maxFlow_PushRelabelMFImpl
-//    val sizeLimit = 500
-//    val plotPoints = 100
-//    val files =
-//      """
-//        |/Users/weijiayi/Downloads/size400/jGraphT.maxFlow.PushRelabelMFImpl[performance=2.947238186E9][ioId=123,seed=123](17-12-19-23:45:36)
-//      """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
-//
-//
-//    for (fileLine <- files) {
-//      //      val lastName = "timeoutIndividual.serialized"
+
+    import StandardSystem._
+    val timeoutHead = FileInteraction.readObjectFromFile[EValue]("results/stac.e5.accountingwizard.filesize[performance=timeout][ioId=0,seed=0](18-01-05-17:00:53)/timeoutValue.serialized")
+    val timeoutValue = IS[EValue](timeoutHead, VectValue(Vector(5,1,8,8,2,1,9,3,9,2,0)), 0)
+
+    for(i <- 0 until 100){
+      println(s"timeout value usage [$i]:")
+      config.resourceUsage(timeoutValue)
+    }
+
+  }
+
+  def main(args: Array[String]): Unit = {
+    timeoutTest()
+    return
+
+    implicit val classPath = FileInteraction.getClassPath(inIDE = true)
+    val config = AccountingWizardExample.fileSizeExample(ioId = 1)
+    val sizeLimit = 10000
+    val plotPoints = 3
+    val files =
+      """
+        |results/stac.e5.accountingwizard.filesize[performance=timeout][ioId=1,seed=1](18-01-06-15:40:27)/timeoutIndividual.serialized
+      """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
+
+    import StandardSystem._
+    val timeoutValue = FileInteraction.readObjectFromFile[Vector[EValue]]("results/stac.e5.accountingwizard.filesize[performance=timeout][ioId=1,seed=1](18-01-06-16:17:26)/timeoutValue.serialized")
+
+    Debug.log("timeout value usage"){
+      config.resourceUsage(timeoutValue)
+    }
+
+    return
+    for (fileLine <- files) {
+      val lastName = "timeoutIndividual.serialized"
 //      val lastName = "bestIndividual.serialized"
-//      val file = if (fileLine.endsWith(".serialized")) fileLine else fileLine + "/" + lastName
-//      val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
-//      println("Individual: ")
-//
-//      showResourceUsageChart(config, ind, sizeLimit,
-//        plotPoints = plotPoints, plotName = file, exitOnClose = false,
-//        memoryLimit = sizeLimit * ind.nStates * 4,
-//        patternCreationFeedback = (i, ev) => {
-//          if (i % 1 == 0) {
-//            println(s"input created: $i")
-//            ev match {
-//              case IS(graph: GraphValue, _, _) =>
-//                println {
-//                  MamFormat.showAsMamGraph(graph)
-//                }
-//            }
-//          }
-//        }
-//      )
-//    }
+      val file = if (fileLine.endsWith(".serialized")) fileLine else fileLine + "/" + lastName
+      val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
+      println("Individual: ")
+
+      showResourceUsageChart(config, ind, sizeLimit,
+        plotPoints = plotPoints, plotName = file, exitOnClose = false,
+        memoryLimit = sizeLimit * ind.nStates * 4,
+        patternCreationFeedback = (i, ev) => {
+          if (i % 1 == 0) {
+            println(s"input created: $i")
+            ev match {
+              case IS(graph: GraphValue, _, _) =>
+                println {
+                  MamFormat.showAsMamGraph(graph)
+                }
+              case _ =>
+            }
+          }
+        }
+      )
+    }
   }
 }

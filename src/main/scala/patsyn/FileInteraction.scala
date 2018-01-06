@@ -57,26 +57,33 @@ object FileInteraction{
     Files.deleteIfExists(Paths.get(filePath))
   }
 
-  def deleteDirIfExist(filePath: String): Unit = {
-    def deleteRecursively (file: java.io.File): Unit = {
-      if (!file.exists)
-        return
-      if (file.isDirectory)
-        file.listFiles.foreach(deleteRecursively)
-      if (!file.delete)
-        throw new Exception(s"Unable to delete ${file.getAbsolutePath}")
+  def deleteDirIfExist(filePath: String, whiteList: Set[String] = Set()): Unit = {
+    val file = new File(filePath)
+    if(!file.exists())
+      return
+    require(file.isDirectory)
+
+    file.listFiles.foreach{ f =>
+      if(f.isDirectory){
+        deleteDirIfExist(f.getAbsolutePath, whiteList)
+      }
+
+      if(!(whiteList contains f.getAbsolutePath)){
+        f.delete()
+      }
     }
-    deleteRecursively(new java.io.File(filePath))
   }
 
-  def measureFileSize(filePath: String): Long = {
+  def measureFileSize(blackList: Set[String], filePath: String): Long = {
     def measureRecursively(file: java.io.File): Long = {
+      if(blackList contains file.getAbsolutePath)
+        return 0
       if (!file.exists)
         return 0
       if (file.isDirectory)
         file.listFiles.map(measureRecursively).sum
       else
-        file.length
+        file.length()
     }
     measureRecursively(new java.io.File(filePath))
   }
@@ -94,9 +101,10 @@ object FileInteraction{
   }
 
   def mkDirsAlongPath(path: String): Unit = {
+    val prefix = if(path.startsWith("/")) "/" else ""
     val parts = path.split("/").filterNot(_.isEmpty)
     require(parts.length>=1, s"invalid path format: '$path'")
-    parts.tail.scanLeft(parts.head){ case (p0, part) => p0 + "/" + part }.foreach{ p =>
+    parts.tail.scanLeft(prefix + parts.head){ case (p0, part) => p0 + "/" + part }.foreach{ p =>
       val f = new File(p)
       if(!f.exists()){
         f.mkdir()
@@ -132,6 +140,12 @@ object FileInteraction{
     val workingDirPath = java.nio.file.Files.createTempDirectory(workingDirPrefix)
     workingDirPath.toFile.deleteOnExit()
     workingDirPath.toString
+  }
+
+  def getNormalWorkingDir(ioId: Int): String = {
+    val s = s"${getCurrentWorkingDir()}/temp/workingDir$ioId"
+    mkDirsAlongPath(s)
+    s
   }
 
   def saveMultiIndToFile(path: String)(ind: MultiStateInd): Unit = ind match {
