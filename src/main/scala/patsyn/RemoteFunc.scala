@@ -1,6 +1,7 @@
 package patsyn
 
 import patsyn.FileInteraction.ClassPath
+import patsyn.RemoteFunc.{RemoteFailure, RemoteInput, RemoteResult, RemoteSuccess}
 
 trait RemoteFunc[A <: Serializable, B <: Serializable] {
   def tempFileName = "tempFile.serialized"
@@ -14,7 +15,7 @@ trait RemoteFunc[A <: Serializable, B <: Serializable] {
     import java.nio.file._
 
     val tempFile = s"$workingDir/$tempFileName"
-    FileInteraction.saveObjectToFile(tempFile)((false, input))
+    FileInteraction.saveObjectToFile(tempFile)(RemoteInput(input))
 
     val javaPath = Paths.get(System.getProperty("java.home"), "bin", "java").toFile.getAbsolutePath
 //    val jarPath = new File(this.getClass.getProtectionDomain.getCodeSource.getLocation.toURI.getPath).getAbsolutePath
@@ -25,22 +26,40 @@ trait RemoteFunc[A <: Serializable, B <: Serializable] {
       s.init
     }
 
-    val cmd = Debug.log("cmd")(s"$javaPath -cp $classPath $mainClassName $workingDir")
+    val cmd = s"$javaPath -cp $classPath $mainClassName $workingDir"
 
     import sys.process._
     Process(cmd.split("\\s+").toSeq, new java.io.File(workingDir)).!
-    val (true, result) = FileInteraction.readObjectFromFile[(Boolean,B)](tempFile)
-    result
+    FileInteraction.readObjectFromFile[RemoteResult[B]](tempFile) match {
+      case RemoteSuccess(result) => result
+      case RemoteFailure(ex) =>
+        System.err.println("Remote Exception: ")
+        throw ex
+    }
   }
 
   def main(args: Array[String]): Unit = {
     val workingDir = args.head
     val tempFile = s"$workingDir/$tempFileName"
-    val (false, input) = FileInteraction.readObjectFromFile[(Boolean,A)](tempFile)
-    val result = f(input, workingDir)
-    FileInteraction.saveObjectToFile(tempFile)((true, result))
-    System.exit(0)
+
+    try {
+      val input = FileInteraction.readObjectFromFile[RemoteInput[A]](tempFile).input
+      val result = f(input, workingDir)
+      FileInteraction.saveObjectToFile(tempFile)(RemoteSuccess(result))
+    } catch {
+      case ex: Exception => FileInteraction.saveObjectToFile(tempFile)(RemoteFailure(ex))
+    } finally {
+      System.exit(0)
+    }
   }
+}
+
+object RemoteFunc{
+  case class RemoteInput[A](input: A)
+
+  trait RemoteResult[+A] extends Serializable
+  case class RemoteSuccess[A](input: A) extends RemoteResult[A]
+  case class RemoteFailure(msg: Exception) extends RemoteResult[Nothing]
 }
 
 object ReverseList extends RemoteFunc[List[Int], List[Int]] {
