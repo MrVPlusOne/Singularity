@@ -8,4 +8,8 @@ object Debug {
     println(s"[$name end]")
     r
   }
+
+  def logLn[A](s: String): Unit ={
+    println(s)
+  }
 }
