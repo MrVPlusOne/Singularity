@@ -97,6 +97,8 @@ implements Serializable {
             if (e == 0 && e1 == 0 && e2 == 0 && e3 == 0 && e4 == 0) {
                 session.starttime = System.currentTimeMillis();
                 this.readysessions.put(session.starttime, session);
+                Debug.logLn("Session data1 length: " + data1.length);
+                Debug.logLn("Session start: " + session.start);
                 int totall = data1.length - session.start;
                 for (int x = data1.length - 1; x >= 0 && data1[x] == 0; --x) {
                     --totall;

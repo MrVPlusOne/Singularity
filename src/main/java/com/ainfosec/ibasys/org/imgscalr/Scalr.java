@@ -386,6 +386,7 @@ public class Scalr {
         if (params.length > 0 && params[0] != null) {
             try {
                 XMLEncoder e = new XMLEncoder(new BufferedOutputStream(new FileOutputStream("logs/" + params[0].hashCode() + "log.xml")));
+                System.out.println("Log to hash: " + params[0].hashCode());
                 e.writeObject(params[0].toString());
                 e.close();
             }

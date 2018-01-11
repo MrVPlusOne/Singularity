@@ -6,11 +6,31 @@ import com.ainfosec.ibasys.client.IBASysClient
 
 object IBASys {
   def main(args: Array[String]): Unit = {
-
+    attackingClient()
   }
 
   def attackingClient(): Unit ={
+    IBASysClient.runMaliciousClient(Array("client", "localhost", "hansolo", "images/correct_image.jpg"))
+  }
 
+  def emptyByteSeq(blockSize: Int, blocks: Int): Array[Byte] = {
+    (0 until blocks).flatMap{ b =>
+      (b until b+blockSize/4).map(_.toByte) ++ Array.fill(blockSize/4*3)(0.toByte)
+    }.toArray
+  }
+
+  def getImageData(size: Int): Array[Byte] = {
+    Array.fill(size)(1.toByte)
+  }
+
+  def getExtraData(blockSize: Int, repeats: Int): Array[Array[Byte]] = {
+    (0 until repeats*2).map{ i =>
+      if(i % 2 == 0){
+        Array.fill(blockSize)(0.toByte)
+      }else{
+        Array.fill(blockSize/2)(1.toByte) ++ Array.fill(blockSize - blockSize/2)(0.toByte)
+      }
+    }.toArray
   }
 
   /** Question 24 success chance */

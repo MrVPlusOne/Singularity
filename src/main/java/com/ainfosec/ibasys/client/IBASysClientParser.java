@@ -189,6 +189,26 @@ public class IBASysClientParser {
         return datastate;
     }
 
+    DataHolder makeDataHolder(byte[] iv, int packetSum, byte[] extractBytes, String uname) throws IOException {
+        DataHolder datastate = new DataHolder();
+        Object response = null;
+        try {
+            datastate.data = extractBytes;
+            datastate.aeskey = this.aesKey;
+            datastate.iv = iv;
+            this.prepareHeaderBuffer("public.der", datastate, uname);
+            byte[] fileContentFULL = null;
+            assert (datastate.aesencrypteddata[datastate.aesencrypteddata.length - 1] != 0);
+        }
+        catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(IBASysClientParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (GeneralSecurityException ex) {
+            Logger.getLogger(IBASysClientParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return datastate;
+    }
+
     public boolean lowLevelSend(DataHolder datastate) {
         int start = 0;
         int increment = 10000;
@@ -214,10 +234,82 @@ public class IBASysClientParser {
         return true;
     }
 
-    public boolean lowLevelSendPart(ByteBuffer buffer) {
-        if (this.gotresponse && buffer == null) {
-            return false;
+    public boolean modifiedlLowLevelSend(DataHolder datastate, byte[][] extraData, byte[][] extraHeaders) {
+        int start = 0;
+        int increment = 10000;
+        for (start = 0; start < datastate.aesencrypteddata.length; start += increment) {
+            int end = start + increment;
+            if (end > datastate.aesencrypteddata.length) {
+                end = datastate.aesencrypteddata.length;
+            }
+            byte[] bufferpart = Arrays.copyOfRange(datastate.aesencrypteddata, start, end);
+            byte s = bufferpart[0];
+            byte e = bufferpart[increment - 1];
+            ByteArrayOutputStream baes = new ByteArrayOutputStream();
+            try {
+                baes.write(datastate.header);
+                baes.write(bufferpart);
+                this.lowLevelSendPart(ByteBuffer.wrap(baes.toByteArray()));
+                baes.close();
+            }
+            catch (IOException ex) {
+                Logger.getLogger(IBASysClientParser.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+
+        for (int i = 0; i < extraData.length; i+=1) {
+            ByteArrayOutputStream baes = new ByteArrayOutputStream();
+            byte[] data = extraData[i];
+            byte[] header = extraHeaders[i];
+            try {
+                baes.write(header);
+                baes.write(data);
+                this.lowLevelSendPart(ByteBuffer.wrap(baes.toByteArray()));
+                baes.close();
+                System.out.println("Extra data " + i + " sent.");
+            }
+            catch (IOException ex) {
+                Logger.getLogger(IBASysClientParser.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return true;
+    }
+
+    public boolean modifiedLowLevelSendPart(ByteBuffer buffer, boolean waitResult) {
+        //        if (this.gotresponse && buffer == null) {
+//            return false;
+//        }
+        try {
+            if (buffer != null) {
+                int write = client.write(buffer);
+                buffer.clear();
+            }
+            if(waitResult) {
+                ByteBuffer bufferin = ByteBuffer.allocate(1000);
+                bufferin.flip();
+                byte[] array = bufferin.array();
+                Charset charset = Charset.forName("us-ascii");
+                CharsetDecoder decoder = charset.newDecoder();
+                CharBuffer charBuffer = decoder.decode(bufferin);
+                String result = charBuffer.toString();
+                if (result.contains("result")) {
+                    this.gotresponse = true;
+                }
+                IntBuffer ibuf = bufferin.asIntBuffer();
+                int[] iarr = new int[10];
+                bufferin.clear();
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    public boolean lowLevelSendPart(ByteBuffer buffer) {
+//        if (this.gotresponse && buffer == null) {
+//            return false;
+//        }
         try {
             if (buffer != null) {
                 int write = client.write(buffer);
@@ -287,6 +379,15 @@ public class IBASysClientParser {
         bbuff.write(aeskeyrsaencrypt);
         bbuff.write(datastate.iv);
         datastate.header = bbuff.toByteArray();
+    }
+
+    public byte[] mkHeader(String pkey, DataHolder datastate, String uname) throws IOException, GeneralSecurityException {
+        File pkeyfile = new File(pkey);
+        byte[] aeskeyrsaencrypt = this.rsaEncryptAESKey(datastate.aeskey, pkeyfile, uname);
+        ByteArrayOutputStream bbuff = new ByteArrayOutputStream(aeskeyrsaencrypt.length + datastate.iv.length);
+        bbuff.write(aeskeyrsaencrypt);
+        bbuff.write(datastate.iv);
+        return bbuff.toByteArray();
     }
 
     public class DataHolder {
