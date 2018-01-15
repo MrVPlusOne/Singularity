@@ -102,14 +102,14 @@ object AccountingWizardRunningTimeFunc extends RemoteFunc[(Vector[EValue], Int),
     val values = input._1
     val portNum = 4567 + input._2
 
-    Some(BenchmarkSet.measureCost {
+    Some(CostMeasurement.measureCost {
 
       // Initialize the server
       spark.Spark.port(portNum)
       com.bbn.accounting.wizard.AccountingWizard.main(Array())
 
       // Translate values into requests and send them
-      BenchmarkSet.handleException(()) {
+      CostMeasurement.handleException(()) {
         sendRequests(values, workingDir, portNum)
 
         // Cleanup

@@ -117,7 +117,7 @@ class Supernova(extendedConstRule: (PartialFunction[EType, Random => EValue] => 
 
 object Supernova{
 
-  val standard = new Supernova(extendedConstRule = PartialFunction.empty, IS(), IS())
+  val standard = new Supernova(extendedConstRule = _ => PartialFunction.empty, IS(), IS())
 
 
   def main(args: Array[String]): Unit = {

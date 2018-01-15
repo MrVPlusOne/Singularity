@@ -3,7 +3,7 @@ package benchmarks
 import edu.utexas.stac.Cost
 
 
-object BenchmarkSet {
+object CostMeasurement {
   def measureCost[A](f: => A): Long = {
     Cost.reset()
     f
