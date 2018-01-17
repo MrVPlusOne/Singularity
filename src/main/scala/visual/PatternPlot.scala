@@ -113,27 +113,59 @@ object PatternPlot {
 
   }
 
+  def testAccountingWizard(): Unit ={
+    import StandardSystem._
+
+    implicit val classPath = FileInteraction.getClassPath(inIDE = true)
+    val config = AccountingWizardExample.fileSizeExample(ioId = 1)
+    val sizeLimit = 10000
+    val plotPoints = 50
+    val file =
+      """
+        |results/seed101/bestInput.serialized
+      """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty).head
+
+    val inputValue = FileInteraction.readObjectFromFile[Vector[EValue]](file)
+    println("Individual: ")
+
+    val Vector(orders: VectValue, name, budget) = inputValue
+
+    val nameContent = name.asInstanceOf[VectValue].value
+    val largerInput = IS(VectValue(Vector.fill(6)(orders.value).flatten),
+      VectValue(Vector.fill(600)(IntValue(-316))++nameContent), budget)
+//    Debug.log("name length")(name.asInstanceOf[VectValue].value.length)
+    println{
+      config.sizeF(largerInput)
+    }
+    println{
+      config.resourceUsage(largerInput)
+    }
+
+
+  }
+
   def main(args: Array[String]): Unit = {
-    timeoutTest()
+//    timeoutTest()
+    testAccountingWizard()
     return
 
     implicit val classPath = FileInteraction.getClassPath(inIDE = true)
     val config = AccountingWizardExample.fileSizeExample(ioId = 1)
     val sizeLimit = 10000
-    val plotPoints = 3
+    val plotPoints = 50
     val files =
       """
-        |results/stac.e5.accountingwizard.filesize[performance=timeout][ioId=1,seed=1](18-01-06-15:40:27)/timeoutIndividual.serialized
+        |results/seed101/bestIndividual.serialized
       """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
 
-    import StandardSystem._
-    val timeoutValue = FileInteraction.readObjectFromFile[Vector[EValue]]("results/stac.e5.accountingwizard.filesize[performance=timeout][ioId=1,seed=1](18-01-06-16:17:26)/timeoutValue.serialized")
+//    import StandardSystem._
+//    val timeoutValue = FileInteraction.readObjectFromFile[Vector[EValue]]("results/stac.e5.accountingwizard.filesize[performance=timeout][ioId=1,seed=1](18-01-06-16:17:26)/timeoutValue.serialized")
+//
+//    Debug.log("timeout value usage"){
+//      config.resourceUsage(timeoutValue)
+//    }
 
-    Debug.log("timeout value usage"){
-      config.resourceUsage(timeoutValue)
-    }
 
-    return
     for (fileLine <- files) {
       val lastName = "timeoutIndividual.serialized"
 //      val lastName = "bestIndividual.serialized"

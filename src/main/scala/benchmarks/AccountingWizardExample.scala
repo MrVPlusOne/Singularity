@@ -41,8 +41,29 @@ object AccountingWizardFuncHelper {
     }
   }
 
+  implicit class Cmd(cmd: Seq[String]){
+    def ! : Unit = {
+      import scala.sys.process._
+      println{
+        cmd.mkString(" ")
+      }
+      cmd.!!
+    }
+
+    def run = this.!
+  }
+//
+//  def sendAndPrint(cmd: Seq[String]): Unit ={
+//    import scala.sys.process._
+//    import env._
+//    println{
+//      cmd
+//    }
+//    cmd.!
+//  }
+
   def managerSetup(env: ServerEnv, projectName: String, projectCap: Int) = {
-    import scala.sys.process._
+//    import scala.sys.process._
     import env._
 
     (curlPrefix ++ postMethodPrefix ++ genCookiePrefix ++ dataPrefix("""{"username":"Burger.King", "password":"BK4CLGBG"}""") ++ loginSite).!
@@ -53,25 +74,25 @@ object AccountingWizardFuncHelper {
   }
 
   def managerQuery(env: ServerEnv) = {
-    import scala.sys.process._
+    import scala.sys.process.{ProcessLogger}
     import env._
 
     (curlPrefix ++ postMethodPrefix ++ genCookiePrefix ++ dataPrefix("""{"username":"Burger.King", "password":"BK4CLGBG"}""") ++ loginSite).!
-    (curlPrefix ++ getMethodPrefix ++ useCookiePrefix ++ expenditureReportSite).run( ProcessLogger(line => ()))
+    (curlPrefix ++ getMethodPrefix ++ useCookiePrefix ++ expenditureReportSite).!
     (curlPrefix ++ getMethodPrefix ++ logoutSite).!
 
     FileInteraction.deleteIfExist(cookieFile)
   }
 
   def employeeRequest(env: ServerEnv, projectName: String, values: Vector[EValue]) = {
-    import scala.sys.process._
+    import scala.sys.process.ProcessLogger
     import env._
 
     (curlPrefix ++ postMethodPrefix ++ genCookiePrefix ++ dataPrefix("""{"username":"Marie.Callender", "password":"MC1CRNCPNC"}""") ++ loginSite).!
 
     values.map {
       cmd =>
-        (curlPrefix ++ postMethodPrefix ++ useCookiePrefix ++ dataPrefix(AccountingWizardExample.cmdToJson(cmd)) ++ orderItemSite(projectName)).run(ProcessLogger(line => ()))
+        (curlPrefix ++ postMethodPrefix ++ useCookiePrefix ++ dataPrefix(AccountingWizardExample.cmdToJson(cmd)) ++ orderItemSite(projectName)).!
     }
 
     (curlPrefix ++ getMethodPrefix ++ logoutSite).!
