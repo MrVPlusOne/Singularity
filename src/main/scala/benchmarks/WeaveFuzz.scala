@@ -4,7 +4,7 @@ import patsyn.ProblemConfig
 import patsyn.Runner.RunnerConfig
 import patsyn._
 import patsyn.StandardSystem._
-import weave.Weave
+import weave_original.Weave
 
 import scala.util.Random
 

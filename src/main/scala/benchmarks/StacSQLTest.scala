@@ -100,8 +100,30 @@ object StacSQLTest {
     println(s"update t set d = ${encode64(largeData)}")
   }
 
+  def treeTheory(): Unit = {
+    val colNum = 8
+    val rowNum = 50
+    //    val codes = validEncodes.take(rowNum).toVector
+
+    val initData = encode64(Array(0,1,2))
+
+    println(s"create table t (${(0 until colNum).map(c => s"d$c blob").mkString(",")})")
+    for(i <- 0 until rowNum){
+      println(s"insert into t values (${List.fill(colNum)(initData).mkString(",")})")
+    }
+
+    val updateNum = 105
+    for(i <- 0 until updateNum){
+      val data = encode64(Array(0,0,(i+3).toByte))
+      println(s"update t set ${(0 until colNum).map{c => (s"d$c = $data")}.mkString(",")}")
+    }
+
+//    val largeData = Array.fill(245)(Array[Byte](0,1,2)).flatten
+//    println(s"update t set d = ${encode64(largeData)}")
+  }
+
   def main(args: Array[String]): Unit = {
-    printScript()
+    treeTheory()
 
 
 

@@ -1,0 +1,157 @@
+create table t (d0 blob,d1 blob,d2 blob,d3 blob,d4 blob,d5 blob,d6 blob,d7 blob)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+insert into t values (AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC,AAEC)
+update t set d0 = AAAD,d1 = AAAD,d2 = AAAD,d3 = AAAD,d4 = AAAD,d5 = AAAD,d6 = AAAD,d7 = AAAD
+update t set d0 = AAAE,d1 = AAAE,d2 = AAAE,d3 = AAAE,d4 = AAAE,d5 = AAAE,d6 = AAAE,d7 = AAAE
+update t set d0 = AAAF,d1 = AAAF,d2 = AAAF,d3 = AAAF,d4 = AAAF,d5 = AAAF,d6 = AAAF,d7 = AAAF
+update t set d0 = AAAG,d1 = AAAG,d2 = AAAG,d3 = AAAG,d4 = AAAG,d5 = AAAG,d6 = AAAG,d7 = AAAG
+update t set d0 = AAAH,d1 = AAAH,d2 = AAAH,d3 = AAAH,d4 = AAAH,d5 = AAAH,d6 = AAAH,d7 = AAAH
+update t set d0 = AAAI,d1 = AAAI,d2 = AAAI,d3 = AAAI,d4 = AAAI,d5 = AAAI,d6 = AAAI,d7 = AAAI
+update t set d0 = AAAJ,d1 = AAAJ,d2 = AAAJ,d3 = AAAJ,d4 = AAAJ,d5 = AAAJ,d6 = AAAJ,d7 = AAAJ
+update t set d0 = AAAK,d1 = AAAK,d2 = AAAK,d3 = AAAK,d4 = AAAK,d5 = AAAK,d6 = AAAK,d7 = AAAK
+update t set d0 = AAAL,d1 = AAAL,d2 = AAAL,d3 = AAAL,d4 = AAAL,d5 = AAAL,d6 = AAAL,d7 = AAAL
+update t set d0 = AAAM,d1 = AAAM,d2 = AAAM,d3 = AAAM,d4 = AAAM,d5 = AAAM,d6 = AAAM,d7 = AAAM
+update t set d0 = AAAN,d1 = AAAN,d2 = AAAN,d3 = AAAN,d4 = AAAN,d5 = AAAN,d6 = AAAN,d7 = AAAN
+update t set d0 = AAAO,d1 = AAAO,d2 = AAAO,d3 = AAAO,d4 = AAAO,d5 = AAAO,d6 = AAAO,d7 = AAAO
+update t set d0 = AAAP,d1 = AAAP,d2 = AAAP,d3 = AAAP,d4 = AAAP,d5 = AAAP,d6 = AAAP,d7 = AAAP
+update t set d0 = AAAQ,d1 = AAAQ,d2 = AAAQ,d3 = AAAQ,d4 = AAAQ,d5 = AAAQ,d6 = AAAQ,d7 = AAAQ
+update t set d0 = AAAR,d1 = AAAR,d2 = AAAR,d3 = AAAR,d4 = AAAR,d5 = AAAR,d6 = AAAR,d7 = AAAR
+update t set d0 = AAAS,d1 = AAAS,d2 = AAAS,d3 = AAAS,d4 = AAAS,d5 = AAAS,d6 = AAAS,d7 = AAAS
+update t set d0 = AAAT,d1 = AAAT,d2 = AAAT,d3 = AAAT,d4 = AAAT,d5 = AAAT,d6 = AAAT,d7 = AAAT
+update t set d0 = AAAU,d1 = AAAU,d2 = AAAU,d3 = AAAU,d4 = AAAU,d5 = AAAU,d6 = AAAU,d7 = AAAU
+update t set d0 = AAAV,d1 = AAAV,d2 = AAAV,d3 = AAAV,d4 = AAAV,d5 = AAAV,d6 = AAAV,d7 = AAAV
+update t set d0 = AAAW,d1 = AAAW,d2 = AAAW,d3 = AAAW,d4 = AAAW,d5 = AAAW,d6 = AAAW,d7 = AAAW
+update t set d0 = AAAX,d1 = AAAX,d2 = AAAX,d3 = AAAX,d4 = AAAX,d5 = AAAX,d6 = AAAX,d7 = AAAX
+update t set d0 = AAAY,d1 = AAAY,d2 = AAAY,d3 = AAAY,d4 = AAAY,d5 = AAAY,d6 = AAAY,d7 = AAAY
+update t set d0 = AAAZ,d1 = AAAZ,d2 = AAAZ,d3 = AAAZ,d4 = AAAZ,d5 = AAAZ,d6 = AAAZ,d7 = AAAZ
+update t set d0 = AAAa,d1 = AAAa,d2 = AAAa,d3 = AAAa,d4 = AAAa,d5 = AAAa,d6 = AAAa,d7 = AAAa
+update t set d0 = AAAb,d1 = AAAb,d2 = AAAb,d3 = AAAb,d4 = AAAb,d5 = AAAb,d6 = AAAb,d7 = AAAb
+update t set d0 = AAAc,d1 = AAAc,d2 = AAAc,d3 = AAAc,d4 = AAAc,d5 = AAAc,d6 = AAAc,d7 = AAAc
+update t set d0 = AAAd,d1 = AAAd,d2 = AAAd,d3 = AAAd,d4 = AAAd,d5 = AAAd,d6 = AAAd,d7 = AAAd
+update t set d0 = AAAe,d1 = AAAe,d2 = AAAe,d3 = AAAe,d4 = AAAe,d5 = AAAe,d6 = AAAe,d7 = AAAe
+update t set d0 = AAAf,d1 = AAAf,d2 = AAAf,d3 = AAAf,d4 = AAAf,d5 = AAAf,d6 = AAAf,d7 = AAAf
+update t set d0 = AAAg,d1 = AAAg,d2 = AAAg,d3 = AAAg,d4 = AAAg,d5 = AAAg,d6 = AAAg,d7 = AAAg
+update t set d0 = AAAh,d1 = AAAh,d2 = AAAh,d3 = AAAh,d4 = AAAh,d5 = AAAh,d6 = AAAh,d7 = AAAh
+update t set d0 = AAAi,d1 = AAAi,d2 = AAAi,d3 = AAAi,d4 = AAAi,d5 = AAAi,d6 = AAAi,d7 = AAAi
+update t set d0 = AAAj,d1 = AAAj,d2 = AAAj,d3 = AAAj,d4 = AAAj,d5 = AAAj,d6 = AAAj,d7 = AAAj
+update t set d0 = AAAk,d1 = AAAk,d2 = AAAk,d3 = AAAk,d4 = AAAk,d5 = AAAk,d6 = AAAk,d7 = AAAk
+update t set d0 = AAAl,d1 = AAAl,d2 = AAAl,d3 = AAAl,d4 = AAAl,d5 = AAAl,d6 = AAAl,d7 = AAAl
+update t set d0 = AAAm,d1 = AAAm,d2 = AAAm,d3 = AAAm,d4 = AAAm,d5 = AAAm,d6 = AAAm,d7 = AAAm
+update t set d0 = AAAn,d1 = AAAn,d2 = AAAn,d3 = AAAn,d4 = AAAn,d5 = AAAn,d6 = AAAn,d7 = AAAn
+update t set d0 = AAAo,d1 = AAAo,d2 = AAAo,d3 = AAAo,d4 = AAAo,d5 = AAAo,d6 = AAAo,d7 = AAAo
+update t set d0 = AAAp,d1 = AAAp,d2 = AAAp,d3 = AAAp,d4 = AAAp,d5 = AAAp,d6 = AAAp,d7 = AAAp
+update t set d0 = AAAq,d1 = AAAq,d2 = AAAq,d3 = AAAq,d4 = AAAq,d5 = AAAq,d6 = AAAq,d7 = AAAq
+update t set d0 = AAAr,d1 = AAAr,d2 = AAAr,d3 = AAAr,d4 = AAAr,d5 = AAAr,d6 = AAAr,d7 = AAAr
+update t set d0 = AAAs,d1 = AAAs,d2 = AAAs,d3 = AAAs,d4 = AAAs,d5 = AAAs,d6 = AAAs,d7 = AAAs
+update t set d0 = AAAt,d1 = AAAt,d2 = AAAt,d3 = AAAt,d4 = AAAt,d5 = AAAt,d6 = AAAt,d7 = AAAt
+update t set d0 = AAAu,d1 = AAAu,d2 = AAAu,d3 = AAAu,d4 = AAAu,d5 = AAAu,d6 = AAAu,d7 = AAAu
+update t set d0 = AAAv,d1 = AAAv,d2 = AAAv,d3 = AAAv,d4 = AAAv,d5 = AAAv,d6 = AAAv,d7 = AAAv
+update t set d0 = AAAw,d1 = AAAw,d2 = AAAw,d3 = AAAw,d4 = AAAw,d5 = AAAw,d6 = AAAw,d7 = AAAw
+update t set d0 = AAAx,d1 = AAAx,d2 = AAAx,d3 = AAAx,d4 = AAAx,d5 = AAAx,d6 = AAAx,d7 = AAAx
+update t set d0 = AAAy,d1 = AAAy,d2 = AAAy,d3 = AAAy,d4 = AAAy,d5 = AAAy,d6 = AAAy,d7 = AAAy
+update t set d0 = AAAz,d1 = AAAz,d2 = AAAz,d3 = AAAz,d4 = AAAz,d5 = AAAz,d6 = AAAz,d7 = AAAz
+update t set d0 = AAA0,d1 = AAA0,d2 = AAA0,d3 = AAA0,d4 = AAA0,d5 = AAA0,d6 = AAA0,d7 = AAA0
+update t set d0 = AAA1,d1 = AAA1,d2 = AAA1,d3 = AAA1,d4 = AAA1,d5 = AAA1,d6 = AAA1,d7 = AAA1
+update t set d0 = AAA2,d1 = AAA2,d2 = AAA2,d3 = AAA2,d4 = AAA2,d5 = AAA2,d6 = AAA2,d7 = AAA2
+update t set d0 = AAA3,d1 = AAA3,d2 = AAA3,d3 = AAA3,d4 = AAA3,d5 = AAA3,d6 = AAA3,d7 = AAA3
+update t set d0 = AAA4,d1 = AAA4,d2 = AAA4,d3 = AAA4,d4 = AAA4,d5 = AAA4,d6 = AAA4,d7 = AAA4
+update t set d0 = AAA5,d1 = AAA5,d2 = AAA5,d3 = AAA5,d4 = AAA5,d5 = AAA5,d6 = AAA5,d7 = AAA5
+update t set d0 = AAA6,d1 = AAA6,d2 = AAA6,d3 = AAA6,d4 = AAA6,d5 = AAA6,d6 = AAA6,d7 = AAA6
+update t set d0 = AAA7,d1 = AAA7,d2 = AAA7,d3 = AAA7,d4 = AAA7,d5 = AAA7,d6 = AAA7,d7 = AAA7
+update t set d0 = AAA8,d1 = AAA8,d2 = AAA8,d3 = AAA8,d4 = AAA8,d5 = AAA8,d6 = AAA8,d7 = AAA8
+update t set d0 = AAA9,d1 = AAA9,d2 = AAA9,d3 = AAA9,d4 = AAA9,d5 = AAA9,d6 = AAA9,d7 = AAA9
+update t set d0 = AAA+,d1 = AAA+,d2 = AAA+,d3 = AAA+,d4 = AAA+,d5 = AAA+,d6 = AAA+,d7 = AAA+
+update t set d0 = AAA/,d1 = AAA/,d2 = AAA/,d3 = AAA/,d4 = AAA/,d5 = AAA/,d6 = AAA/,d7 = AAA/
+update t set d0 = AABA,d1 = AABA,d2 = AABA,d3 = AABA,d4 = AABA,d5 = AABA,d6 = AABA,d7 = AABA
+update t set d0 = AABB,d1 = AABB,d2 = AABB,d3 = AABB,d4 = AABB,d5 = AABB,d6 = AABB,d7 = AABB
+update t set d0 = AABC,d1 = AABC,d2 = AABC,d3 = AABC,d4 = AABC,d5 = AABC,d6 = AABC,d7 = AABC
+update t set d0 = AABD,d1 = AABD,d2 = AABD,d3 = AABD,d4 = AABD,d5 = AABD,d6 = AABD,d7 = AABD
+update t set d0 = AABE,d1 = AABE,d2 = AABE,d3 = AABE,d4 = AABE,d5 = AABE,d6 = AABE,d7 = AABE
+update t set d0 = AABF,d1 = AABF,d2 = AABF,d3 = AABF,d4 = AABF,d5 = AABF,d6 = AABF,d7 = AABF
+update t set d0 = AABG,d1 = AABG,d2 = AABG,d3 = AABG,d4 = AABG,d5 = AABG,d6 = AABG,d7 = AABG
+update t set d0 = AABH,d1 = AABH,d2 = AABH,d3 = AABH,d4 = AABH,d5 = AABH,d6 = AABH,d7 = AABH
+update t set d0 = AABI,d1 = AABI,d2 = AABI,d3 = AABI,d4 = AABI,d5 = AABI,d6 = AABI,d7 = AABI
+update t set d0 = AABJ,d1 = AABJ,d2 = AABJ,d3 = AABJ,d4 = AABJ,d5 = AABJ,d6 = AABJ,d7 = AABJ
+update t set d0 = AABK,d1 = AABK,d2 = AABK,d3 = AABK,d4 = AABK,d5 = AABK,d6 = AABK,d7 = AABK
+update t set d0 = AABL,d1 = AABL,d2 = AABL,d3 = AABL,d4 = AABL,d5 = AABL,d6 = AABL,d7 = AABL
+update t set d0 = AABM,d1 = AABM,d2 = AABM,d3 = AABM,d4 = AABM,d5 = AABM,d6 = AABM,d7 = AABM
+update t set d0 = AABN,d1 = AABN,d2 = AABN,d3 = AABN,d4 = AABN,d5 = AABN,d6 = AABN,d7 = AABN
+update t set d0 = AABO,d1 = AABO,d2 = AABO,d3 = AABO,d4 = AABO,d5 = AABO,d6 = AABO,d7 = AABO
+update t set d0 = AABP,d1 = AABP,d2 = AABP,d3 = AABP,d4 = AABP,d5 = AABP,d6 = AABP,d7 = AABP
+update t set d0 = AABQ,d1 = AABQ,d2 = AABQ,d3 = AABQ,d4 = AABQ,d5 = AABQ,d6 = AABQ,d7 = AABQ
+update t set d0 = AABR,d1 = AABR,d2 = AABR,d3 = AABR,d4 = AABR,d5 = AABR,d6 = AABR,d7 = AABR
+update t set d0 = AABS,d1 = AABS,d2 = AABS,d3 = AABS,d4 = AABS,d5 = AABS,d6 = AABS,d7 = AABS
+update t set d0 = AABT,d1 = AABT,d2 = AABT,d3 = AABT,d4 = AABT,d5 = AABT,d6 = AABT,d7 = AABT
+update t set d0 = AABU,d1 = AABU,d2 = AABU,d3 = AABU,d4 = AABU,d5 = AABU,d6 = AABU,d7 = AABU
+update t set d0 = AABV,d1 = AABV,d2 = AABV,d3 = AABV,d4 = AABV,d5 = AABV,d6 = AABV,d7 = AABV
+update t set d0 = AABW,d1 = AABW,d2 = AABW,d3 = AABW,d4 = AABW,d5 = AABW,d6 = AABW,d7 = AABW
+update t set d0 = AABX,d1 = AABX,d2 = AABX,d3 = AABX,d4 = AABX,d5 = AABX,d6 = AABX,d7 = AABX
+update t set d0 = AABY,d1 = AABY,d2 = AABY,d3 = AABY,d4 = AABY,d5 = AABY,d6 = AABY,d7 = AABY
+update t set d0 = AABZ,d1 = AABZ,d2 = AABZ,d3 = AABZ,d4 = AABZ,d5 = AABZ,d6 = AABZ,d7 = AABZ
+update t set d0 = AABa,d1 = AABa,d2 = AABa,d3 = AABa,d4 = AABa,d5 = AABa,d6 = AABa,d7 = AABa
+update t set d0 = AABb,d1 = AABb,d2 = AABb,d3 = AABb,d4 = AABb,d5 = AABb,d6 = AABb,d7 = AABb
+update t set d0 = AABc,d1 = AABc,d2 = AABc,d3 = AABc,d4 = AABc,d5 = AABc,d6 = AABc,d7 = AABc
+update t set d0 = AABd,d1 = AABd,d2 = AABd,d3 = AABd,d4 = AABd,d5 = AABd,d6 = AABd,d7 = AABd
+update t set d0 = AABe,d1 = AABe,d2 = AABe,d3 = AABe,d4 = AABe,d5 = AABe,d6 = AABe,d7 = AABe
+update t set d0 = AABf,d1 = AABf,d2 = AABf,d3 = AABf,d4 = AABf,d5 = AABf,d6 = AABf,d7 = AABf
+update t set d0 = AABg,d1 = AABg,d2 = AABg,d3 = AABg,d4 = AABg,d5 = AABg,d6 = AABg,d7 = AABg
+update t set d0 = AABh,d1 = AABh,d2 = AABh,d3 = AABh,d4 = AABh,d5 = AABh,d6 = AABh,d7 = AABh
+update t set d0 = AABi,d1 = AABi,d2 = AABi,d3 = AABi,d4 = AABi,d5 = AABi,d6 = AABi,d7 = AABi
+update t set d0 = AABj,d1 = AABj,d2 = AABj,d3 = AABj,d4 = AABj,d5 = AABj,d6 = AABj,d7 = AABj
+update t set d0 = AABk,d1 = AABk,d2 = AABk,d3 = AABk,d4 = AABk,d5 = AABk,d6 = AABk,d7 = AABk
+update t set d0 = AABl,d1 = AABl,d2 = AABl,d3 = AABl,d4 = AABl,d5 = AABl,d6 = AABl,d7 = AABl
+update t set d0 = AABm,d1 = AABm,d2 = AABm,d3 = AABm,d4 = AABm,d5 = AABm,d6 = AABm,d7 = AABm
+update t set d0 = AABn,d1 = AABn,d2 = AABn,d3 = AABn,d4 = AABn,d5 = AABn,d6 = AABn,d7 = AABn
+update t set d0 = AABo,d1 = AABo,d2 = AABo,d3 = AABo,d4 = AABo,d5 = AABo,d6 = AABo,d7 = AABo
+update t set d0 = AABp,d1 = AABp,d2 = AABp,d3 = AABp,d4 = AABp,d5 = AABp,d6 = AABp,d7 = AABp
+update t set d0 = AABq,d1 = AABq,d2 = AABq,d3 = AABq,d4 = AABq,d5 = AABq,d6 = AABq,d7 = AABq
+update t set d0 = AABr,d1 = AABr,d2 = AABr,d3 = AABr,d4 = AABr,d5 = AABr,d6 = AABr,d7 = AABr
+
