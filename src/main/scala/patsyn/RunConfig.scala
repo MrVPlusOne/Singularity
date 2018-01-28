@@ -9,7 +9,7 @@ case class ProblemConfig(problemName: String,
                          resourceUsage: IS[EValue] => Double,
                          sizeF: IS[EValue] => Int = _.map(_.memoryUsage.toInt).sum,
                          displayValue: IS[EValue] => String = FuzzingTaskProvider.defaultDisplayValue,
-                         saveValueWithName: (IS[EValue], String) => Unit = FuzzingTaskProvider.defaultSaveValueWithName
+                         saveValueWithName: (IS[EValue], String) => Unit = FuzzingTaskProvider.defaultSaveValueWithName(FuzzingTaskProvider.defaultDisplayValue)
                         )
 
 object ProblemConfig{

@@ -23,7 +23,7 @@ trait FuzzingTaskProvider {
   def displayValue: PartialFunction[IS[EValue], String] = FuzzingTaskProvider.defaultDisplayValue
 
   def saveValueWithName(value: IS[EValue], name: String): Unit = {
-    FuzzingTaskProvider.defaultSaveValueWithName(value, name)
+    FuzzingTaskProvider.defaultSaveValueWithName(displayValue)(value, name)
   }
 
   def run[A](f: RunningFuzzingTask => A): A = {
@@ -59,14 +59,9 @@ object FuzzingTaskProvider {
     case v => v.toString
   }
 
-  def defaultSaveValueWithName(value: IS[EValue], name: String): Unit = {
-    import java.io._
-    val fw = new FileWriter(new File(name + ".txt"))
-    try {
-      fw.write(defaultDisplayValue(value))
-    } finally {
-      fw.close()
-    }
+  def defaultSaveValueWithName(displayValue: IS[EValue] => String)(value: IS[EValue], name: String): Unit = {
+
+    FileInteraction.writeToFile(name + ".txt"){ displayValue(value) }
     FileInteraction.saveObjectToFile(name+".serialized")(value.toVector)
   }
 

@@ -42,7 +42,7 @@ object WeaveFuzz {
           math.max(vec1.length, vec2.length)
       },
       saveValueWithName = { (args, name) =>
-        FuzzingTaskProvider.defaultSaveValueWithName(args, name)
+        FuzzingTaskProvider.defaultSaveValueWithName(FuzzingTaskProvider.defaultDisplayValue)(args, name)
         FileInteraction.writeToFile(name+"_print.txt")(getArgumentsForWeave(args).toString)
       }
     )
