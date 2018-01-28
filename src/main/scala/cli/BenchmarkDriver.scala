@@ -10,6 +10,7 @@ object BenchmarkDriver {
 
   private def benchmarks(ioId: Int): Map[String, FuzzingTaskProvider] = {
     import FuzzingTaskProvider._
+    import NativeSortExamples._
 
     Map[String, FuzzingTaskProvider](
 

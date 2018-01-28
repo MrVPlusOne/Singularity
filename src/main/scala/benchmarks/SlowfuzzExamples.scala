@@ -1,11 +1,23 @@
 package benchmarks
 
+
 import patsyn.StandardSystem._
 import patsyn._
 
 object SlowfuzzExamples {
 
-  def nativeExample(execName: String)(inputSize: Int)(workingDir: String) = {
+  import java.nio.{ByteBuffer, ByteOrder}
+
+  def nativeExample(execName: String)(inputSize: Int)(workingDir: String): ProblemConfig = {
+    def vectToBytes(vect: Vector[EValue]): Array[Byte] = {
+      val ints = FuzzingTaskProvider.toIntVect(vect)
+      val bBuffer = ByteBuffer.allocate(ints.length*4).order(ByteOrder.LITTLE_ENDIAN)
+      ints.foreach{x =>
+        bBuffer.putInt(x)
+      }
+      bBuffer.array()
+    }
+
     val native = new FuzzingTaskProvider.NativeExample(execName, workingDir)
     ProblemConfig(
       problemName =
@@ -19,15 +31,16 @@ object SlowfuzzExamples {
       },
       resourceUsage = {
         case IS(VectValue(v)) =>
-          val data = FuzzingTaskProvider.toIntVect(v).map(x => x.toByte).toArray
-          native.writeByteArrayRunNativeGetCost(data)
+          native.writeByteArrayRunNativeGetCost(vectToBytes(v))
       },
       saveValueWithName = (value: IS[EValue], name: String) => {
         value match {
           case IS(VectValue(v)) =>
-            val data = FuzzingTaskProvider.toIntVect(v).map(x => x.toByte).toArray
+            val bytes = vectToBytes(v)
             val fileName = s"$name.bin"
-            FileInteraction.writeToBinaryFile(fileName)(data)
+            FileInteraction.writeToBinaryFile(fileName)(bytes)
+            val textFileName = s"$name.txt"
+            FileInteraction.writeToFile(textFileName)(v.toString())
         }
       }
     )
