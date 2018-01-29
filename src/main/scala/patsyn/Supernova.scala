@@ -2,6 +2,7 @@ package patsyn
 
 import patsyn.GeneticOperator.ExprGen
 import patsyn.Runner.RunnerConfig
+import patsyn.StandardSystem.{EInt, EVect, IntValue, VectValue}
 
 import scala.util.Random
 
@@ -30,26 +31,34 @@ case class GPEnvGenerator(constRule: PartialFunction[EType, Random => EValue],
   }
 }
 
-object Supernova{
+
+class Supernova(extendedConstRule: (PartialFunction[EType, Random => EValue] => PartialFunction[EType, Random => EValue]),
+                extraSafeFunctions: IS[EFunction],
+                extraUnsafeFunctions: IS[EFunction]
+               ){
+
   def genStandardEnv(rand: Random, aggressiveness: Double)(returnTypes: IS[EType]): GPEnvironment = {
     import StandardSystem._
     import SimpleMath.{aggressiveInterpolate, aggressiveSigmoid}
 
     val intRange = aggressiveInterpolate(aggressiveness, 5, 500)(rand.nextDouble()).toInt
+    lazy val exRule = extendedConstRule(constRule)
     lazy val constRule: PartialFunction[EType, Random => EValue] = PartialFunction[EType, Random => EValue] {
+      case any if exRule.isDefinedAt(any) => exRule(any)
       case EInt => r => r.nextInt(intRange)
       case EVect(_) => _ => Vector()
       case EGraph(_) => _ => GraphValue.empty
       case EPair(a,b) => r => (constRule(a)(r), constRule(b)(r))
       case EByteArray(i) => r => ByteArrayValue(IS.fill(i){ r.nextInt(256).toByte})
       case EUnit => _ => UnitValue
-      case _ => throw new Exception("Unsupported EType encountered in Supernova.")
+      case other => throw new Exception(s"Unsupported EType $other encountered in Supernova.")
     }
 
 
-    val safeFunctions = IS(IntComponents, VectComponents, GraphComponents, PairComponents).flatMap(_.collection)
-    val unsafeFunctions = IS(BitComponents, AdvancedVectComponents).
-      flatMap(_.collection).filter(_ => aggressiveSigmoid(aggressiveness)(rand.nextDouble()) > 0.5)
+    val safeFunctions =
+      IS(IntComponents, VectComponents, GraphComponents, PairComponents).flatMap(_.collection) ++ extraSafeFunctions
+    val unsafeFunctions = (IS(BitComponents, AdvancedVectComponents).
+      flatMap(_.collection) ++ extraUnsafeFunctions).filter(_ => aggressiveSigmoid(aggressiveness)(rand.nextDouble()) > 0.5)
 
     val stateNum = PartialFunction[EType, Int] { _ =>
       aggressiveInterpolate(aggressiveness, 1.01, 3.01)(rand.nextDouble()).toInt
@@ -104,6 +113,12 @@ object Supernova{
     val (env, gpConfig) = genGPParameters(problemConfig.outputTypes, rand, aggressiveness)
     Runner.run(problemConfig, env, RunConfig(runnerConfig, gpConfig, execConfig))
   }
+}
+
+object Supernova{
+
+  val standardSupernova = new Supernova(extendedConstRule = _ => PartialFunction.empty, IS(), IS())
+
 
   def main(args: Array[String]): Unit = {
     val seed = 3
@@ -111,10 +126,10 @@ object Supernova{
     val rand = new Random(seed)
     val sizePolicy = FixedEvalSize(200)
 
-//    val example = FuzzingTaskProvider.bzipExample(workingDir, 200)
-//    fuzzTask("hashCollision", example, RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(), rand)
-    val prob = FuzzingTaskProvider.bzipProblem(workingDir)
-    fuzzProblem(prob,
+    //    val example = FuzzingTaskProvider.bzipExample(workingDir, 200)
+    //    fuzzTask("hashCollision", example, RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(), rand)
+    val prob = ???
+    standardSupernova.fuzzProblem(prob,
       RunnerConfig().copy(randomSeed = seed, ioId = seed),
       ExecutionConfig().copy(evalSizePolicy = sizePolicy),
       rand, aggressiveness = Some(0.9))

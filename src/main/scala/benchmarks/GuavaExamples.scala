@@ -151,7 +151,7 @@ object GuavaExamples {
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
-    fuzzProblem(
+    standardSupernova.fuzzProblem(
       treeMultiSet_insertSequence,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
       ExecutionConfig(evalSizePolicy = FixedEvalSize(400)), rand)

@@ -155,7 +155,7 @@ object JGraphTExamples {
 
   def runExample(seed: Int, problemConfig: ProblemConfig, useGUI: Boolean, size: Int): Unit = {
     val rand = new Random(seed)
-    Supernova.fuzzProblem(
+    Supernova.standardSupernova.fuzzProblem(
       problemConfig,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
       ExecutionConfig(evalSizePolicy = FixedEvalSize(size)), rand)

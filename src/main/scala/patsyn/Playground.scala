@@ -129,7 +129,7 @@ object Playground {
   def run(ioId: Int): Unit ={
     val rand = new Random(ioId)
     FuzzingTaskProvider.phpHashCollisionExample.runAsProbConfig("PhpHash"){ config =>
-      Supernova.fuzzProblem(
+     Supernova.standardSupernova.fuzzProblem(
         config,
         RunnerConfig().copy(randomSeed = ioId, ioId = ioId, useGUI = false),
         ExecutionConfig(evalSizePolicy = VariedEvalSize.choppedGaussian(rand, 400)), rand)

@@ -39,7 +39,7 @@ object AlgorithmExamples {
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
-    Supernova.fuzzProblem(
+    Supernova.standardSupernova.fuzzProblem(
       giftWrapping,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
       ExecutionConfig(evalSizePolicy = FixedEvalSize(10), timeLimitInMillis = 10000), rand)

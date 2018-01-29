@@ -33,7 +33,7 @@ object LuceneExamples {
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
-    Supernova.fuzzProblem(
+    Supernova.standardSupernova.fuzzProblem(
       chineseAnalyzer,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
       ExecutionConfig(evalSizePolicy = FixedEvalSize(200)), rand)

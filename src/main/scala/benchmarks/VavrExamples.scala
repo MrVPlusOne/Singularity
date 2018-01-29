@@ -172,7 +172,7 @@ object VavrExamples {
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
-    Supernova.fuzzProblem(
+   Supernova.standardSupernova.fuzzProblem(
       treeSetIntersect,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
       ExecutionConfig(evalSizePolicy = FixedEvalSize(200)), rand)

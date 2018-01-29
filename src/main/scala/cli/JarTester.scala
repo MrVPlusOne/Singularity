@@ -57,7 +57,7 @@ object JarTester {
       }.sum
     }
 
-    Supernova.fuzzProblem(
+   Supernova.standardSupernova.fuzzProblem(
       problemConfig = ProblemConfig(
         problemName = method.getName,
         outputTypes = IS(EVect(EVect(EInt))),

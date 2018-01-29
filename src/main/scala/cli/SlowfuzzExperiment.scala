@@ -92,7 +92,7 @@ object SlowfuzzExperiment {
       val config = RunConfig(runnerConfig, gpConfig, execConfig)
       Runner.run(problem, gpEnv, config)
     } else {
-      Supernova.fuzzProblem(problem, runnerConfig, execConfig, new scala.util.Random(cliOption.seed))
+     Supernova.standardSupernova.fuzzProblem(problem, runnerConfig, execConfig, new scala.util.Random(cliOption.seed))
     }
     println(s"*** Task $cliOption finished ***")
   }
