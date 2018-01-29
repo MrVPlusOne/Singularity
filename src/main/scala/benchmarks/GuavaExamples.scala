@@ -1,11 +1,15 @@
 package benchmarks
 
 
+import java.util.Comparator
+
 import patsyn.Runner.RunnerConfig
 import patsyn._
 import patsyn.StandardSystem._
 import Supernova._
 import BenchmarkSet._
+import patbench.guava.common.collect.TreeMultiset
+
 import scala.util.Random
 
 object GuavaExamples {
@@ -73,6 +77,29 @@ object GuavaExamples {
     )
   }
 
+  def treeMultiSet_insertSequence: ProblemConfig = {
+    ProblemConfig(
+      "guava.TreeMultiset.add",
+      outputTypes = IS(EVect(EInt)),
+      sizeF = {
+        case IS(v: VectValue) => v.value.length
+      },
+      resourceUsage = {
+        case IS(VectValue(vec)) =>
+          val vecInt = vec.map(_.asInstanceOf[IntValue].value)
+
+          measureCost{
+            handleException(()){
+              val ms = TreeMultiset.create[Int](new Comparator[Int] {
+                def compare(o1: Int, o2: Int): Int = o1-o2
+              })
+              vecInt.foreach(i => ms.add(i))
+            }
+          }
+      }
+    )
+  }
+
   def immutableBiMap_copyOf: ProblemConfig = {
     ProblemConfig(
       "guava.ImmutableBiMap.copyOf",
@@ -125,9 +152,9 @@ object GuavaExamples {
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
     fuzzProblem(
-      immutableMultiset_copyOf,
+      treeMultiSet_insertSequence,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
-      ExecutionConfig(evalSizePolicy = FixedEvalSize(1200)), rand)
+      ExecutionConfig(evalSizePolicy = FixedEvalSize(400)), rand)
   }
 
   def testAverage(): Unit ={
@@ -162,6 +189,9 @@ object GuavaExamples {
 //    runExample(15, useGUI = true)
 
 //    testAverage()
+
+    runExample(7, useGUI = true)
+
     fitCurveImmutableSet()
   }
 }
