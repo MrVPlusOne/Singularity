@@ -9,9 +9,12 @@ libraryDependencies ++= Seq(
   "org.jfree" % "jfreechart" % "1.0.14",
   "com.typesafe.akka" %% "akka-actor" % "2.5.6",
   "com.typesafe.akka" %% "akka-testkit" % "2.5.6" % Test,
-  "org.apache.commons" % "commons-lang3" % "3.1",
   "com.github.scopt" %% "scopt" % "3.7.0",
-  "com.google.guava" % "guava" % "23.6-jre"
+  "com.google.guava" % "guava" % "23.6-jre",
+  "org.apache.commons" % "commons-lang3" % "3.1",
+  "org.apache.commons" % "commons-collections4" % "4.1",
+  "org.apache.commons" % "commons-compress" % "1.15",
+  "org.tukaani" % "xz" % "1.6"
 )
 
 mainClass in assembly := Some("cli.BenchmarkDriver")
