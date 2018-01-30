@@ -199,6 +199,8 @@ object Runner {
     FileInteraction.runWithAFileLogger(s"$recordDirPath/runLog.txt") { logger =>
       import logger._
 
+      println(s"Starting task: ${problemConfig.problemName}")
+
       printSection("Configuration"){
         println(s"[sizePolicy] $evalSizePolicy")
         println(gpEnv.show)
