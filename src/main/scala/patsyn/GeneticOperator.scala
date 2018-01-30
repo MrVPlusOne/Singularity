@@ -59,6 +59,18 @@ object GeneticOperator{
     val (parentPoint, _) = possiblePoints(random.nextInt(possiblePoints.size))
     Expr.replaceSubExpr(parent, newChild, parentPoint)
   }
+
+  def foldConsts(expr: Expr): EConst = {
+    val value = Expr.evaluateWithCheck(expr, IS())
+    EConst(expr.returnType, value)
+  }
+
+  /** constant folding on all seed expressions */
+  def foldConstsMultiInd(ind: MultiStateInd): MultiStateInd = {
+    val newSeeds = ind.seeds.map(foldConsts)
+    val newExprs = newSeeds ++ ind.exprs.drop(newSeeds.length)
+    MultiStateInd(newExprs, ind.nStates)
+  }
 }
 
 case class GPEnvironment(constMap: Map[EType, ExprGen[EConst]], functions: IS[EFunction], stateTypes: IS[EType], argConstRatio: Double = 0.35, warningOn: Boolean = true) {
@@ -266,9 +278,9 @@ case class MultiStateGOpLibrary(environment: GPEnvironment, outputTypes: IS[ETyp
 
     def name = "Mutate"
 
-    override def arity: Int = 1
+    def arity: Int = 1
 
-    override def operate(random: Random, participates: IS[Individual]): Individual = {
+    def operate(random: Random, participates: IS[Individual]): Individual = {
       val IndexedSeq(parent) = participates
 
       val allSubs = parent.allSubExprs
@@ -279,6 +291,17 @@ case class MultiStateGOpLibrary(environment: GPEnvironment, outputTypes: IS[ETyp
 
       val newSubTree = genExpr(e.returnType, newTreeMaxDepth, mapToUse, functionMap, random)
       parent.update(c, newSubTree)
+    }
+  }
+
+  /** constant folding on all seed expressions */
+  def constantFolding: GOp = new GOp {
+    def name = "ConstFold"
+
+    def arity: Int = 1
+
+    def operate(random: Random, participates: IS[Individual]): Individual = {
+      foldConstsMultiInd(participates.head)
     }
   }
 }

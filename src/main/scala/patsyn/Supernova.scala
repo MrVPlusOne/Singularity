@@ -82,7 +82,8 @@ class Supernova(extendedConstRule: (PartialFunction[EType, Random => EValue] => 
       singleSizeTolerance = singleTolerance.toInt,
       mutateP = inter(0.4,0.7),
       crossoverP = 0.5,
-      copyP = 0.07+0.23-inter(0.0,0.23)
+      copyP = 0.05+0.1-inter(0.0,0.1),
+      constFoldP = 0.04 + inter(0.0, 0.06)
     )
   }
 

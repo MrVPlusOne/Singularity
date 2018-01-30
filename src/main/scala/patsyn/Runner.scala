@@ -16,7 +16,7 @@ object Runner {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
     val workingDir = FileInteraction.getWorkingDir(ioId)
 
-    runExample("javahash", FuzzingTaskProvider.javaHashCollisionExample, RunConfig.default.withIoIdAndSeed(ioId, ioId))
+    runExample("phpHash", FuzzingTaskProvider.phpHashCollisionExample, RunConfig.default.withIoIdAndSeed(ioId, ioId))
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -231,7 +231,8 @@ object Runner {
       val operators = IS(
         library.simpleCrossOp -> crossoverP,
         library.simpleMutateOp(newTreeMaxDepth = 3) -> mutateP,
-        library.copyOp -> copyP
+        library.copyOp -> copyP,
+        library.constantFolding -> constFoldP
       )
 
       def showPattern(ind: MultiStateInd): String ={

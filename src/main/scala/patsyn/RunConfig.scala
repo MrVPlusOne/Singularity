@@ -23,7 +23,8 @@ case class GPConfig(populationSize: Int = 500,
                     singleSizeTolerance: Int = 30,
                     crossoverP: Double = 0.4,
                     mutateP: Double = 0.5,
-                    copyP: Double = 0.1
+                    copyP: Double = 0.05,
+                    constFoldP: Double = 0.05
                    ){
   def show: String = {
     s"""
