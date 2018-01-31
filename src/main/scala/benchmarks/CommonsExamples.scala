@@ -4,10 +4,13 @@ import java.io.ByteArrayOutputStream
 
 import patsyn._
 import StandardSystem._
-import org.apache.commons.compress.compressors.{CompressorStreamFactory => CF}
-import org.apache.commons.compress.archivers.{ArchiveStreamFactory => AF}
+import patbench.commons.compress.compressors.{CompressorStreamFactory => CF}
+import patbench.commons.compress.archivers.{ArchiveStreamFactory => AF}
 import BenchmarkSet._
-import org.apache.commons.math3.fitting.{AbstractCurveFitter, HarmonicCurveFitter, PolynomialCurveFitter, WeightedObservedPoints}
+import patbench.commons.math3.fitting.{AbstractCurveFitter, HarmonicCurveFitter, PolynomialCurveFitter, WeightedObservedPoints}
+import patsyn.Runner.RunnerConfig
+
+import scala.util.Random
 
 
 object CommonsExamples {
@@ -88,6 +91,22 @@ object CommonsExamples {
     )
   }
 
+  def runExample(seed: Int, useGUI: Boolean): Unit = {
+    val rand = new Random(seed)
+    Supernova.standardSupernova.fuzzProblem(
+      curveFittingProblem("commons.polyFit5", PolynomialCurveFitter.create(5)),
+      RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
+      ExecutionConfig(evalSizePolicy = FixedEvalSize(500)), rand)
+  }
 
+  def main(args: Array[String]): Unit = {
+    runExample(2, true)
+
+//    SimpleMath.processMap(args,
+//          0 to 60, processNum = 10,
+//          mainClass = this){
+//          i => runExample(i + 100, useGUI = false)
+//        }
+  }
 
 }
