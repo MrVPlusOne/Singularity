@@ -14,6 +14,7 @@ libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-lang3" % "3.1",
   "org.apache.commons" % "commons-collections4" % "4.1",
   "org.apache.commons" % "commons-compress" % "1.15",
+  "org.apache.commons" % "commons-math3" % "3.6.1",
   "org.tukaani" % "xz" % "1.6"
 )
 

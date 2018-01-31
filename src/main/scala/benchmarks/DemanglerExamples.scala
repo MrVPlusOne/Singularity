@@ -38,7 +38,7 @@ object DemanglerExamples {
   def runExample(example: String => ProblemConfig, seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
     val workingDir = FileInteraction.getWorkingDir(seed)
-    Supernova.fuzzProblem(
+    Supernova.standardSupernova.fuzzProblem(
       example(workingDir),
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
       ExecutionConfig(evalSizePolicy = FixedEvalSize(500)), rand)

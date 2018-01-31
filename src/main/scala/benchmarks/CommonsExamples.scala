@@ -7,6 +7,7 @@ import StandardSystem._
 import org.apache.commons.compress.compressors.{CompressorStreamFactory => CF}
 import org.apache.commons.compress.archivers.{ArchiveStreamFactory => AF}
 import BenchmarkSet._
+import org.apache.commons.math3.fitting.{AbstractCurveFitter, HarmonicCurveFitter, PolynomialCurveFitter, WeightedObservedPoints}
 
 
 object CommonsExamples {
@@ -67,5 +68,26 @@ object CommonsExamples {
       }
     )
   }
+
+  def curveFittingProblem(name: String, fitter: AbstractCurveFitter): ProblemConfig = {
+    ProblemConfig(
+      problemName = name,
+      outputTypes = IS(EVect(EPair(EInt, EInt))),
+      resourceUsage = {
+        case IS(VectValue(vec)) =>
+          val points = new WeightedObservedPoints()
+          vec.foreach {
+            case PairValue((IntValue(x), IntValue(y))) =>
+              points.add(x, y)
+          }
+
+          measureCost{
+            fitter.fit(points.toList)
+          }
+      }
+    )
+  }
+
+
 
 }
