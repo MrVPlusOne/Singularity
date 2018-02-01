@@ -245,6 +245,22 @@ object Runner {
         }.mkString(", ")
       }
 
+      def emergencySaveIndividual(ind: MultiStateInd, cause: String): Unit ={
+        representation.printIndividualMultiLine(println)(ind)
+        println{
+          showPattern(ind)
+        }
+        FileInteraction.saveMultiIndToFile(s"$recordDirPath/${cause}Individual.serialized")(ind)
+        FileInteraction.writeToFile(s"$recordDirPath/${cause}Individual.txt"){
+          representation.showIndividualMultiLine(ind)
+        }
+
+        // We might also be interested in the value
+        MultiStateRepresentation.saveExtrapolation(problemConfig ,ind, evalSize, memoryLimit,
+          s"$recordDirPath/${cause}Value")
+        renameResultDir(s"$cause")
+      }
+
       val generations = EvolutionaryOptimizer[MultiStateInd]().optimize(
         populationSize = populationSize, tournamentSize = tournamentSize,
         initOperator = library.initOp(maxDepth = 3),
@@ -255,22 +271,12 @@ object Runner {
           } catch {
             case _: TimeoutException =>
               println("Evaluation timed out!")
-              representation.printIndividualMultiLine(println)(ind)
-              println{
-                showPattern(ind)
-              }
-              FileInteraction.saveMultiIndToFile(s"$recordDirPath/timeoutIndividual.serialized")(ind)
-              FileInteraction.writeToFile(s"$recordDirPath/bestIndividual.txt"){
-                representation.showIndividualMultiLine(ind)
-              }
-
-              // We might also be interested in the value
-              MultiStateRepresentation.saveExtrapolation(problemConfig ,ind, evalSize, memoryLimit,
-                s"$recordDirPath/timeoutValue")
-              renameResultDir("timeout")
-
-              System.exit(0)
+              emergencySaveIndividual(ind, "timeout")
               throw new Exception("Timed out!")
+            case other: Exception =>
+              System.err.println("Unexpected exception thrown during individual evaluation!")
+              emergencySaveIndividual(ind, "exception")
+              throw other
           }
         },
         threadNum = threadNum,
