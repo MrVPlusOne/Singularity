@@ -93,7 +93,7 @@ object CommonsExamples {
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
-    Supernova.standardSupernova.fuzzProblem(
+    Supernova.standardSupernova.fuzzProblem(  //todo: try other curve fitters
       curveFittingProblem("commons.polyFit5", PolynomialCurveFitter.create(5)),
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
       ExecutionConfig(evalSizePolicy = FixedEvalSize(500)), rand)

@@ -2,7 +2,8 @@ package visual
 
 import javax.swing.JFrame
 
-import benchmarks.{GuavaExamples, JGraphTExamples}
+import benchmarks.{CommonsExamples, GuavaExamples, JGraphTExamples}
+import patbench.commons.math3.fitting.PolynomialCurveFitter
 import patsyn.MultiStateRepresentation.individualToPattern
 import patsyn.StandardSystem.GraphValue
 import patsyn._
@@ -100,12 +101,12 @@ object PatternPlot {
   def main(args: Array[String]): Unit = {
     import io.Source
 
-    val config = GuavaExamples.immutableBiMap_copyOf
-    val sizeLimit = 2000
-    val plotPoints = 100
+    val config = CommonsExamples.curveFittingProblem("polyFit5",PolynomialCurveFitter.create(5))
+    val sizeLimit = 200
+    val plotPoints = 30
     val files =
       """
-        |InterestingResults/ImmutableBiMap.copyOf[performance=1796418.0][ioId=103,seed=103](17-12-04-12:36:26)/bestIndividual.serialized
+        |/Users/weijiayi/Downloads/results 4/commons.polyFit5[performance=1.986358852E9][ioId=107,seed=107](18-02-01-10:13:59)
       """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
 
 
@@ -130,6 +131,7 @@ object PatternPlot {
                   println{
                     MamFormat.showAsMamGraph(graph)
                   }
+                case _ => ()
               }
             }
           }

@@ -6,9 +6,12 @@ import StandardSystem._
 import patbench.jgrapht
 import patbench.jgrapht.alg.StoerWagnerMinimumCut
 import patbench.jgrapht.alg.color._
+import patbench.jgrapht.alg.cycle._
 import patbench.jgrapht.alg.flow._
-import patbench.jgrapht.alg.interfaces.{MaximumFlowAlgorithm, SpanningTreeAlgorithm, VertexColoringAlgorithm}
+import patbench.jgrapht.alg.interfaces.{MaximumFlowAlgorithm, MinimumVertexCoverAlgorithm, SpanningTreeAlgorithm, VertexColoringAlgorithm}
+import patbench.jgrapht.alg.scoring.{ClosenessCentrality, Coreness}
 import patbench.jgrapht.alg.spanning.{BoruvkaMinimumSpanningTree, KruskalMinimumSpanningTree, PrimMinimumSpanningTree}
+import patbench.jgrapht.alg.vertexcover.{ClarksonTwoApproxVCImpl, EdgeBasedTwoApproxVCImpl, GreedyVCImpl, RecursiveExactVCImpl}
 import patbench.jgrapht.graph._
 import patsyn.Runner.RunnerConfig
 
@@ -94,9 +97,9 @@ object JGraphTExamples {
     g => new BoruvkaMinimumSpanningTree[Integer, DefaultWeightedEdge](g))
 
   val spanningTreeProblems = IS(
-    spanningTree_prim,
-    spanningTree_kruskal,
-    spanningTree_boruvka
+    spanningTree_prim -> 200,
+    spanningTree_kruskal -> 200,
+    spanningTree_boruvka -> 200
   )
 
   def minCutProblem = ProblemConfig(
@@ -152,6 +155,155 @@ object JGraphTExamples {
     vertexColor_smallestDegreeLast
   )
 
+  def toDefaultDirectedGraph(g: GraphValue, directed: Boolean = true) = {
+    val graph = if(directed) new DefaultDirectedGraph[Integer, DefaultEdge](
+      new ClassBasedEdgeFactory[Integer, DefaultEdge](classOf[DefaultEdge]))
+    else new SimpleGraph[Integer, DefaultEdge](classOf[DefaultEdge])
+
+    (0 until g.nodeNum).foreach(i => graph.addVertex(i))
+    g.edges.foreach{
+      case (from, to, _) => graph.addEdge(from, to)
+    }
+    graph
+  }
+
+  // no anomaly found
+  def simpleCyclesProblem(name: String, algorithm: DirectedSimpleCycles[Integer, DefaultEdge]) = {
+    ProblemConfig(
+      name,
+      outputTypes = IS(EGraph(EUnit)),
+      resourceUsage = {
+        case IS(g: GraphValue) =>
+          val graph = toDefaultDirectedGraph(g)
+          measureCost{
+//            handleException(()){
+              algorithm.setGraph(graph)
+              algorithm.findSimpleCycles()
+//            }
+          }
+      }
+    )
+  }
+
+  val hawickJamesSimpleCyclesProblem = simpleCyclesProblem(
+    "jGraphT.simpleCycles.hawickJames", new HawickJamesSimpleCycles[Integer, DefaultEdge]()
+  )
+
+  val tiernanSimpleCyclesProblem = simpleCyclesProblem(
+    "jGraphT.simpleCycles.tiernan", new TiernanSimpleCycles[Integer, DefaultEdge]()
+  )
+
+  val tarjanSimpleCyclesProblem = simpleCyclesProblem(
+    "jGraphT.simpleCycles.tarjan", new TarjanSimpleCycles[Integer, DefaultEdge]()
+  )
+
+  val johnsonSimpleCyclesProblem = simpleCyclesProblem(
+    "jGraphT.simpleCycles.johnson", new JohnsonSimpleCycles[Integer, DefaultEdge]()
+  )
+
+  val szwarcfiterLauerSimpleCyclesProblem = simpleCyclesProblem(
+    "jGraphT.simpleCycles.szwarcfiterLauer", new SzwarcfiterLauerSimpleCycles[Integer, DefaultEdge]()
+  )
+
+  def closenessExample = {
+    ProblemConfig(
+      "jGraphT.closeness",
+      outputTypes = IS(EGraph(EUnit)),
+      resourceUsage = {
+        case IS(g: GraphValue) =>
+          val graph = toDefaultDirectedGraph(g)
+          measureCost {
+            val c = new ClosenessCentrality[Integer, DefaultEdge](graph)
+            c.getScores
+          }
+      }
+    )
+  }
+
+  def corenessExample = {
+    ProblemConfig(
+      "jGraphT.coreness",
+      outputTypes = IS(EGraph(EUnit)),
+      resourceUsage = {
+        case IS(g: GraphValue) =>
+          val graph = toDefaultDirectedGraph(g, directed = false)
+          measureCost {
+            val c = new Coreness[Integer, DefaultEdge](graph)
+            c.getScores
+          }
+      }
+    )
+  }
+
+  def boruvkaMinimumSpanningTreeProblem = {
+    ProblemConfig(
+      "jGraphT.boruvkaMST",
+      outputTypes = IS(EGraph(EInt)),
+      resourceUsage = {
+        case IS(g: GraphValue) =>
+          handleException(0.0){
+            val graph = TestJGraphT.mkSimpleWeightedGraph(g)
+            measureCost {
+              new BoruvkaMinimumSpanningTree[Integer, DefaultWeightedEdge](graph).getSpanningTree
+              new KruskalMinimumSpanningTree[Integer, DefaultWeightedEdge](graph).getSpanningTree
+            }
+          }
+      }
+    )
+  }
+
+  def kruskalMinimumSpanningTreeProblem = {
+    ProblemConfig(
+      "jGraphT.kruskalMST",
+      outputTypes = IS(EGraph(EInt)),
+      resourceUsage = {
+        case IS(g: GraphValue) =>
+          handleException(0.0){
+            val graph = TestJGraphT.mkSimpleWeightedGraph(g)
+            measureCost {
+              new KruskalMinimumSpanningTree[Integer, DefaultWeightedEdge](graph).getSpanningTree
+            }
+          }
+      }
+    )
+  }
+
+  def primMinimumSpanningTreeProblem = {
+    ProblemConfig(
+      "jGraphT.primMST",
+      outputTypes = IS(EGraph(EInt)),
+      resourceUsage = {
+        case IS(g: GraphValue) =>
+          handleException(0.0){
+            val graph = TestJGraphT.mkDirectedWeightedMultiGraph(g)
+            measureCost {
+              new PrimMinimumSpanningTree[Integer, DefaultWeightedEdge](graph).getSpanningTree
+            }
+          }
+      }
+    )
+  }
+
+  def vertexCoverProblem(name: String, alg: MinimumVertexCoverAlgorithm[Integer, DefaultEdge]) = {
+    ProblemConfig(
+      name,
+      outputTypes = IS(EGraph(EUnit)),
+      resourceUsage = {
+        case IS(g: GraphValue) =>
+          handleException(0.0){
+            val graph = toDefaultDirectedGraph(g, directed = false)
+            measureCost {
+              alg.getVertexCover(graph)
+            }
+          }
+      }
+    )
+  }
+
+  val edgeBased2VC = vertexCoverProblem("EdgeBasedTwoApproxVCImpl", new EdgeBasedTwoApproxVCImpl())
+  val clarkson2VC = vertexCoverProblem("ClarksonTwoApproxVCImpl", new ClarksonTwoApproxVCImpl())
+  val greedy2VC = vertexCoverProblem("GreedyTwoApproxVCImpl", new GreedyVCImpl())
+  val recursiveExactVC = vertexCoverProblem("RecursiveExactVCImpl", new RecursiveExactVCImpl())
 
   def main(args: Array[String]): Unit = {
 
@@ -166,7 +318,9 @@ object JGraphTExamples {
 //        val size = 200
 //        runExample(i+shift, problems(i/numPerExample), useGUI = false, size = size)
 //    }
-      runExample(0, minCutProblem, useGUI = true, size = 100)
+
+
+    runExample(2, recursiveExactVC, useGUI = true, size = 200)
 
     //    testAverage()
   }
