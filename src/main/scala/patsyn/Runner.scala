@@ -258,7 +258,7 @@ object Runner {
         // We might also be interested in the value
         MultiStateRepresentation.saveExtrapolation(problemConfig ,ind, evalSize, memoryLimit,
           s"$recordDirPath/${cause}Value")
-        renameResultDir(s"$cause")
+        renameResultDir(cause)
       }
 
       val generations = EvolutionaryOptimizer[MultiStateInd]().optimize(

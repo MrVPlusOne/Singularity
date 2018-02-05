@@ -7,6 +7,7 @@ import StandardSystem._
 import patbench.commons.compress.compressors.{CompressorStreamFactory => CF}
 import patbench.commons.compress.archivers.{ArchiveStreamFactory => AF}
 import BenchmarkSet._
+import measure.TimeTools
 import patbench.commons.math3.fitting.{AbstractCurveFitter, HarmonicCurveFitter, PolynomialCurveFitter, WeightedObservedPoints}
 import patsyn.Runner.RunnerConfig
 
@@ -100,7 +101,22 @@ object CommonsExamples {
   }
 
   def main(args: Array[String]): Unit = {
-    runExample(2, true)
+//    runExample(2, true)
+    import org.apache.commons.math3.fitting.{PolynomialCurveFitter, WeightedObservedPoints}
+    val fitter = PolynomialCurveFitter.create(5).withMaxIterations(100)
+
+    val points = {
+      val wp = new WeightedObservedPoints()
+      Seq((95,-75),(100,204),(148,52),(152,42),(142,141),(127715543,147),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2),(85726871,2), (85726871,2) ,(97,118)).foreach{
+        case (x,y) => wp.add(x,y)
+      }
+      wp
+    }
+
+
+    TimeTools.printTimeUsed("fitter"){
+      fitter.fit(points.toList)
+    }
 
 //    SimpleMath.processMap(args,
 //          0 to 60, processNum = 10,

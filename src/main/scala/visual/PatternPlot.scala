@@ -106,7 +106,7 @@ object PatternPlot {
     val plotPoints = 30
     val files =
       """
-        |/Users/weijiayi/Downloads/results 4/commons.polyFit5[performance=1.986358852E9][ioId=107,seed=107](18-02-01-10:13:59)
+        |/Users/weijiayi/Programming/SingularityResults/polyFitResults/commons.polyFit5[performance=1.0756863171E10][ioId=110,seed=110](18-02-01-10:14:22)
       """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
 
 

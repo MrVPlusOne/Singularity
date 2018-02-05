@@ -121,10 +121,6 @@ object Playground {
     println("Evaluation finished.")
   }
 
-  def testGraph(): Unit ={
-
-    GraphSample.ind
-  }
 
   def run(ioId: Int): Unit ={
     val rand = new Random(ioId)

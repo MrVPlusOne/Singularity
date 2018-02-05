@@ -284,7 +284,7 @@ object JGraphTExamples {
     )
   }
 
-  def vertexCoverProblem(name: String, alg: MinimumVertexCoverAlgorithm[Integer, DefaultEdge]) = {
+  def vertexCoverProblem(name: String, alg: ()=>MinimumVertexCoverAlgorithm[Integer, DefaultEdge]) = {
     ProblemConfig(
       name,
       outputTypes = IS(EGraph(EUnit)),
@@ -293,17 +293,17 @@ object JGraphTExamples {
           handleException(0.0){
             val graph = toDefaultDirectedGraph(g, directed = false)
             measureCost {
-              alg.getVertexCover(graph)
+              alg().getVertexCover(graph)
             }
           }
       }
     )
   }
 
-  val edgeBased2VC = vertexCoverProblem("EdgeBasedTwoApproxVCImpl", new EdgeBasedTwoApproxVCImpl())
-  val clarkson2VC = vertexCoverProblem("ClarksonTwoApproxVCImpl", new ClarksonTwoApproxVCImpl())
-  val greedy2VC = vertexCoverProblem("GreedyTwoApproxVCImpl", new GreedyVCImpl())
-  val recursiveExactVC = vertexCoverProblem("RecursiveExactVCImpl", new RecursiveExactVCImpl())
+  val edgeBased2VC = vertexCoverProblem("EdgeBasedTwoApproxVCImpl", () => new EdgeBasedTwoApproxVCImpl())
+  val clarkson2VC = vertexCoverProblem("ClarksonTwoApproxVCImpl", ()=> new ClarksonTwoApproxVCImpl())
+  val greedy2VC = vertexCoverProblem("GreedyTwoApproxVCImpl", ()=> new GreedyVCImpl())
+  val recursiveExactVC = vertexCoverProblem("RecursiveExactVCImpl", ()=> new RecursiveExactVCImpl())
 
   def main(args: Array[String]): Unit = {
 
@@ -320,7 +320,7 @@ object JGraphTExamples {
 //    }
 
 
-    runExample(2, recursiveExactVC, useGUI = true, size = 200)
+    runExample(2, clarkson2VC, useGUI = true, size = 200)
 
     //    testAverage()
   }

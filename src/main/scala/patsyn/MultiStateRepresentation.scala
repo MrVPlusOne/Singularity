@@ -119,7 +119,7 @@ case class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType
   def showIndividualMultiLine(ind: MultiStateInd): String = {
     val s = new StringBuilder()
     printIndividualMultiLine(x => {
-      s.append(s)
+      s.append(x)
       s.append("\n")
     })(ind)
     s.mkString
