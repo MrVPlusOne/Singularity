@@ -12,11 +12,15 @@ import scala.util.Random
 
 object Runner {
 
+  case class MaxFuzzingTimeReachedException(timeLimitSec: Long) extends Exception
+
   def main(args: Array[String]): Unit = {
     val ioId = if(args.isEmpty) 0 else args.head.toInt
     val workingDir = FileInteraction.getWorkingDir(ioId)
 
-    runExample("phpHash", FuzzingTaskProvider.phpHashCollisionExample, RunConfig.default.withIoIdAndSeed(ioId, ioId))
+    runExample("phpHash", FuzzingTaskProvider.phpHashCollisionExample,
+      RunConfig.default.withIoIdAndSeed(ioId, ioId).copy(
+        execConfig = ExecutionConfig().copy(maxFuzzingTimeSec = Some(20))))
   }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
@@ -161,11 +165,20 @@ object Runner {
       }
     }
 
+    val startTime = System.nanoTime()
+
     @throws[TimeoutException]
+    @throws[MaxFuzzingTimeReachedException]
     def timeLimitedResourceUsage(timeLimitInMillis: Int)(value: IS[EValue]): Double = {
       import scala.concurrent.ExecutionContext.Implicits.global
       import scala.concurrent._
       import scala.concurrent.duration._
+
+      val timeInSec = (System.nanoTime() - startTime) / 1e9
+      if(maxFuzzingTimeSec.exists(timeInSec > _)){
+        throw MaxFuzzingTimeReachedException(maxFuzzingTimeSec.get)
+      }
+
       Await.result(
         Future (resourceUsage(value)), timeLimitInMillis.milliseconds)
     }
@@ -261,118 +274,122 @@ object Runner {
         renameResultDir(cause)
       }
 
-      val generations = EvolutionaryOptimizer[MultiStateInd]().optimize(
-        populationSize = populationSize, tournamentSize = tournamentSize,
-        initOperator = library.initOp(maxDepth = 3),
-        operators = operators,
-        indEval = ind => {
-          try {
-            representation.fitnessEvaluation(ind)._1
-          } catch {
-            case _: TimeoutException =>
-              println("Evaluation timed out!")
-              emergencySaveIndividual(ind, "timeout")
-              throw new Exception("Timed out!")
-            case other: Exception =>
-              System.err.println("Unexpected exception thrown during individual evaluation!")
-              emergencySaveIndividual(ind, "exception")
-              throw other
-          }
-        },
-        threadNum = threadNum,
-        random = rand,
-        evalProgressCallback = { i =>
-          evalProgressCallback(s"GP Evaluation progress: $i")
-        },
-        bufferEvaluation = evalSizePolicy match {
-          case _: FixedEvalSize => true
-          case _: VariedEvalSize => false
-        }
-      ).map{ pop =>
-        evalSizePolicy match {
-          case _: VariedEvalSize =>
-            val inds = pop.individuals.zipWithIndex.map { case (indData, p) =>
-              val eval = refRepresentation.fitnessEvaluation(indData.ind)._1
-              evalProgressCallback(s"Ref evaluation progress: $p")
-              indData.copy(evaluation = eval)
-            }
-            ReEvaluatedPop(pop.individuals, inds)
-          case _: FixedEvalSize =>
-            ReEvaluatedPop(pop.individuals, pop.individuals)
-        }
-      }
-
-
-      val startTime = System.nanoTime()
-
       var bestSoFar: Option[IndividualData[MultiStateInd]] = None
-      var nonIncreasingTime = 0
-
-      def setBestInd(indData: IndividualData[MultiStateInd]): Unit = {
-        bestSoFar = Some(indData)
-
-        val timeString = if (keepBestIndividuals) {
-          val timeInNano = System.nanoTime() - startTime
-          val timeInMillis = (timeInNano/1e6).toInt
-          s"[time=$timeInMillis]"
-        } else {
-          ""
-        }
-        FileInteraction.saveMultiIndToFile(s"$recordDirPath/bestIndividual$timeString.serialized")(indData.ind)
-        FileInteraction.writeToFile(s"$recordDirPath/bestIndividual.txt"){
-          representation.showIndividualMultiLine(indData.ind)
-        }
-
-        MultiStateRepresentation.saveExtrapolation(problemConfig, indData.ind,
-          evalSize, memoryLimit, s"$recordDirPath/bestInput$timeString")
-      }
-
-      generations.takeWhile(pop => {
-        updateEvalSize()
-
-        nonIncreasingTime += 1
-        bestSoFar match {
-          case Some(previousBest) =>
-            if (pop.bestInd.evaluation.fitness > previousBest.evaluation.fitness) {
-              nonIncreasingTime = 0
-              setBestInd(pop.bestInd)
+      try {
+        val generations = EvolutionaryOptimizer[MultiStateInd]().optimize(
+          populationSize = populationSize, tournamentSize = tournamentSize,
+          initOperator = library.initOp(maxDepth = 3),
+          operators = operators,
+          indEval = ind => {
+            try {
+              representation.fitnessEvaluation(ind)._1
+            } catch {
+              case _: TimeoutException =>
+                println("Evaluation timed out!")
+                emergencySaveIndividual(ind, "timeout")
+                throw new Exception("Timed out!")
+              case me: MaxFuzzingTimeReachedException =>
+                throw me
+              case other: Exception =>
+                System.err.println("Unexpected exception thrown during individual evaluation!")
+                emergencySaveIndividual(ind, "exception")
+                throw other
             }
-          case None => setBestInd(pop.bestInd)
+          },
+          threadNum = threadNum,
+          random = rand,
+          evalProgressCallback = { i =>
+            evalProgressCallback(s"GP Evaluation progress: $i")
+          },
+          bufferEvaluation = evalSizePolicy match {
+            case _: FixedEvalSize => true
+            case _: VariedEvalSize => false
+          }
+        ).map { pop =>
+          evalSizePolicy match {
+            case _: VariedEvalSize =>
+              val inds = pop.individuals.zipWithIndex.map { case (indData, p) =>
+                val eval = refRepresentation.fitnessEvaluation(indData.ind)._1
+                evalProgressCallback(s"Ref evaluation progress: $p")
+                indData.copy(evaluation = eval)
+              }
+              ReEvaluatedPop(pop.individuals, inds)
+            case _: FixedEvalSize =>
+              ReEvaluatedPop(pop.individuals, pop.individuals)
+          }
         }
-        println(s"Last fitness increase: $nonIncreasingTime generations ago.")
 
-        val shouldStop = {
-          val timeInSec = (System.nanoTime() - startTime) / 1e9
-          maxNonIncreaseGen.exists(nonIncreasingTime > _) ||
-          maxFuzzingTimeSec.exists(timeInSec > _)
+        var nonIncreasingTime = 0
+
+        def setBestInd(indData: IndividualData[MultiStateInd]): Unit = {
+          bestSoFar = Some(indData)
+
+          val timeString = if (keepBestIndividuals) {
+            val timeInNano = System.nanoTime() - startTime
+            val timeInMillis = (timeInNano / 1e6).toInt
+            s"[time=$timeInMillis]"
+          } else {
+            ""
+          }
+          FileInteraction.saveMultiIndToFile(s"$recordDirPath/bestIndividual$timeString.serialized")(indData.ind)
+          FileInteraction.writeToFile(s"$recordDirPath/bestIndividual.txt") {
+            representation.showIndividualMultiLine(indData.ind)
+          }
+
+          MultiStateRepresentation.saveExtrapolation(problemConfig, indData.ind,
+            evalSize, memoryLimit, s"$recordDirPath/bestInput$timeString")
         }
-        !shouldStop
-      }).zipWithIndex.foreach { case (pop, i) =>
 
-        val bestData = pop.bestInd
-        val bestEval = {
-          val bestInd = bestData.ind
-          refRepresentation.fitnessEvaluation(bestInd)._1
+        generations.takeWhile(pop => {
+          updateEvalSize()
+
+          nonIncreasingTime += 1
+          bestSoFar match {
+            case Some(previousBest) =>
+              if (pop.bestInd.evaluation.fitness > previousBest.evaluation.fitness) {
+                nonIncreasingTime = 0
+                setBestInd(pop.bestInd)
+              }
+            case None => setBestInd(pop.bestInd)
+          }
+          println(s"Last fitness increase: $nonIncreasingTime generations ago.")
+
+          val shouldStop = {
+            val timeInSec = (System.nanoTime() - startTime) / 1e9
+            maxNonIncreaseGen.exists(nonIncreasingTime > _) ||
+              maxFuzzingTimeSec.exists(timeInSec > _)
+          }
+          !shouldStop
+        }).zipWithIndex.foreach { case (pop, i) =>
+
+          val bestData = pop.bestInd
+          val bestEval = {
+            val bestInd = bestData.ind
+            refRepresentation.fitnessEvaluation(bestInd)._1
+          }
+
+          monitorCallback(MonitoringData(pop.averageFitness, bestEval.fitness, bestEval.performance))
+          saveMonitor(s"$recordDirPath/monitor.png")
+
+          println("------------")
+          print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
+          println(s"Generation ${i + 1}")
+          println(s"Best Result: ${bestEval.showAsLinearExpr}, Created by ${bestData.history.birthOp}")
+          representation.printIndividualMultiLine(println)(bestData.ind)
+          println(s"Best Individual Pattern: ${showPattern(bestData.ind)}, ...")
+          println(s"Average Size: ${representation.populationAverageSize(pop.refEvaluations.map(_.ind))}")
+          println(s"Average Fitness: ${pop.averageFitness}")
+          println(s"Fitness Variation: ${pop.fitnessStdDiv}")
+          print("Distribution: ")
+          println {
+            representation.frequencyRatioStat(pop.refEvaluations.map(_.ind)).take(10).map {
+              case (s, f) => s"$s -> ${"%.3f".format(f)}"
+            }.mkString(", ")
+          }
         }
-
-        monitorCallback(MonitoringData(pop.averageFitness, bestEval.fitness, bestEval.performance))
-        saveMonitor(s"$recordDirPath/monitor.png")
-
-        println("------------")
-        print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
-        println(s"Generation ${i + 1}")
-        println(s"Best Result: ${bestEval.showAsLinearExpr}, Created by ${bestData.history.birthOp}")
-        representation.printIndividualMultiLine(println)(bestData.ind)
-        println(s"Best Individual Pattern: ${showPattern(bestData.ind)}, ...")
-        println(s"Average Size: ${representation.populationAverageSize(pop.refEvaluations.map(_.ind))}")
-        println(s"Average Fitness: ${pop.averageFitness}")
-        println(s"Fitness Variation: ${pop.fitnessStdDiv}")
-        print("Distribution: ")
-        println {
-          representation.frequencyRatioStat(pop.refEvaluations.map(_.ind)).take(10).map {
-            case (s, f) => s"$s -> ${"%.3f".format(f)}"
-          }.mkString(", ")
-        }
+      } catch {
+        case MaxFuzzingTimeReachedException(timeLimitSec) =>
+          println(s"Max Fuzzing time reached! [$timeLimitSec sec]")
       }
 
       println("Evolution Finished!")
