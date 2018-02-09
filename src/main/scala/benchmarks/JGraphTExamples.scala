@@ -205,6 +205,8 @@ object JGraphTExamples {
     "jGraphT.simpleCycles.szwarcfiterLauer", new SzwarcfiterLauerSimpleCycles[Integer, DefaultEdge]()
   )
 
+  val simpleCyclesProblems = IS(hawickJamesSimpleCyclesProblem, tiernanSimpleCyclesProblem, tarjanSimpleCyclesProblem, johnsonSimpleCyclesProblem, szwarcfiterLauerSimpleCyclesProblem)
+
   def closenessExample = {
     ProblemConfig(
       "jGraphT.closeness",

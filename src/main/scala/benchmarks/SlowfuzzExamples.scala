@@ -1,6 +1,7 @@
 package benchmarks
 
 
+import benchmarks.AllTogether.ConfigGen
 import patsyn.StandardSystem._
 import patsyn._
 
@@ -85,4 +86,7 @@ object SlowfuzzExamples {
       }
     )
   }
+
+  def allExceptRegex: IS[ConfigGen] = IS(insertionSortIntExample, appleQsortIntExample, bsdQsortIntExample, gnuQsortIntExample,
+    pgQsortIntExample, slowfuzzQsortIntExample, phpHashExample).map(f => f(100)) //we don't care the numbers
 }

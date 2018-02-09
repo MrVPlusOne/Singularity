@@ -2,6 +2,7 @@ package benchmarks
 
 import java.util.Random
 
+import benchmarks.AllTogether.ConfigGen
 import patsyn.Runner.RunnerConfig
 import patsyn.StandardSystem._
 import patsyn._
@@ -169,6 +170,8 @@ object VavrExamples {
       }
     )
   }
+
+  def all: IS[ProblemConfig] = IS(treeSetIntersect, treeSetUnion, hashSetIntersect, hashSetUnion, linkedHashSetIntersect, linkedHashSetUnion)
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)

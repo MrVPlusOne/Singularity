@@ -148,6 +148,9 @@ object GuavaExamples {
   def immutableMultiset_copyOf = arrayListInputExample("guava.ImmutableMultiset.copyOf",
     TestGuava.arrayListToMultiset)
 
+  def all: IS[ProblemConfig] = IS(
+    treeMultiSet_insertSequence, immutableBiMap_copyOf, immutableSet_copyOf, immutableMultiset_copyOf
+  )
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
