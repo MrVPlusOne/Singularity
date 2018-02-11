@@ -1,6 +1,5 @@
 package benchmarks
 
-import benchmarks.AllTogether.{ConfigGen, TaskGen}
 import patsyn.{IS}
 
 object STACExamples {

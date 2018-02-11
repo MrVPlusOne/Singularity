@@ -90,5 +90,5 @@ object SlowfuzzExamples {
   def allExceptRegex: IS[String => ProblemConfig] = IS(insertionSortIntExample, appleQsortIntExample, bsdQsortIntExample, gnuQsortIntExample,
     pgQsortIntExample, slowfuzzQsortIntExample, phpHashExample).map(f => f(100)) //we don't care the numbers
 
-  def allRegexProblems: IS[String => ProblemConfig] = (0 until 19).map{ i => pcreExample(i)(100) }
+  def allRegexProblems: IS[String => ProblemConfig] = (0 until 19).map{ i => pcreExample(i)(100) _ }
 }

@@ -28,7 +28,7 @@ object AllTogether {
 
 
   def main(args: Array[String]): Unit = {
-    val problems = allProblems2
+    val problems = allProblems ++ allProblems2
     val epochNum = 20
     val taskNum = problems.length * epochNum
     val fuzzingTimeLimit = 2*3600
