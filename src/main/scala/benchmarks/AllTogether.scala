@@ -28,12 +28,12 @@ object AllTogether {
 
 
   def main(args: Array[String]): Unit = {
-    val problems = allProblems ++ allProblems2
+    val problems = SlowfuzzExamples.allExceptRegex.map(toGen) //allProblems ++ allProblems2
     val epochNum = 20
     val taskNum = problems.length * epochNum
     val fuzzingTimeLimit = 2*3600
 
-    val seedBase = allProblems.length * epochNum
+    val seedBase = (allProblems.length + VavrExamples.all.length) * epochNum
 
     SimpleMath.processMap(args, 0 until taskNum,
       processNum = 35,

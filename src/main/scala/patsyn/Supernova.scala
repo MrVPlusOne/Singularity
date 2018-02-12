@@ -1,5 +1,6 @@
 package patsyn
 
+import benchmarks.SlowfuzzExamples
 import patsyn.GeneticOperator.ExprGen
 import patsyn.Runner.RunnerConfig
 import patsyn.StandardSystem.{EInt, EVect, IntValue, VectValue}
@@ -125,14 +126,14 @@ object Supernova{
     val seed = 3
     val workingDir = FileInteraction.getWorkingDir(seed)
     val rand = new Random(seed)
-    val sizePolicy = FixedEvalSize(200)
+    val sizePolicy = FixedEvalSize(100)
 
     //    val example = FuzzingTaskProvider.bzipExample(workingDir, 200)
     //    fuzzTask("hashCollision", example, RunnerConfig().copy(randomSeed = seed, ioId = seed), ExecutionConfig(), rand)
-    val prob = ???
+    val prob = SlowfuzzExamples.appleQsortIntExample(100)(FileInteraction.getWorkingDir(1))
     standardSupernova.fuzzProblem(prob,
       RunnerConfig().copy(randomSeed = seed, ioId = seed),
       ExecutionConfig().copy(evalSizePolicy = sizePolicy),
-      rand, aggressiveness = Some(0.9))
+      rand)
   }
 }

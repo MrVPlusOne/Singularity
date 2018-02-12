@@ -7,6 +7,7 @@ import java.util.concurrent.TimeoutException
 import measure.TimeTools
 import patsyn.EvolutionRepresentation.{IndividualData, MemoryUsage}
 import FuzzingTaskProvider.escapeStrings
+import benchmarks.SlowfuzzExamples
 
 import scala.util.Random
 
@@ -291,7 +292,8 @@ object Runner {
               case me: MaxFuzzingTimeReachedException =>
                 throw me
               case other: Exception =>
-                System.err.println("Unexpected exception thrown during individual evaluation!")
+                println("Unexpected exception thrown during individual evaluation!")
+                println(s"Exception: ${other.getMessage}")
                 emergencySaveIndividual(ind, "exception")
                 throw other
             }

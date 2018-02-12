@@ -18,6 +18,8 @@ libraryDependencies ++= Seq(
   "org.tukaani" % "xz" % "1.6"
 )
 
+libraryDependencies += "com.lihaoyi" %% "ammonite-ops" % "1.0.3"
+
 mainClass in assembly := Some("cli.BenchmarkDriver")
 test in assembly := {}
 assemblyJarName in assembly := "PatternSynthBenchmarkDriver.jar"
