@@ -1,6 +1,9 @@
 package patsyn
 
+import patbench.commons.math3.analysis.ParametricUnivariateFunction
 import patsyn.EvolutionRepresentation.MemoryUsage
+
+import scala.collection.mutable
 
 
 object PerformanceEvaluation {
@@ -32,12 +35,9 @@ class ExtrapolatePerformanceEvaluation(mamLink: MamLink, sizeOfInterest: Int, fi
   def breakingMemoryUsage = ???
 
   def evaluate[T](xs: Stream[T], sizeF: T => Int, executeF: T => Double): EvaluationResult = {
-    def maxSmooth(data: Seq[Double]): Seq[Double] = {
-      data.scanLeft(nonsenseFitness)(math.max).tail
-    }
 
     def fitData(xyData: Seq[(Int, Double)]): ExtrapolatedResult = {
-      val maxSmoothed = xyData.map(_._1) zip maxSmooth(xyData.map(_._2))
+      val maxSmoothed = xyData.map(_._1) zip SimpleMath.maxSmooth(xyData.map(_._2))
       val smoothData = maxSmoothed.filterNot(p => p._1 == 0 && p._2 == 0.0) //hacking fix
       val dataString = smoothData.map{case (x,y) => s"{$x,${MamFormat.showDouble(y)}}"}.mkString("{",",","}")
       val mamCode = s"FindFit[$dataString, a x^b + c, {{a, 1.0}, {b, 1.1}, {c, 1.1}}, x][[All, 2]]"
@@ -104,5 +104,102 @@ class SimplePerformanceEvaluation(sizeOfInterest: Int, evaluationTrials: Int, va
   }
 }
 
+object FittingPerformanceEvaluation {
+  trait ModelFitter{
+    def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): ((Double => Double), Double)
+  }
+
+  case class PowerLawFitter(maxIter: Int) extends ModelFitter{
+
+    def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): (Double => Double, Double) = {
+      import collection.JavaConverters._
+      import org.apache.commons.math3.fitting.{SimpleCurveFitter, WeightedObservedPoints}
+      val obPoints = new WeightedObservedPoints()
+      val nPoints = xyPoints.length
+      val xRangeSize = xRange._2 - xRange._1
+      xyPoints.indices.foreach{i =>
+        val d1 = if(i>0) xyPoints(i)._1 - xyPoints(i-1)._1 else 0.0
+        val d2 = if(i+1<nPoints) xyPoints(i+1)._1 - xyPoints(i)._1 else 0.0
+        val weight = (d1+d2)/xRangeSize
+        obPoints.add(weight, xyPoints(i)._1, xyPoints(i)._2)
+      }
+
+      val observations = obPoints.toList
+      val Array(a,b) = new SimpleCurveFitter(PowerLawModel, Array(10.0, 2.0), maxIter).fit(observations)
+      def f(x: Double) = a * math.pow(x, b)
+
+      val beta: Double = {
+        val weights = new Array[Double](nPoints)
+        val xs = new Array[Double](nPoints)
+        val ys = new Array[Double](nPoints)
+        observations.asScala.zipWithIndex.foreach{
+          case (wp, i) =>
+            weights(i) = wp.getWeight
+            xs(i) = wp.getX
+            ys(i) = wp.getY
+        }
+        SimpleMath.rSquared(xs, ys, xs.map(f), weights)
+      }
+      (f, beta)
+    }
+  }
+
+  object PowerLawModel extends ParametricUnivariateFunction{
+    def gradient(x: Double, ab: Double*): Array[Double] = {
+      val Seq(a,b) = ab
+      val xb = math.pow(x, b)
+      Array(xb, a * xb * math.log(x))
+    }
+
+    def value(x: Double, ab: Double*): Double = {
+      val Seq(a,b) = ab
+      a * math.pow(x, b)
+    }
+  }
+
+}
+
+class FittingPerformanceEvaluation(sizeOfInterest: Int, val resourceUsage: (IS[EValue]) => Double,
+                                   val sizeF: (IS[EValue]) => Int,
+                                   val breakingMemoryUsage: Long,
+                                   val nonsenseFitness: Double,
+                                   val minPointsToUse: Int,
+                                   val fitter: FittingPerformanceEvaluation.ModelFitter
+                                   ) extends PerformanceEvaluation {
+
+  def usableInputs(inputStream: Stream[(MemoryUsage, IS[EValue])]): Option[IS[(Int, IS[EValue])]] = {
+    var lastSize = Int.MinValue
+    val xyPoints = mutable.ListBuffer[(Int, IS[EValue])]()
+    inputStream.foreach{ case (usage, input) =>
+      val inputSize = sizeF(input)
+      if (inputSize <= lastSize || usage.amount > breakingMemoryUsage)
+        return None
+      lastSize = inputSize
+      val shouldContinue = sizeF(input) <= sizeOfInterest
+      if(!shouldContinue)
+        return Some(xyPoints.toIndexedSeq)
+      xyPoints.append(inputSize -> input)
+    }
+    Some(xyPoints.toIndexedSeq)
+  }
+
+
+  def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): Double = {
+
+    usableInputs(inputStream) match {
+      case Some(points) if points.length >= minPointsToUse =>
+        val xyPoints = {
+          val ps = points.map{
+            case (x, input) => x.toDouble -> resourceUsage(input)
+          }
+          ps.map(_._1) zip SimpleMath.maxSmooth(ps.map(_._2))
+        }
+        val xRange = (xyPoints.head._1, sizeOfInterest.toDouble)
+        val (model, beta) = fitter.fitModel(xyPoints, xRange)
+        model(sizeOfInterest) * beta
+      case _ => nonsenseFitness
+    }
+  }
+}
 
 

@@ -8,6 +8,7 @@ object SimpleMath {
     if (m < 0) m + range else m
   }
 
+  @inline
   def square(x: Double): Double = x * x
 
   def gaussianForthOrder(halfPoint: Double)(x: Double): Double = {
@@ -194,6 +195,19 @@ object SimpleMath {
         case (a, pAcc) => x < pAcc
       }.getOrElse(pcf.last)._1
     }
+  }
+
+  def maxSmooth(data: Seq[Double]): Seq[Double] = {
+    data.scanLeft(Double.MinValue)(math.max).tail
+  }
+
+  /** In statistics, the coefficient of determination, denoted R2 or r2 and pronounced "R squared", is the proportion of the variance in the dependent variable that is predictable from the independent variable(s) */
+  def rSquared(xs: IS[Double], ys: IS[Double], predictions: IS[Double], weights: IS[Double]): Double = {
+    val n = xs.length
+    val mean = (0 until n).map(i => ys(i) * weights(i)).sum/n
+    val resSquared = (0 until n).map(i => square(ys(i) - predictions(i))).sum
+    val variance = (0 until n).map(i => square(ys(i) - mean)).sum
+    1 - resSquared / variance
   }
 
   def main(args: Array[String]): Unit = {
