@@ -132,7 +132,7 @@ object Supernova{
     val prob = SlowfuzzExamples.phpHashExample(50)(FileInteraction.getWorkingDir(1))
     standardSupernova.fuzzProblem(prob,
       RunnerConfig().copy(randomSeed = seed, ioId = seed),
-      ExecutionConfig().copy(evalSizePolicy = sizePolicy),
+      ExecutionConfig().copy(evalSizePolicy = sizePolicy, resourcePolicy = ResourceUsagePolicy.FittingEvaluationPolicy()),
       rand)
   }
 }

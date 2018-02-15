@@ -18,7 +18,6 @@ object ProblemConfig{
 
 case class GPConfig(populationSize: Int = 500,
                     tournamentSize: Int = 7,
-                    evaluationTrials: Int = 1,
                     totalSizeTolerance: Int = 60,
                     singleSizeTolerance: Int = 30,
                     crossoverP: Double = 0.4,
@@ -30,7 +29,6 @@ case class GPConfig(populationSize: Int = 500,
     s"""
        |populationSize: $populationSize
        |tournamentSize: $tournamentSize
-       |evaluationTrials：$evaluationTrials
        |totalSizeTolerance：$totalSizeTolerance
        |singleSizeTolerance：$singleSizeTolerance
        |crossoverP: $crossoverP
@@ -71,11 +69,23 @@ object VariedEvalSize{
   }
 }
 
+sealed trait ResourceUsagePolicy
+
+object ResourceUsagePolicy{
+  case class SimpleEvaluationPolicy(windowSize: Int = 1) extends ResourceUsagePolicy
+
+  case class FittingEvaluationPolicy(minPointsToUse: Int = 5,
+                                     maxPointsToUse: Int = 20,
+                                     maxIter: Int = 100) extends ResourceUsagePolicy
+}
+
+
 case class ExecutionConfig(evalSizePolicy: EvalSizePolicy = FixedEvalSize(300),
                            threadNum: Int = 1,
                            timeLimitInMillis: Int = 120000,
                            maxNonIncreaseGen: Option[Int] = Some(150),
-                           maxFuzzingTimeSec: Option[Long] = None
+                           maxFuzzingTimeSec: Option[Long] = None,
+                           resourcePolicy: ResourceUsagePolicy = ResourceUsagePolicy.SimpleEvaluationPolicy()
                           ){
   def show: String = {
     s"""
@@ -84,6 +94,7 @@ case class ExecutionConfig(evalSizePolicy: EvalSizePolicy = FixedEvalSize(300),
        |timeLimitInMillis：$timeLimitInMillis
        |maxNonIncreaseGen：$maxNonIncreaseGen
        |maxFuzzingTimeSec: $maxFuzzingTimeSec
+       |resourcePolicy: $resourcePolicy
      """.stripMargin
   }
 }

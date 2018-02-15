@@ -1,9 +1,11 @@
 package patsyn
 
-import patbench.commons.math3.analysis.ParametricUnivariateFunction
+import org.apache.commons.math3.analysis.ParametricUnivariateFunction
+import org.apache.commons.math3.exception.ConvergenceException
 import patsyn.EvolutionRepresentation.MemoryUsage
 
 import scala.collection.mutable
+import scala.util.Random
 
 
 object PerformanceEvaluation {
@@ -112,36 +114,37 @@ object FittingPerformanceEvaluation {
   case class PowerLawFitter(maxIter: Int) extends ModelFitter{
 
     def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): (Double => Double, Double) = {
-//      import collection.JavaConverters._
-//      import org.apache.commons.math3.fitting.{SimpleCurveFitter, WeightedObservedPoints}
-//      val obPoints = new WeightedObservedPoints()
-//      val nPoints = xyPoints.length
-//      val xRangeSize = xRange._2 - xRange._1
-//      xyPoints.indices.foreach{i =>
-//        val d1 = if(i>0) xyPoints(i)._1 - xyPoints(i-1)._1 else 0.0
-//        val d2 = if(i+1<nPoints) xyPoints(i+1)._1 - xyPoints(i)._1 else 0.0
-//        val weight = (d1+d2)/xRangeSize
-//        obPoints.add(weight, xyPoints(i)._1, xyPoints(i)._2)
-//      }
-//
-//      val observations = obPoints.toList
-//      val Array(a,b) = new SimpleCurveFitter(PowerLawModel, Array(10.0, 2.0), maxIter).fit(observations)
-//      def f(x: Double) = a * math.pow(x, b)
-//
-//      val beta: Double = {
-//        val weights = new Array[Double](nPoints)
-//        val xs = new Array[Double](nPoints)
-//        val ys = new Array[Double](nPoints)
-//        observations.asScala.zipWithIndex.foreach{
-//          case (wp, i) =>
-//            weights(i) = wp.getWeight
-//            xs(i) = wp.getX
-//            ys(i) = wp.getY
-//        }
-//        SimpleMath.rSquared(xs, ys, xs.map(f), weights)
-//      }
-//      (f, beta)
-      ???
+      import collection.JavaConverters._
+      import org.apache.commons.math3.fitting.{SimpleCurveFitter, WeightedObservedPoints}
+      val obPoints = new WeightedObservedPoints()
+      val nPoints = xyPoints.length
+      val xRangeSize = xRange._2 - xRange._1
+      xyPoints.indices.foreach{i =>
+        val d1 = if(i>0) xyPoints(i)._1 - xyPoints(i-1)._1 else 0.0
+        val d2 = if(i+1<nPoints) xyPoints(i+1)._1 - xyPoints(i)._1 else 0.0
+        val weight = (d1+d2)/xRangeSize
+        obPoints.add(weight, xyPoints(i)._1, xyPoints(i)._2)
+      }
+
+      val observations = obPoints.toList
+      val Array(a,b) = SimpleCurveFitter.create(PowerLawModel, Array(10.0, 2.0)).fit(observations)
+      def f(x: Double) = a * math.pow(x, b)
+
+      val beta: Double = {
+        val weights = new Array[Double](nPoints)
+        val xs = new Array[Double](nPoints)
+        val ys = new Array[Double](nPoints)
+        observations.asScala.zipWithIndex.foreach{
+          case (wp, i) =>
+            weights(i) = wp.getWeight
+            xs(i) = wp.getX
+            ys(i) = wp.getY
+        }
+        val rs = SimpleMath.rSquared(xs, ys, xs.map(f), weights)
+        assert(0.0 <= rs && rs <= 1.0)
+        10.0 * math.pow(10, -1.0/rs)
+      }
+      (f, beta)
     }
   }
 
@@ -165,6 +168,7 @@ class FittingPerformanceEvaluation(sizeOfInterest: Int, val resourceUsage: (IS[E
                                    val breakingMemoryUsage: Long,
                                    val nonsenseFitness: Double,
                                    val minPointsToUse: Int,
+                                   val maxPointsToUse: Int,
                                    val fitter: FittingPerformanceEvaluation.ModelFitter
                                    ) extends PerformanceEvaluation {
 
@@ -188,16 +192,27 @@ class FittingPerformanceEvaluation(sizeOfInterest: Int, val resourceUsage: (IS[E
   def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): Double = {
 
     usableInputs(inputStream) match {
-      case Some(points) if points.length >= minPointsToUse =>
+      case Some(pts) =>
+        val points = pts.filter(p => p._1 > 0)
+        if (points.length < minPointsToUse)
+          return nonsenseFitness
         val xyPoints = {
-          val ps = points.map{
+          val ps = SimpleMath.randomSelectFrom(points, maxPointsToUse, new Random(1)).map{
             case (x, input) => x.toDouble -> resourceUsage(input)
           }
           ps.map(_._1) zip SimpleMath.maxSmooth(ps.map(_._2))
         }
         val xRange = (xyPoints.head._1, sizeOfInterest.toDouble)
-        val (model, beta) = fitter.fitModel(xyPoints, xRange)
-        model(sizeOfInterest) * beta
+        try {
+          val (model, beta) = fitter.fitModel(xyPoints, xRange)
+          model(sizeOfInterest) * beta
+        } catch {
+          case cE: ConvergenceException =>
+            System.err.println{"ConvergenceException when try to fit a curve during resource usage evaluation."}
+            System.err.println{s"xyPoints: $xyPoints"}
+            System.err.println{s"xRange: $xRange"}
+            throw cE
+        }
       case _ => nonsenseFitness
     }
   }

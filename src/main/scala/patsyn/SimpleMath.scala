@@ -201,6 +201,25 @@ object SimpleMath {
     data.scanLeft(Double.MinValue)(math.max).tail
   }
 
+  def randomSelectFrom[A](values: IS[A], maxPoints: Int, random: Random): IS[A] = {
+    if (values.length <= maxPoints) {
+      values
+    } else {
+      val xs = {
+        var dataPointsLeft = maxPoints
+        val filtered = values.indices.filter{i =>
+          val keep = SimpleMath.randomGuess(random)(dataPointsLeft.toDouble/(values.length-i))
+          if(keep){
+            dataPointsLeft -= 1
+          }
+          keep
+        }
+        if (filtered.last != (values.length - 1)) filtered :+ (values.length - 1) else filtered
+      }
+      xs.map(values.apply)
+    }
+  }
+
   /** In statistics, the coefficient of determination, denoted R2 or r2 and pronounced "R squared", is the proportion of the variance in the dependent variable that is predictable from the independent variable(s) */
   def rSquared(xs: IS[Double], ys: IS[Double], predictions: IS[Double], weights: IS[Double]): Double = {
     val n = xs.length

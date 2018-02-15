@@ -86,7 +86,7 @@ object Playground {
 
     val config = GuavaExamples.immutableBiMap_copyOf
     val random = new Random(1)
-    val indicies = PatternPlot.randomSelectFrom((0 until sizeOfInterest), maxPoints = 30, random = random)
+    val indicies = SimpleMath.randomSelectFrom((0 until sizeOfInterest), maxPoints = 30, random = random)
 
     import StandardSystem._
     val points = indicies.map{

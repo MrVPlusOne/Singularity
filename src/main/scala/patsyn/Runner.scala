@@ -199,11 +199,20 @@ object Runner {
     }
 
     def mkRepresentation(sizeOfInterest: Int, memoryLimit: Long): MultiStateRepresentation = {
-      val evaluation = new SimplePerformanceEvaluation(
-        sizeOfInterest = sizeOfInterest, evaluationTrials = evaluationTrials, nonsenseFitness = -1.0,
-        resourceUsage = timeLimitedResourceUsage(timeLimitInMillis),
-        sizeF = sizeF, breakingMemoryUsage = memoryLimit
-      )
+      val evaluation = {
+        execConfig.resourcePolicy match{
+          case ResourceUsagePolicy.SimpleEvaluationPolicy(windowSize) =>
+            new SimplePerformanceEvaluation(
+              sizeOfInterest = sizeOfInterest, evaluationTrials = windowSize, nonsenseFitness = -1.0,
+              resourceUsage = timeLimitedResourceUsage(timeLimitInMillis),
+              sizeF = sizeF, breakingMemoryUsage = memoryLimit
+            )
+          case ResourceUsagePolicy.FittingEvaluationPolicy(minPointsToUse, maxPointsToUse, maxIter) =>
+            new FittingPerformanceEvaluation(sizeOfInterest, resourceUsage, sizeF, memoryLimit,
+              nonsenseFitness = -1.0, minPointsToUse = minPointsToUse, maxPointsToUse = maxPointsToUse,
+              FittingPerformanceEvaluation.PowerLawFitter(maxIter))
+        }
+      }
       MultiStateRepresentation(
         totalSizeTolerance = totalSizeTolerance,
         singleSizeTolerance = singleSizeTolerance,

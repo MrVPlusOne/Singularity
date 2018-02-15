@@ -34,7 +34,7 @@ object PatternPlot {
 
     println(s"Values accumulated.")
 
-    val valuesToUse = randomSelectFrom(values, maxPoints, new Random(seed))
+    val valuesToUse = SimpleMath.randomSelectFrom(values, maxPoints, new Random(seed))
 
 
     valuesToUse.toStream.map(v => {
@@ -45,24 +45,6 @@ object PatternPlot {
     })
   }
 
-  def randomSelectFrom[A](values: IS[A], maxPoints: Int, random: Random): IS[A] = {
-    if (values.length <= maxPoints) {
-      values
-    } else {
-      val xs = {
-        var dataPointsLeft = maxPoints
-        val filtered = values.indices.filter{i =>
-          val keep = SimpleMath.randomGuess(random)(dataPointsLeft.toDouble/(values.length-i))
-          if(keep){
-            dataPointsLeft -= 1
-          }
-          keep
-        }
-        if (filtered.last != (values.length - 1)) filtered :+ (values.length - 1) else filtered
-      }
-      xs.map(values.apply)
-    }
-  }
 
   def showResourceUsageChart(probConfig: ProblemConfig,
                              ind: MultiStateInd,
