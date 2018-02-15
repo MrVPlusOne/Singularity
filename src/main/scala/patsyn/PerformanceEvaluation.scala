@@ -112,35 +112,36 @@ object FittingPerformanceEvaluation {
   case class PowerLawFitter(maxIter: Int) extends ModelFitter{
 
     def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): (Double => Double, Double) = {
-      import collection.JavaConverters._
-      import org.apache.commons.math3.fitting.{SimpleCurveFitter, WeightedObservedPoints}
-      val obPoints = new WeightedObservedPoints()
-      val nPoints = xyPoints.length
-      val xRangeSize = xRange._2 - xRange._1
-      xyPoints.indices.foreach{i =>
-        val d1 = if(i>0) xyPoints(i)._1 - xyPoints(i-1)._1 else 0.0
-        val d2 = if(i+1<nPoints) xyPoints(i+1)._1 - xyPoints(i)._1 else 0.0
-        val weight = (d1+d2)/xRangeSize
-        obPoints.add(weight, xyPoints(i)._1, xyPoints(i)._2)
-      }
-
-      val observations = obPoints.toList
-      val Array(a,b) = new SimpleCurveFitter(PowerLawModel, Array(10.0, 2.0), maxIter).fit(observations)
-      def f(x: Double) = a * math.pow(x, b)
-
-      val beta: Double = {
-        val weights = new Array[Double](nPoints)
-        val xs = new Array[Double](nPoints)
-        val ys = new Array[Double](nPoints)
-        observations.asScala.zipWithIndex.foreach{
-          case (wp, i) =>
-            weights(i) = wp.getWeight
-            xs(i) = wp.getX
-            ys(i) = wp.getY
-        }
-        SimpleMath.rSquared(xs, ys, xs.map(f), weights)
-      }
-      (f, beta)
+//      import collection.JavaConverters._
+//      import org.apache.commons.math3.fitting.{SimpleCurveFitter, WeightedObservedPoints}
+//      val obPoints = new WeightedObservedPoints()
+//      val nPoints = xyPoints.length
+//      val xRangeSize = xRange._2 - xRange._1
+//      xyPoints.indices.foreach{i =>
+//        val d1 = if(i>0) xyPoints(i)._1 - xyPoints(i-1)._1 else 0.0
+//        val d2 = if(i+1<nPoints) xyPoints(i+1)._1 - xyPoints(i)._1 else 0.0
+//        val weight = (d1+d2)/xRangeSize
+//        obPoints.add(weight, xyPoints(i)._1, xyPoints(i)._2)
+//      }
+//
+//      val observations = obPoints.toList
+//      val Array(a,b) = new SimpleCurveFitter(PowerLawModel, Array(10.0, 2.0), maxIter).fit(observations)
+//      def f(x: Double) = a * math.pow(x, b)
+//
+//      val beta: Double = {
+//        val weights = new Array[Double](nPoints)
+//        val xs = new Array[Double](nPoints)
+//        val ys = new Array[Double](nPoints)
+//        observations.asScala.zipWithIndex.foreach{
+//          case (wp, i) =>
+//            weights(i) = wp.getWeight
+//            xs(i) = wp.getX
+//            ys(i) = wp.getY
+//        }
+//        SimpleMath.rSquared(xs, ys, xs.map(f), weights)
+//      }
+//      (f, beta)
+      ???
     }
   }
 
