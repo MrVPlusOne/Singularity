@@ -9,6 +9,7 @@ import scala.util.Random
 
 
 object PerformanceEvaluation {
+  case class EvaluationResult(value: Double, extraData: AnyRef)
 }
 
 trait PerformanceEvaluation {
@@ -107,6 +108,7 @@ class SimplePerformanceEvaluation(sizeOfInterest: Int, evaluationTrials: Int, va
 }
 
 object FittingPerformanceEvaluation {
+
   trait ModelFitter{
     def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): ((Double => Double), Double)
   }
@@ -127,7 +129,7 @@ object FittingPerformanceEvaluation {
       }
 
       val observations = obPoints.toList
-      val Array(a,b) = SimpleCurveFitter.create(PowerLawModel, Array(10.0, 2.0)).fit(observations)
+      val Array(a,b) = SimpleCurveFitter.create(PowerLawModel, Array(10.0, 2.0)).withMaxIterations(maxIter).fit(observations)
       def f(x: Double) = a * math.pow(x, b)
 
       val beta: Double = {
