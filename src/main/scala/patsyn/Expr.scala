@@ -15,13 +15,13 @@ sealed trait Expr {
 
 sealed trait ETerminal extends Expr with SExpr {
   def argTypes: IS[EType] = IS()
-
-  override def astSize: Int = 1
 }
 
 @SerialVersionUID(0L)
 case class EArg(id: Int, returnType: EType) extends ETerminal{
   def isConst: Boolean = false
+
+  def astSize: Int = 1
 }
 
 @SerialVersionUID(0L)
@@ -29,6 +29,8 @@ case class EConst(returnType: EType, value: EValue) extends ETerminal{
   require(value hasType returnType)
 
   def isConst: Boolean = true
+
+  def astSize: Int = value.memoryUsage.toInt
 }
 
 @SerialVersionUID(0L)
