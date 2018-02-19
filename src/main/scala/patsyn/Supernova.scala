@@ -126,7 +126,7 @@ object Supernova{
     val seed = 1
 //    val workingDir = FileInteraction.getWorkingDir(seed)
     val rand = new Random(seed)
-    val sizePolicy = FixedEvalSize(50)
+    val sizePolicy = FixedEvalSize(200)
 
 //    val prob = SlowfuzzExamples.phpHashExample(50)(FileInteraction.getWorkingDir(1))
     FuzzingTaskProvider.quickSortMiddlePivotExample.runAsProbConfig("quickSortMiddle"){ prob =>

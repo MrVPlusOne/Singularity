@@ -76,38 +76,39 @@ object FittingPerformanceEvaluation {
       }
 
       val observations = obPoints.toList
-      val Array(a,b) = SimpleCurveFitter.create(PowerLawModel, Array(10.0, 2.0)).withMaxIterations(maxIter).fit(observations)
-      def f(x: Double) = a * math.pow(x, b)
+      val Array(a,b,c) = ModifiedCurveFitter.create(PowerLawModel, Array(10.0, 2.0, 0.0)).withMaxIterations(maxIter).fit(observations)
+      def f(x: Double) = a * math.pow(x, b) + c
 
+      val weights = new Array[Double](nPoints)
+      val xs = new Array[Double](nPoints)
+      val ys = new Array[Double](nPoints)
+      observations.asScala.zipWithIndex.foreach{
+        case (wp, i) =>
+          weights(i) = wp.getWeight
+          xs(i) = wp.getX
+          ys(i) = wp.getY
+      }
       val beta: Double = {
-        val weights = new Array[Double](nPoints)
-        val xs = new Array[Double](nPoints)
-        val ys = new Array[Double](nPoints)
-        observations.asScala.zipWithIndex.foreach{
-          case (wp, i) =>
-            weights(i) = wp.getWeight
-            xs(i) = wp.getX
-            ys(i) = wp.getY
-        }
+
         val rs = SimpleMath.rSquared(xs, ys, xs.map(f), weights)
         assert(0.0 <= rs && rs <= 1.0)
         10.0 * math.pow(10, -1.0/rs)
       }
 
-      (f, beta, s"$a * x ^ $b, beta = $beta")
+      (f, beta, s"$a * x ^ $b + $c, beta = $beta, data = {${xs.mkString("{",",","}")},${ys.mkString("{",",","}")}}")
     }
   }
 
   object PowerLawModel extends ParametricUnivariateFunction{
-    def gradient(x: Double, ab: Double*): Array[Double] = {
-      val Seq(a,b) = ab
+    def gradient(x: Double, abc: Double*): Array[Double] = {
+      val Seq(a,b,c) = abc
       val xb = math.pow(x, b)
-      Array(xb, a * xb * math.log(x))
+      Array(xb, a * xb * math.log(x),1.0)
     }
 
-    def value(x: Double, ab: Double*): Double = {
-      val Seq(a,b) = ab
-      a * math.pow(x, b)
+    def value(x: Double, abc: Double*): Double = {
+      val Seq(a,b,c) = abc
+      a * math.pow(x, b) + c
     }
   }
 
