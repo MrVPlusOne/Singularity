@@ -12,13 +12,15 @@ object PerformanceEvaluation {
   case class EvaluationResult(value: Double, extraData: AnyRef)
 }
 
+case class PerformanceEvalResult(perf: Double, info: String)
+
 trait PerformanceEvaluation {
   def resourceUsage: IS[EValue] => Double
   def sizeF: IS[EValue] => Int
   def nonsenseFitness: Double
   def breakingMemoryUsage: Long
 
-  def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): Double
+  def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): PerformanceEvalResult
 }
 
 object ExtrapolatePerformanceEvaluation{
@@ -31,91 +33,36 @@ object ExtrapolatePerformanceEvaluation{
 
 }
 
-@deprecated
-class ExtrapolatePerformanceEvaluation(mamLink: MamLink, sizeOfInterest: Int, fitEndPoint: Int, minPointsToUse: Int, val resourceUsage: IS[EValue] => Double, val sizeF: IS[EValue] => Int, val nonsenseFitness: Double = 0.0) extends PerformanceEvaluation {
-  import ExtrapolatePerformanceEvaluation._
-
-  def breakingMemoryUsage = ???
-
-  def evaluate[T](xs: Stream[T], sizeF: T => Int, executeF: T => Double): EvaluationResult = {
-
-    def fitData(xyData: Seq[(Int, Double)]): ExtrapolatedResult = {
-      val maxSmoothed = xyData.map(_._1) zip SimpleMath.maxSmooth(xyData.map(_._2))
-      val smoothData = maxSmoothed.filterNot(p => p._1 == 0 && p._2 == 0.0) //hacking fix
-      val dataString = smoothData.map{case (x,y) => s"{$x,${MamFormat.showDouble(y)}}"}.mkString("{",",","}")
-      val mamCode = s"FindFit[$dataString, a x^b + c, {{a, 1.0}, {b, 1.1}, {c, 1.1}}, x][[All, 2]]"
-      val result = mamLink.execute(mamCode)
-      assert(result.head == '{' && result.last == '}', s"Invalid result: $result")
-      val Array(a,b,c) = result.substring(1,result.length-1).split(",").map(s => s.replace("*^","e").toDouble)
-
-      ExtrapolatedResult(a * math.pow(sizeOfInterest, b) + c, xyData)
-    }
-
-    val sizedInputs = xs.map(x => (sizeF(x), x))
-    val smallInputs = sizedInputs.takeWhile{ _._1 <= fitEndPoint }
-    if(smallInputs.size >= minPointsToUse)
-      return fitData(smallInputs.map{case (size, v) => size -> executeF(v)})
-
-
-    var i = 0
-    val largerDataSet = sizedInputs.takeWhile{
-      case (size, v) =>
-        i += 1
-        size <= sizeOfInterest && i <= minPointsToUse
-    }
-    if(largerDataSet.size < minPointsToUse)
-      MaxSoFarResult(largerDataSet.map{p => executeF(p._2)}.max)
-    else
-      fitData(largerDataSet.map{case (size, v) => size -> executeF(v)})
-
-
-  }
-
-
-  def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): Double = {
-//    var lastSize = Int.MinValue
-//    val xs = inputStream.map{ input =>
-//      val inputSize = sizeF(input)
-//      if(inputSize <= lastSize)
-//        return nonsenseFitness
-//      lastSize = inputSize
-//      input
-//    }
-//    this.evaluate[IS[EValue]](xs, sizeF, resourceUsage).value
-    ???
-  }
-
-}
 
 class SimplePerformanceEvaluation(sizeOfInterest: Int, evaluationTrials: Int, val resourceUsage: (IS[EValue]) => Double, val sizeF: (IS[EValue]) => Int, val breakingMemoryUsage: Long, val nonsenseFitness: Double) extends PerformanceEvaluation {
 
 
-  def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): Double = {
+  def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): PerformanceEvalResult = {
     var lastSize = Int.MinValue
     val pointsToTry = inputStream.takeWhile { case (usage, input) =>
       val inputSize = sizeF(input)
       if (inputSize <= lastSize || usage.amount > breakingMemoryUsage)
-        return nonsenseFitness
+        return PerformanceEvalResult(nonsenseFitness, "inputSize <= lastSize || usage.amount > breakingMemoryUsage")
       lastSize = inputSize
       sizeF(input) <= sizeOfInterest
     }.takeRight(evaluationTrials)
 
     if (pointsToTry.isEmpty)
-      nonsenseFitness
+      PerformanceEvalResult(nonsenseFitness, "pointsToTry.isEmpty")
     else
-      pointsToTry.map(_._2).map(resourceUsage).max
+      PerformanceEvalResult(pointsToTry.map(_._2).map(resourceUsage).max, "Simple Eval")
   }
 }
 
 object FittingPerformanceEvaluation {
 
   trait ModelFitter{
-    def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): ((Double => Double), Double)
+    def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): ((Double => Double), Double, String)
   }
 
   case class PowerLawFitter(maxIter: Int) extends ModelFitter{
 
-    def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): (Double => Double, Double) = {
+    def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): (Double => Double, Double, String) = {
       import collection.JavaConverters._
       import org.apache.commons.math3.fitting.{SimpleCurveFitter, WeightedObservedPoints}
       val obPoints = new WeightedObservedPoints()
@@ -146,7 +93,8 @@ object FittingPerformanceEvaluation {
         assert(0.0 <= rs && rs <= 1.0)
         10.0 * math.pow(10, -1.0/rs)
       }
-      (f, beta)
+
+      (f, beta, s"$a * x ^ $b, beta = $beta")
     }
   }
 
@@ -191,13 +139,13 @@ class FittingPerformanceEvaluation(sizeOfInterest: Int, val resourceUsage: (IS[E
   }
 
 
-  def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): Double = {
+  def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): PerformanceEvalResult = {
 
     usableInputs(inputStream) match {
       case Some(pts) =>
         val points = pts.filter(p => p._1 > 0)
         if (points.length < minPointsToUse)
-          return nonsenseFitness
+          return PerformanceEvalResult(nonsenseFitness, "points.length < minPointsToUse")
         val xyPoints = {
           val ps = SimpleMath.randomSelectFrom(points, maxPointsToUse, new Random(1)).map{
             case (x, input) => x.toDouble -> resourceUsage(input)
@@ -206,8 +154,8 @@ class FittingPerformanceEvaluation(sizeOfInterest: Int, val resourceUsage: (IS[E
         }
         val xRange = (xyPoints.head._1, sizeOfInterest.toDouble)
         try {
-          val (model, beta) = fitter.fitModel(xyPoints, xRange)
-          model(sizeOfInterest) * beta
+          val (model, beta, info) = fitter.fitModel(xyPoints, xRange)
+          PerformanceEvalResult(model(sizeOfInterest) * beta, info)
         } catch {
           case cE: ConvergenceException =>
             System.err.println{"ConvergenceException when try to fit a curve during resource usage evaluation."}
@@ -215,7 +163,7 @@ class FittingPerformanceEvaluation(sizeOfInterest: Int, val resourceUsage: (IS[E
             System.err.println{s"xRange: $xRange"}
             throw cE
         }
-      case _ => nonsenseFitness
+      case _ => PerformanceEvalResult(nonsenseFitness, "usableInputs is None")
     }
   }
 }

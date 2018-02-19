@@ -19,10 +19,10 @@ trait EvolutionRepresentation[Individual] {
 
   def fitnessEvaluation(ind: Individual): (IndividualEvaluation, Stream[IS[EValue]]) = {
     val inputStream = individualToPattern(ind)
-    val performance = evaluation.evaluateAPattern(inputStream)
+    val PerformanceEvalResult(performance, info) = evaluation.evaluateAPattern(inputStream)
     val sp = sizePenaltyFactor(ind)
     val fitness = sp * performance + (if(isTooLarge(ind)) -0.1 else 0.0)
-    IndividualEvaluation(fitness, performance) -> inputStream.map(_._2)
+    IndividualEvaluation(fitness, performance, info) -> inputStream.map(_._2)
   }
 
   def showIndData(data: IndividualData[Individual]): String = {
@@ -66,9 +66,9 @@ trait EvolutionRepresentation[Individual] {
 }
 
 object EvolutionRepresentation{
-  case class IndividualEvaluation(fitness: Double, performance: Double){
+  case class IndividualEvaluation(fitness: Double, performance: Double, extraInfo: String){
     def showAsLinearExpr: String = {
-      s"(fitness: ${f"$fitness%.1f"}, performance: ${f"$performance%.1f"})"
+      s"(fitness: ${f"$fitness%.1f"}, performance: ${f"$performance%.1f"}, info: $extraInfo)"
     }
   }
 
