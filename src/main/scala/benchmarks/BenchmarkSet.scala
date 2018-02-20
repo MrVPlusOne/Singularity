@@ -14,6 +14,14 @@ object BenchmarkSet {
     Cost.read()
   }
 
+  def handleIllegalArgumentException[A](default: A)(f: => A): A = {
+    try{
+      f
+    }catch {
+      case _: IllegalArgumentException => default
+    }
+  }
+
   def runExample(seed: Int, problemConfig: ProblemConfig, useGUI: Boolean, size: Int): Unit = {
     val rand = new Random(seed)
     Supernova.standardSupernova.fuzzProblem(
