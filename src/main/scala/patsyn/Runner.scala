@@ -93,7 +93,7 @@ object Runner {
                           keepBestIndividuals: Boolean = false,
                           previewPatternLen: Int = 7,
                           callExitAfterFinish: Boolean = true,
-                          fitDuringEvolution: Boolean = false
+                          fitAfterEachGen: Boolean = false
                          ){
     def show: String = {
       s"""
@@ -396,7 +396,7 @@ object Runner {
           representation.printIndividualMultiLine(println)(bestData.ind)
           println(s"Best Individual Pattern: ${showPattern(bestData.ind)}, ...")
           println(s"Best Individual cost penalty: ${representation.costPenalty(bestData.ind)}")
-          if(runnerConfig.fitDuringEvolution){
+          if(runnerConfig.fitAfterEachGen){
             val fittingRepr = mkRepresentation(evalSize, memoryLimit, ResourceUsagePolicy.FittingEvaluationPolicy())
             val fitInfo = fittingRepr.fitnessEvaluation(bestData.ind)._1.extraInfo
             println(s"Best Individual Fit: $fitInfo")
