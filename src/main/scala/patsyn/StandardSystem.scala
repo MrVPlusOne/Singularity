@@ -26,12 +26,15 @@ object StandardSystem {
   case object EUnit extends EType()
 
   // Value declarations
+  @SerialVersionUID(-2901336594181525995L)
   case class IntValue(value: Int) extends EValue {
     def hasType(ty: EType): Boolean = ty == EInt
 
     override def toString: String = value.toString
 
     def memoryUsage: Long = 1
+
+    def cost: Double = math.log10(math.abs(value.toDouble)+1)
   }
 
   case class ByteArrayValue(value: IS[Byte]) extends EValue {
@@ -44,6 +47,8 @@ object StandardSystem {
     override def toString: String = s"[${value.mkString(":")}]"
 
     override def memoryUsage: Long = value.length + 1
+
+    def cost: Double = value.map(v => v.toDouble / Byte.MaxValue).sum
   }
 
   case class ByteValue(value: Byte) extends EValue {
@@ -53,8 +58,11 @@ object StandardSystem {
     override def toString: String = s"$value"
 
     override def memoryUsage: Long = 1
+
+    def cost: Double = value.toDouble / Byte.MaxValue
   }
 
+  @SerialVersionUID(4070837804269965038L)
   case class VectValue(value: Vector[EValue]) extends EValue{
     def hasType(ty: EType): Boolean = ty match {
       case EVect(et) => value.isEmpty || value.head.hasType(et)
@@ -64,6 +72,8 @@ object StandardSystem {
     override def toString: String = value.mkString("[",",","]")
 
     def memoryUsage: Long = value.map(_.memoryUsage).sum + 1
+
+    def cost: Double = value.map(_.cost).sum
   }
 
   case class BoolValue(value: Boolean) extends EValue{
@@ -72,6 +82,8 @@ object StandardSystem {
     def memoryUsage: Long = 1
 
     override def toString: String = if(value)"T" else "F"
+
+    def cost: Double = 0
   }
 
   case class PairValue(value: (EValue, EValue)) extends EValue{
@@ -83,6 +95,8 @@ object StandardSystem {
     def memoryUsage: Long = value._1.memoryUsage + value._2.memoryUsage
 
     override def toString: String = value.toString()
+
+    def cost: Double = value._1.cost + value._2.cost
   }
 
   case class GraphValue(nodeNum: Int, edges: IS[(Int, Int, EValue)]) extends EValue{
@@ -96,12 +110,16 @@ object StandardSystem {
     def shiftIndex(offset: Int): GraphValue = {
       this.copy(edges = edges.map{ case (n1, n2, v) => (n1+offset, n2+offset, v)})
     }
+
+    def cost: Double = edges.map(_._3.cost).sum
   }
 
   case object UnitValue extends EValue{
     def hasType(ty: EType): Boolean = ty == EUnit
 
     def memoryUsage: Long = 1
+
+    def cost: Double = 0
   }
 
   implicit def intValue(v: Int): IntValue = IntValue(v)
@@ -442,6 +460,17 @@ object StandardSystem {
             val newEdges = g1.edges.updated(index, (from, to, v))
             GraphValue(g1.nodeNum, newEdges)
           }
+      }
+    )
+
+    val addCompleteNode = mkAbstract("addCompleteNode", tyVarNum = 1,
+      typeInstantiation = {
+        case IS(eT) => IS(EGraph(eT), eT) -> EGraph(eT),
+      }, eval = {
+        case IS(g1: GraphValue, v: EValue) =>
+          val nV = g1.nodeNum
+          val newEdges = (0 until nV).map(i => (i, nV, v))
+          GraphValue(nV+1, g1.edges ++ newEdges)
       }
     )
   }
