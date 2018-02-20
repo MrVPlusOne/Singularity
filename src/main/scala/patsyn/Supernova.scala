@@ -106,15 +106,16 @@ class Supernova(extendedConstRule: (PartialFunction[EType, Random => EValue] => 
     (env, gpConfig)
   }
 
-  def fuzzTask(name: String, taskProvider: FuzzingTaskProvider, runnerConfig: RunnerConfig, execConfig: ExecutionConfig, rand: Random): Unit = {
+  def fuzzTask(name: String, taskProvider: FuzzingTaskProvider, runnerConfig: RunnerConfig, execConfig: ExecutionConfig, rand: Random, aggressiveness: Option[Double] = None, overrideGpConfig: GPConfig => GPConfig = x => x): Unit = {
     taskProvider.runAsProbConfig(name) { problemConfig =>
-      fuzzProblem(problemConfig, runnerConfig, execConfig, rand)
+      fuzzProblem(problemConfig, runnerConfig, execConfig, rand, aggressiveness, overrideGpConfig)
     }
   }
 
-  def fuzzProblem(problemConfig: ProblemConfig, runnerConfig: RunnerConfig, execConfig: ExecutionConfig, rand: Random, aggressiveness: Option[Double] = None): Unit ={
+  def fuzzProblem(problemConfig: ProblemConfig, runnerConfig: RunnerConfig, execConfig: ExecutionConfig, rand: Random, aggressiveness: Option[Double] = None, overrideGpConfig: GPConfig => GPConfig = x => x): Unit ={
     val (env, gpConfig) = genGPParameters(problemConfig.outputTypes, rand, aggressiveness)
-    Runner.run(problemConfig, env, RunConfig(runnerConfig, gpConfig, execConfig))
+    val gpConfig1 = overrideGpConfig(gpConfig)
+    Runner.run(problemConfig, env, RunConfig(runnerConfig, gpConfig1, execConfig))
   }
 }
 
