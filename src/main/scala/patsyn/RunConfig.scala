@@ -20,6 +20,7 @@ case class GPConfig(populationSize: Int = 500,
                     tournamentSize: Int = 7,
                     totalSizeTolerance: Int = 60,
                     singleSizeTolerance: Int = 30,
+                    exprCostPenaltyBase: Double = 0.95,
                     crossoverP: Double = 0.4,
                     mutateP: Double = 0.5,
                     copyP: Double = 0.05,
@@ -29,11 +30,13 @@ case class GPConfig(populationSize: Int = 500,
     s"""
        |populationSize: $populationSize
        |tournamentSize: $tournamentSize
-       |totalSizeTolerance：$totalSizeTolerance
-       |singleSizeTolerance：$singleSizeTolerance
+       |totalSizeTolerance: $totalSizeTolerance
+       |singleSizeTolerance: $singleSizeTolerance
+       |exprCostPenaltyBase: $exprCostPenaltyBase,
        |crossoverP: $crossoverP
        |mutateP: $mutateP
        |copyP: $copyP
+       |constFoldP: $constFoldP
      """.stripMargin
   }
 }

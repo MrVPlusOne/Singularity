@@ -88,7 +88,7 @@ object PatternPlot {
     val plotPoints = 30
     val files =
       """
-        |/Users/weijiayi/Programming/PatternSyn/results-running/phphash_int_100[ioId=2,seed=2](18-02-19-18:58:58)/bestIndividual.serialized
+        |/Users/weijiayi/Programming/PatternSyn/results-running/phphash_int_100[ioId=4,seed=4](18-02-20-14:23:19)/bestIndividual.serialized
       """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
 
 

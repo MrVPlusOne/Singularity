@@ -100,6 +100,7 @@ object MultiStateRepresentation{
 
 case class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType],
                                     totalSizeTolerance: Double, singleSizeTolerance: Double,
+                                    exprCostPenaltyBase: Double,
                                     evaluation: PerformanceEvaluation)
   extends EvolutionRepresentation[MultiStateInd] {
 
@@ -114,6 +115,11 @@ case class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType
       val iter = ind.iters(i)
       s"[S$i: $t]{ seed: $s ; iter: $iter }"
     }).mkString("< ", " | ", " >")
+  }
+
+  def costPenalty(ind: MultiStateInd): Double = {
+    val totalCost = ind.exprs.map(CostModel.exprCost).sum
+    math.pow(exprCostPenaltyBase, totalCost)
   }
 
   def showIndividualMultiLine(ind: MultiStateInd): String = {

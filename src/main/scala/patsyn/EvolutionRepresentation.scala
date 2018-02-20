@@ -17,11 +17,13 @@ trait EvolutionRepresentation[Individual] {
 
   def evaluation: PerformanceEvaluation
 
+  def costPenalty(ind: Individual): Double
+
   def fitnessEvaluation(ind: Individual): (IndividualEvaluation, Stream[IS[EValue]]) = {
     val inputStream = individualToPattern(ind)
     val PerformanceEvalResult(performance, info) = evaluation.evaluateAPattern(inputStream)
     val sp = sizePenaltyFactor(ind)
-    val fitness = sp * performance + (if(isTooLarge(ind)) -0.1 else 0.0)
+    val fitness = sp * performance * costPenalty(ind) + (if(isTooLarge(ind)) -0.1 else 0.0)
     IndividualEvaluation(fitness, performance, info) -> inputStream.map(_._2)
   }
 

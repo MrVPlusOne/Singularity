@@ -92,7 +92,8 @@ object Runner {
                           useGUI: Boolean = true,
                           keepBestIndividuals: Boolean = false,
                           previewPatternLen: Int = 7,
-                          callExitAfterFinish: Boolean = true
+                          callExitAfterFinish: Boolean = true,
+                          fitDuringEvolution: Boolean = false
                          ){
     def show: String = {
       s"""
@@ -216,6 +217,7 @@ object Runner {
       MultiStateRepresentation(
         totalSizeTolerance = totalSizeTolerance,
         singleSizeTolerance = singleSizeTolerance,
+        exprCostPenaltyBase = exprCostPenaltyBase,
         stateTypes = gpEnv.stateTypes, outputTypes = outputTypes, evaluation = evaluation)
     }
 
@@ -384,8 +386,7 @@ object Runner {
           monitorCallback(MonitoringData(pop.averageFitness, bestEval.fitness, bestEval.performance))
           saveMonitor(s"$recordDirPath/monitor.png")
 
-          val fittingRepr = mkRepresentation(evalSize, memoryLimit, ResourceUsagePolicy.FittingEvaluationPolicy())
-          val fitInfo = fittingRepr.fitnessEvaluation(bestData.ind)._1.extraInfo
+
 
           println("------------")
           print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
@@ -394,7 +395,12 @@ object Runner {
           println(s"Best Result: ${bestEval.showAsLinearExpr}")
           representation.printIndividualMultiLine(println)(bestData.ind)
           println(s"Best Individual Pattern: ${showPattern(bestData.ind)}, ...")
-          println(s"Best Individual Fit: $fitInfo")
+          println(s"Best Individual cost penalty: ${representation.costPenalty(bestData.ind)}")
+          if(runnerConfig.fitDuringEvolution){
+            val fittingRepr = mkRepresentation(evalSize, memoryLimit, ResourceUsagePolicy.FittingEvaluationPolicy())
+            val fitInfo = fittingRepr.fitnessEvaluation(bestData.ind)._1.extraInfo
+            println(s"Best Individual Fit: $fitInfo")
+          }
           println(s"Average Size: ${representation.populationAverageSize(pop.refEvaluations.map(_.ind))}")
           println(s"Average Fitness: ${pop.averageFitness}")
           println(s"Fitness Variation: ${pop.fitnessStdDiv}")

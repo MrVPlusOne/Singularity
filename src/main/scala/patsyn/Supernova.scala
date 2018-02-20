@@ -42,7 +42,7 @@ class Supernova(extendedConstRule: (PartialFunction[EType, Random => EValue] => 
     import StandardSystem._
     import SimpleMath.{aggressiveInterpolate, aggressiveSigmoid}
 
-    val intRange = aggressiveInterpolate(aggressiveness, 5, 500)(rand.nextDouble()).toInt
+    val intRange = aggressiveInterpolate(aggressiveness, 5, 256)(rand.nextDouble()).toInt
     lazy val exRule = extendedConstRule(constRule)
     lazy val constRule: PartialFunction[EType, Random => EValue] = PartialFunction[EType, Random => EValue] {
       case any if exRule.isDefinedAt(any) => exRule(any)
@@ -81,6 +81,7 @@ class Supernova(extendedConstRule: (PartialFunction[EType, Random => EValue] => 
       tournamentSize = rand.nextInt(9-3)+3,
       totalSizeTolerance = totalTolerance.toInt,
       singleSizeTolerance = singleTolerance.toInt,
+      exprCostPenaltyBase = 0.92 + 0.07*rand.nextDouble(),
       mutateP = inter(0.4,0.7),
       crossoverP = 0.5,
       copyP = 0.05+0.1-inter(0.0,0.1),
@@ -123,7 +124,7 @@ object Supernova{
 
 
   def main(args: Array[String]): Unit = {
-    val seed = 2
+    val seed = 5
 //    val workingDir = FileInteraction.getWorkingDir(seed)
     val rand = new Random(seed)
     val size = 100
@@ -133,7 +134,7 @@ object Supernova{
 //    FuzzingTaskProvider.quickSortMiddlePivotExample.runAsProbConfig("quickSortMiddle"){ prob =>
         standardSupernova.fuzzProblem(prob,
           RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = true),
-          ExecutionConfig().copy(evalSizePolicy = sizePolicy, resourcePolicy = ResourceUsagePolicy.FittingEvaluationPolicy()),
+          ExecutionConfig().copy(evalSizePolicy = sizePolicy),
           rand = rand)
 //    }
   }

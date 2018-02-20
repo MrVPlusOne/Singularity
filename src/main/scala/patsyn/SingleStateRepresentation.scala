@@ -12,6 +12,7 @@ case class SingleStateInd(seed: IS[Expr], iter: IS[Expr]){
 }
 
 case class SingleStateRepresentation(seedSizeTolerance: Int, iterSizeTolerance: Int,
+                                     exprCostPenaltyBase: Double,
                                      evaluation: PerformanceEvaluation) extends EvolutionRepresentation[SingleStateInd]{
 
   def showIndividual(ind: SingleStateInd): String = ind.showAsLinearExpr
@@ -46,5 +47,10 @@ case class SingleStateRepresentation(seedSizeTolerance: Int, iterSizeTolerance: 
 
   def isTooLarge(ind: SingleStateInd): Boolean = {
     (ind.seed ++ ind.iter).map(_.astSize).sum > iterSizeTolerance + seedSizeTolerance
+  }
+
+  def costPenalty(ind: SingleStateInd): Double = {
+    val totalCost = (ind.seed ++ ind.iter).map(CostModel.exprCost).sum
+    math.pow(exprCostPenaltyBase, totalCost)
   }
 }
