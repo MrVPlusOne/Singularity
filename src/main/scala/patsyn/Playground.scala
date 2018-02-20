@@ -133,43 +133,23 @@ object Playground {
   }
 
   def main(args: Array[String]): Unit = {
-//    SimpleMath.processMap(args,
-//      0 to 50, processNum = 10,
-//      mainClass = this) {
-//      ioId =>
-//        run(ioId)
-//    }
 
-//    import StandardSystem._
-//    val vec = for(i <- 0 until 100) yield {
-//      val x = 0
-//      VectValue(Vector(x-i, x+33*i))
-//    }
-//    println{
-//      FuzzingTaskProvider.phpHashCollisionExample.squareMetric(vec.toVector)
-//    }
-//    run(6)
+    import patsyn.SimpleMath._
 
-    def testGraphValue(size: Int) = {
-      import StandardSystem._
+    val ys = ((1 to 10) ++ (11 to 20).map(x => 2*x-10)).map(_.toDouble)
+    println(ys)
 
-      val a = IntValue(3)
-      val b = IntValue(4)
+    val obs = Vector(1.6042, 2.09113, 2.75512, 3.56867, 4.51526, 5.58344, 6.76462,
+    8.05203, 9.44014, 10.9243, 12.5006, 14.1656, 15.9162, 17.7497,
+    19.6638, 21.6562, 23.7249, 25.8682, 28.0843, 30.3717)
 
-      val edges = (1 until size).flatMap { i =>
-        if(i%2 == 0){
-          IS((0, i, a), (i, 0, b))
-        }else{
-          IS((0, i, IntValue(0)))
-        }
-      }
-      val g = GraphValue(size, edges)
+    val ranObs = Vector(1.53002, 2.16833, 2.66912, 3.49463, 4.63557, 5.82693, 6.80915,
+    8.15374, 9.50951, 10.8812, 11.9085, 14.8277, 15.5781, 16.9295,
+    18.6827, 20.7155, 22.5459, 26.4805, 26.7853, 29.4198)
 
-      println(MamFormat.showAsMamGraph(g))
-      println{
-        JGraphTExamples.maxFlow_PushRelabelMFImpl.resourceUsage(IS(g, 2, 1))
-      }
+    println{
+     // rSquared(obs, ranObs, Vector.fill(20)(1.0/20.0), 1.0)
     }
-    testGraphValue(100)
+
   }
 }

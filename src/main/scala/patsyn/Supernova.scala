@@ -123,17 +123,18 @@ object Supernova{
 
 
   def main(args: Array[String]): Unit = {
-    val seed = 1
+    val seed = 2
 //    val workingDir = FileInteraction.getWorkingDir(seed)
     val rand = new Random(seed)
-    val sizePolicy = FixedEvalSize(200)
+    val size = 100
+    val sizePolicy = FixedEvalSize(size)
 
-//    val prob = SlowfuzzExamples.phpHashExample(50)(FileInteraction.getWorkingDir(1))
-    FuzzingTaskProvider.quickSortMiddlePivotExample.runAsProbConfig("quickSortMiddle"){ prob =>
+    val prob = SlowfuzzExamples.phpHashExample(size)(FileInteraction.getWorkingDir(1))
+//    FuzzingTaskProvider.quickSortMiddlePivotExample.runAsProbConfig("quickSortMiddle"){ prob =>
         standardSupernova.fuzzProblem(prob,
-          RunnerConfig().copy(randomSeed = seed, ioId = seed),
+          RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = true),
           ExecutionConfig().copy(evalSizePolicy = sizePolicy, resourcePolicy = ResourceUsagePolicy.FittingEvaluationPolicy()),
-          rand)
-    }
+          rand = rand)
+//    }
   }
 }

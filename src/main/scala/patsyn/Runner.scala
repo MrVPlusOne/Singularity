@@ -198,9 +198,9 @@ object Runner {
       (sizeOfInterest, MemoryUsage(memoryLimit))
     }
 
-    def mkRepresentation(sizeOfInterest: Int, memoryLimit: Long): MultiStateRepresentation = {
+    def mkRepresentation(sizeOfInterest: Int, memoryLimit: Long, resourceUsagePolicy: ResourceUsagePolicy): MultiStateRepresentation = {
       val evaluation = {
-        execConfig.resourcePolicy match{
+        resourceUsagePolicy match{
           case ResourceUsagePolicy.SimpleEvaluationPolicy(windowSize) =>
             new SimplePerformanceEvaluation(
               sizeOfInterest = sizeOfInterest, evaluationTrials = windowSize, nonsenseFitness = -1.0,
@@ -239,16 +239,18 @@ object Runner {
 
       val refRepresentation = mkRepresentation(
         evalSizePolicy.referenceSize,
-        calcMemoryLimit(evalSizePolicy.referenceSize))
+        calcMemoryLimit(evalSizePolicy.referenceSize),
+        execConfig.resourcePolicy
+      )
       var (evalSize, MemoryUsage(memoryLimit)) = newEvalSize()
-      var representation = mkRepresentation(evalSize, memoryLimit)
+      var representation = mkRepresentation(evalSize, memoryLimit, execConfig.resourcePolicy)
 
       def updateEvalSize(): Unit = {
         val newSize = newEvalSize()
         println(s"new eval size = $newSize")
         evalSize = newSize._1
         memoryLimit = newSize._2.amount
-        representation = mkRepresentation(evalSize, memoryLimit)
+        representation = mkRepresentation(evalSize, memoryLimit, execConfig.resourcePolicy)
       }
 
       val operators = IS(
@@ -382,12 +384,17 @@ object Runner {
           monitorCallback(MonitoringData(pop.averageFitness, bestEval.fitness, bestEval.performance))
           saveMonitor(s"$recordDirPath/monitor.png")
 
+          val fittingRepr = mkRepresentation(evalSize, memoryLimit, ResourceUsagePolicy.FittingEvaluationPolicy())
+          val fitInfo = fittingRepr.fitnessEvaluation(bestData.ind)._1.extraInfo
+
           println("------------")
           print("[" + TimeTools.nanoToSecondString(System.nanoTime() - startTime) + "]")
           println(s"Generation ${i + 1}")
-          println(s"Best Result: ${bestEval.showAsLinearExpr}, Created by ${bestData.history.birthOp}")
+          println(s"Created by ${bestData.history.birthOp}")
+          println(s"Best Result: ${bestEval.showAsLinearExpr}")
           representation.printIndividualMultiLine(println)(bestData.ind)
           println(s"Best Individual Pattern: ${showPattern(bestData.ind)}, ...")
+          println(s"Best Individual Fit: $fitInfo")
           println(s"Average Size: ${representation.populationAverageSize(pop.refEvaluations.map(_.ind))}")
           println(s"Average Fitness: ${pop.averageFitness}")
           println(s"Fitness Variation: ${pop.fitnessStdDiv}")

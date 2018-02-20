@@ -221,13 +221,31 @@ object SimpleMath {
   }
 
   /** In statistics, the coefficient of determination, denoted R2 or r2 and pronounced "R squared", is the proportion of the variance in the dependent variable that is predictable from the independent variable(s) */
-  def rSquared(xs: IS[Double], ys: IS[Double], predictions: IS[Double], weights: IS[Double]): Double = {
-    val n = xs.length
+  def rSquared(ys: IS[Double], predictions: IS[Double], weights: IS[Double]): Double = {
+    val n = ys.length
     val mean = (0 until n).map(i => ys(i) * weights(i)).sum/n
-    val resSquared = (0 until n).map(i => square(ys(i) - predictions(i))).sum
-    val variance = (0 until n).map(i => square(ys(i) - mean)).sum
+    val resSquared = (0 until n).map(i => square(ys(i) - predictions(i)) * weights(i)).sum
+    val variance = (0 until n).map(i => square(ys(i) - mean) * weights(i)).sum
     1 - resSquared / variance
   }
+
+//  /** use exponentially weighted moving variance to calculate rSquared
+//    * @param alpha: change rate */
+//  def eRSquared(ys: IS[Double], predictions: IS[Double], weights: IS[Double], alpha: Double): Double = {
+//    val n = ys.length
+//    val residuals = (0 until n).map(i => predictions(i) - ys(i))
+//    var mean = 0.0
+//    var vSum = 0.0
+//    for(i <- 0 until n){
+//      val delta = residuals(i) - mean
+//      mean += alpha * weights(i) * delta
+//      vSum += square(delta) * weights(i)
+//    }
+//
+//    val staticMean = (0 until n).map(i => ys(i) * weights(i)).sum/n
+//    val variance = (0 until n).map(i => square(ys(i) - staticMean) * weights(i)).sum
+//    1 - vSum / variance
+//  }
 
   def main(args: Array[String]): Unit = {
     parallelMapOrdered(0 until 100, 6){ i =>

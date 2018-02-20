@@ -60,39 +60,43 @@ object FittingPerformanceEvaluation {
     def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): ((Double => Double), Double, String)
   }
 
-  case class PowerLawFitter(maxIter: Int) extends ModelFitter{
+  case class PowerLawFitter(maxIter: Int, gofPenaltyBase: Double = 100.0) extends ModelFitter{
 
     def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): (Double => Double, Double, String) = {
       import collection.JavaConverters._
       import org.apache.commons.math3.fitting.{SimpleCurveFitter, WeightedObservedPoints}
-      val obPoints = new WeightedObservedPoints()
-      val nPoints = xyPoints.length
+
       val xRangeSize = xRange._2 - xRange._1
-      xyPoints.indices.foreach{i =>
+      val nPoints = xyPoints.length
+      val weights = xyPoints.indices.map{i =>
         val d1 = if(i>0) xyPoints(i)._1 - xyPoints(i-1)._1 else 0.0
         val d2 = if(i+1<nPoints) xyPoints(i+1)._1 - xyPoints(i)._1 else 0.0
-        val weight = (d1+d2)/xRangeSize
-        obPoints.add(weight, xyPoints(i)._1, xyPoints(i)._2)
+        (d1+d2)/xRangeSize
+      }
+
+      val scale = math.max(xyPoints.map(p => math.abs(p._2)).max, 1.0)
+      val obPoints = new WeightedObservedPoints()
+      xyPoints.indices.foreach{i =>
+        obPoints.add(weights(i), xyPoints(i)._1, xyPoints(i)._2/scale)
       }
 
       val observations = obPoints.toList
-      val Array(a,b,c) = ModifiedCurveFitter.create(PowerLawModel, Array(10.0, 2.0, 0.0)).withMaxIterations(maxIter).fit(observations)
+      val Array(a1,b,c1) = ModifiedCurveFitter.create(PowerLawModel, Array(10.0, 2.0, 0.0)).withMaxIterations(maxIter).fit(observations)
+      val (a,c) = (a1*scale, c1*scale)
       def f(x: Double) = a * math.pow(x, b) + c
 
-      val weights = new Array[Double](nPoints)
+//      val weights = new Array[Double](nPoints)
       val xs = new Array[Double](nPoints)
       val ys = new Array[Double](nPoints)
       observations.asScala.zipWithIndex.foreach{
         case (wp, i) =>
-          weights(i) = wp.getWeight
           xs(i) = wp.getX
-          ys(i) = wp.getY
+          ys(i) = wp.getY * scale
       }
       val beta: Double = {
-
-        val rs = SimpleMath.rSquared(xs, ys, xs.map(f), weights)
-        assert(0.0 <= rs && rs <= 1.0)
-        10.0 * math.pow(10, -1.0/rs)
+        val rs = SimpleMath.rSquared(ys, xs.map(f), weights)
+        assert(0.0 <= rs && rs <= 1.0, s"r squared should be in [0,1], but actually in $rs")
+        gofPenaltyBase * math.pow(gofPenaltyBase, -1.0 / (rs * rs))
       }
 
       (f, beta, s"$a * x ^ $b + $c, beta = $beta, data = {${xs.mkString("{",",","}")},${ys.mkString("{",",","}")}}")
@@ -156,7 +160,7 @@ class FittingPerformanceEvaluation(sizeOfInterest: Int, val resourceUsage: (IS[E
         val xRange = (xyPoints.head._1, sizeOfInterest.toDouble)
         try {
           val (model, beta, info) = fitter.fitModel(xyPoints, xRange)
-          PerformanceEvalResult(model(sizeOfInterest) * beta, info)
+          PerformanceEvalResult(xyPoints.last._2 * beta, info)
         } catch {
           case cE: ConvergenceException =>
             System.err.println{"ConvergenceException when try to fit a curve during resource usage evaluation."}

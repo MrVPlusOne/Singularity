@@ -74,8 +74,8 @@ sealed trait ResourceUsagePolicy
 object ResourceUsagePolicy{
   case class SimpleEvaluationPolicy(windowSize: Int = 1) extends ResourceUsagePolicy
 
-  case class FittingEvaluationPolicy(minPointsToUse: Int = 5,
-                                     maxPointsToUse: Int = 20,
+  case class FittingEvaluationPolicy(minPointsToUse: Int = 6,
+                                     maxPointsToUse: Int = 12,
                                      maxIter: Int = 100) extends ResourceUsagePolicy
 }
 

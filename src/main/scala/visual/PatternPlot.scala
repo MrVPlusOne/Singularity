@@ -2,7 +2,7 @@ package visual
 
 import javax.swing.JFrame
 
-import benchmarks.{CommonsExamples, GuavaExamples, JGraphTExamples}
+import benchmarks.{CommonsExamples, GuavaExamples, JGraphTExamples, SlowfuzzExamples}
 import patbench.commons.math3.fitting.PolynomialCurveFitter
 import patsyn.MultiStateRepresentation.individualToPattern
 import patsyn.StandardSystem.GraphValue
@@ -83,12 +83,12 @@ object PatternPlot {
   def main(args: Array[String]): Unit = {
     import io.Source
 
-    val config = CommonsExamples.curveFittingProblem("polyFit5",PolynomialCurveFitter.create(5))
-    val sizeLimit = 200
+    val config = SlowfuzzExamples.phpHashExample(100)(FileInteraction.getWorkingDir(1))
+    val sizeLimit = 1000
     val plotPoints = 30
     val files =
       """
-        |/Users/weijiayi/Programming/SingularityResults/polyFitResults/commons.polyFit5[performance=1.0756863171E10][ioId=110,seed=110](18-02-01-10:14:22)
+        |/Users/weijiayi/Programming/PatternSyn/results-running/phphash_int_100[ioId=2,seed=2](18-02-19-18:58:58)/bestIndividual.serialized
       """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
 
 
