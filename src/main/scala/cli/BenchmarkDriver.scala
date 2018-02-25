@@ -59,12 +59,7 @@ object BenchmarkDriver {
       "hashperf/asp.net" -> aspDotNetHashPerformanceExample,
       "hashperf/python" -> pythonHashPerformanceExample,
       "hashperf/v8" -> v8HashCollisionExample,
-      "hashperf/murmur2s0" -> murmur2HashPerformanceExample,
-      "ds/splaytree" -> splayTreeExample,
-      "ds/fordFulkersonDFS" -> fordFulkersonExample(false),
-      "ds/fordFulkersonBFS" -> fordFulkersonExample(true),
-      "ds/dinic" -> dinicExample,
-      "ds/pushRelabel" -> pushRelabelExample
+      "hashperf/murmur2s0" -> murmur2HashPerformanceExample
     )
   }
 
