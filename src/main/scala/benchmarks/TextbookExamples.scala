@@ -109,8 +109,8 @@ object TextbookExamples {
     name,
     outputTypes = IS(EGraph(EInt)),
     sizeF = {
-      case IS(g) =>
-        g.memoryUsage.toInt
+      case IS(GraphValue(nodeNum, _)) =>
+        nodeNum * nodeNum
     },
     resourceUsage = {
       case IS(g: GraphValue) =>
@@ -191,10 +191,10 @@ object TextbookExamples {
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
     Supernova.standardSupernova.fuzzProblem(
-      dijkstra,
+      seqSearch,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
-      ExecutionConfig(evalSizePolicy = FixedEvalSize(100), timeLimitInMillis = 10000), rand,
-      overrideGpConfig = config => config.copy(exprCostPenaltyBase = 1)
+      ExecutionConfig(evalSizePolicy = FixedEvalSize(250), timeLimitInMillis = 10000), rand,
+      overrideGpConfig = config => config.copy(exprCostPenaltyBase = 0.95)
     )
   }
 
