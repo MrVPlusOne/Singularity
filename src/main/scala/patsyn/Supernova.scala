@@ -1,6 +1,6 @@
 package patsyn
 
-import benchmarks.{AlgorithmExamples, SlowfuzzExamples}
+import benchmarks.{TextbookExamples, SlowfuzzExamples}
 import patsyn.GeneticOperator.ExprGen
 import patsyn.Runner.RunnerConfig
 import patsyn.StandardSystem.{EInt, EVect, IntValue, VectValue}
