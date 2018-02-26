@@ -22,6 +22,14 @@ object BenchmarkSet {
     }
   }
 
+  def handleRuntimeException[A](default: A)(f: => A): A = {
+    try{
+      f
+    }catch {
+      case _: RuntimeException => default
+    }
+  }
+
   def runExample(seed: Int, problemConfig: ProblemConfig, useGUI: Boolean, size: Int): Unit = {
     val rand = new Random(seed)
     Supernova.standardSupernova.fuzzProblem(
