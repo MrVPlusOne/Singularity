@@ -1,6 +1,7 @@
 package patsyn
 
 import benchmarks.{GuavaExamples, JGraphTExamples}
+import measure.TimeTools
 import patsyn.Runner.RunnerConfig
 
 import scala.util.Random
@@ -133,23 +134,29 @@ object Playground {
   }
 
   def main(args: Array[String]): Unit = {
+    val taskNum = 17
+    val hoursAllowed = 3.0
+    val problems: IS[ProblemConfig] = ???
+    val execConfigTemplate: ExecutionConfig = ???
 
-    import patsyn.SimpleMath._
-
-    val ys = ((1 to 10) ++ (11 to 20).map(x => 2*x-10)).map(_.toDouble)
-    println(ys)
-
-    val obs = Vector(1.6042, 2.09113, 2.75512, 3.56867, 4.51526, 5.58344, 6.76462,
-    8.05203, 9.44014, 10.9243, 12.5006, 14.1656, 15.9162, 17.7497,
-    19.6638, 21.6562, 23.7249, 25.8682, 28.0843, 30.3717)
-
-    val ranObs = Vector(1.53002, 2.16833, 2.66912, 3.49463, 4.63557, 5.82693, 6.80915,
-    8.15374, 9.50951, 10.8812, 11.9085, 14.8277, 15.5781, 16.9295,
-    18.6827, 20.7155, 22.5459, 26.4805, 26.7853, 29.4198)
-
-    println{
-     // rSquared(obs, ranObs, Vector.fill(20)(1.0/20.0), 1.0)
+    SimpleMath.processMap(args, (0 until taskNum), processNum = 5, mainClass = this){
+      i =>
+        val problem = problems(i)
+        var timeLeft = (3600 * hoursAllowed).toLong
+        while(timeLeft > 0L) {
+          try {
+            val (timeUsed, _) = TimeTools.measureTime {
+              val execConfig = execConfigTemplate.copy(maxFuzzingTimeSec = Some(timeLeft))
+              Supernova.standardSupernova.fuzzProblem(problem, ???, execConfig,
+                new Random(i))
+            }
+            timeLeft -= timeUsed
+          } catch {
+            case tE: Runner.MaxFuzzingTimeReachedException =>
+              println(s"Benchmark $i finished, time limit for this one: ${tE.timeLimitSec}")
+              timeLeft = -1
+          }
+        }
     }
-
   }
 }
