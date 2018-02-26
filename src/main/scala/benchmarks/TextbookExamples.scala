@@ -2,9 +2,12 @@ package benchmarks
 
 import java.util.Random
 
+import measure.TimeTools
 import patsyn.Runner.RunnerConfig
 import patsyn.StandardSystem._
 import patsyn._
+
+import scala.util.Random
 
 object TextbookExamples {
 
@@ -15,8 +18,8 @@ object TextbookExamples {
       name,
       outputTypes = IS(EVect(EInt)),
       sizeF = {
-        case IS(vec) =>
-          vec.memoryUsage.toInt
+        case IS(VectValue(v)) =>
+          v.value.length
       },
       resourceUsage = {
         case IS(VectValue(vec)) =>
@@ -32,8 +35,8 @@ object TextbookExamples {
       name,
       outputTypes = IS(EVect(EInt), EInt),
       sizeF = {
-        case IS(vec, _) =>
-          vec.memoryUsage.toInt
+        case IS(VectValue(v), _) =>
+          v.value.length
       },
       resourceUsage = {
         case IS(VectValue(vec), IntValue(i)) =>
@@ -51,8 +54,8 @@ object TextbookExamples {
     name,
     outputTypes = IS(EVect(EInt), EVect(EInt)),
     sizeF = {
-      case IS(u, v) =>
-        u.memoryUsage.toInt + v.memoryUsage.toInt
+      case IS(VectValue(u), VectValue(v)) =>
+        u.value.length + v.value.length
     },
     resourceUsage = {
       case IS(VectValue(needle), VectValue(haystack)) =>
@@ -186,7 +189,7 @@ object TextbookExamples {
     }
   )
 
-  val allProblems = IS(insertSort, insertSortOpt, insertSortBinary, selectSort, shellSort, mergeSortTD, mergeSortBU, mergeSortOpt, quickSort, quickSort3Way, quickSortOpt, quickSort3WayOpt, heapSort, seqSearch, binSearch, bstSearch, rbSearch, sepChainHash, linProbeHash, kmpStr, bmStr, rkStr, nfaStr, dfs, bfs, altPathBiMatch, hkBiMatch, prim, kruskal, boruvka, dijkstra, bellmanFord, fordFulkerson, grahamScan)
+  val allProblems = IS(sepChainHash, linProbeHash, kmpStr, bmStr, rkStr, nfaStr, altPathBiMatch, hkBiMatch, prim, kruskal, boruvka, dijkstra, bellmanFord, fordFulkerson, dfs, bfs, grahamScan, quickSort3Way, quickSort3WayOpt, shellSort, mergeSortTD, mergeSortBU, mergeSortOpt, quickSort, quickSortOpt, heapSort, seqSearch, binSearch, bstSearch, rbSearch, insertSort, insertSortOpt, insertSortBinary, selectSort)
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new Random(seed)
@@ -199,8 +202,39 @@ object TextbookExamples {
   }
 
   def main(args: Array[String]): Unit = {
-    runExample(0, true)
-//        val ind = FileInteraction.readMultiIndFromFile("results/textbook.quickSort3Way[performance=2320.0][ioId=0,seed=0](18-02-25-16:54:38)/bestIndividual.serialized", StandardSystem.funcMap)
-//        visual.PatternPlot.showResourceUsageChart(quickSort3Way, ind, 1000, 50)
+
+    val hoursAllowed = 3.0
+    val problems: IS[ProblemConfig] = allProblems
+    val execConfigTemplate: ExecutionConfig = ExecutionConfig(evalSizePolicy = FixedEvalSize(250))
+    val taskNum = problems.length
+
+    SimpleMath.processMap(args, 0 until taskNum, processNum = 5, mainClass = this){
+      i =>
+        val problem = problems(i)
+        var timeLeft = (3600 * hoursAllowed).toLong
+        var baseSeed = 1000
+        while(timeLeft > 0L) {
+          val runnerConfig = RunnerConfig(randomSeed = baseSeed, ioId = baseSeed, useGUI = false, callExitAfterFinish = false)
+          try {
+            val (timeUsed, _) = TimeTools.measureTime {
+              val execConfig = execConfigTemplate.copy(maxFuzzingTimeSec = Some(timeLeft))
+              Supernova.standardSupernova.fuzzProblem(problem, runnerConfig, execConfig,
+                new Random(i))
+            }
+            timeLeft -= timeUsed
+          } catch {
+            case tE: Runner.MaxFuzzingTimeReachedException =>
+              println(s"Benchmark $i finished, time limit for this one: ${tE.timeLimitSec}")
+              timeLeft = -1
+          }
+          baseSeed += 1
+        }
+    }
   }
+
+//  def main(args: Array[String]): Unit = {
+//    runExample(0, true)
+////        val ind = FileInteraction.readMultiIndFromFile("results/textbook.quickSort3Way[performance=2320.0][ioId=0,seed=0](18-02-25-16:54:38)/bestIndividual.serialized", StandardSystem.funcMap)
+////        visual.PatternPlot.showResourceUsageChart(quickSort3Way, ind, 1000, 50)
+//  }
 }
