@@ -1,7 +1,5 @@
 package benchmarks
 
-import java.util.Random
-
 import measure.TimeTools
 import patsyn.Runner.RunnerConfig
 import patsyn.StandardSystem._
@@ -112,8 +110,8 @@ object TextbookExamples {
     name,
     outputTypes = IS(EGraph(EInt)),
     sizeF = {
-      case IS(GraphValue(nodeNum, _)) =>
-        nodeNum * nodeNum
+      case IS(GraphValue(nodeNum, edges)) =>
+        nodeNum + edges.length
     },
     resourceUsage = {
       case IS(g: GraphValue) =>
@@ -192,7 +190,7 @@ object TextbookExamples {
   val allProblems = IS(sepChainHash, linProbeHash, kmpStr, bmStr, rkStr, nfaStr, altPathBiMatch, hkBiMatch, prim, kruskal, boruvka, dijkstra, bellmanFord, fordFulkerson, dfs, bfs, grahamScan, quickSort3Way, quickSort3WayOpt, shellSort, mergeSortTD, mergeSortBU, mergeSortOpt, quickSort, quickSortOpt, heapSort, seqSearch, binSearch, bstSearch, rbSearch, insertSort, insertSortOpt, insertSortBinary, selectSort)
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
-    val rand = new Random(seed)
+    val rand = new java.util.Random(seed)
     Supernova.standardSupernova.fuzzProblem(
       seqSearch,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
@@ -201,35 +199,37 @@ object TextbookExamples {
     )
   }
 
-  def main(args: Array[String]): Unit = {
-
-    val hoursAllowed = 3.0
-    val problems: IS[ProblemConfig] = allProblems
-    val execConfigTemplate: ExecutionConfig = ExecutionConfig(evalSizePolicy = FixedEvalSize(250))
+  def runWithTimeout(args: Array[String], problems: IS[ProblemConfig], hoursAllowed: Double, evalSize: Int, processNum: Int = 1, maxIteration: Int = 500, baseSeed: Int = 0): Unit = {
+    val execConfigTemplate: ExecutionConfig = ExecutionConfig(evalSizePolicy = FixedEvalSize(evalSize))
     val taskNum = problems.length
 
-    SimpleMath.processMap(args, 0 until taskNum, processNum = 5, mainClass = this){
+    SimpleMath.processMap(args, 0 until taskNum, processNum = processNum, mainClass = this) {
       i =>
         val problem = problems(i)
         var timeLeft = (3600 * hoursAllowed).toLong
-        var baseSeed = 1000
-        while(timeLeft > 0L) {
-          val runnerConfig = RunnerConfig(randomSeed = baseSeed, ioId = baseSeed, useGUI = false, callExitAfterFinish = false)
+        var numIters = 0
+        while (timeLeft > 0L && numIters < maxIteration) {
+          val seed = baseSeed + numIters
+          val runnerConfig = RunnerConfig(randomSeed = seed, ioId = seed, useGUI = false, callExitAfterFinish = false)
           try {
             val (timeUsed, _) = TimeTools.measureTime {
               val execConfig = execConfigTemplate.copy(maxFuzzingTimeSec = Some(timeLeft))
               Supernova.standardSupernova.fuzzProblem(problem, runnerConfig, execConfig,
                 new Random(i))
             }
-            timeLeft -= timeUsed
+            timeLeft -= (timeUsed / 1000000000)
           } catch {
             case tE: Runner.MaxFuzzingTimeReachedException =>
               println(s"Benchmark $i finished, time limit for this one: ${tE.timeLimitSec}")
               timeLeft = -1
           }
-          baseSeed += 1
+          numIters += 1
         }
     }
+  }
+
+  def main(args: Array[String]): Unit = {
+    runWithTimeout(args, allProblems, 3.0, 250)
   }
 
 //  def main(args: Array[String]): Unit = {
