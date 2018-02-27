@@ -200,7 +200,7 @@ object TextbookExamples {
   }
 
   def runWithTimeout(args: Array[String], problems: IS[ProblemConfig], hoursAllowed: Double, evalSize: Int, processNum: Int = 1, maxIteration: Int = 500, baseSeed: Int = 0): Unit = {
-    val execConfigTemplate: ExecutionConfig = ExecutionConfig(evalSizePolicy = FixedEvalSize(evalSize))
+    val execConfigTemplate: ExecutionConfig = ExecutionConfig(evalSizePolicy = FixedEvalSize(evalSize), timeLimitInMillis = 10 * 60 * 1000)
     val taskNum = problems.length
 
     SimpleMath.processMap(args, 0 until taskNum, processNum = processNum, mainClass = this) {

@@ -1,10 +1,11 @@
 package benchmarks
 
-import java.util.Random
-
+import measure.TimeTools
 import patsyn.Runner.RunnerConfig
 import patsyn.StandardSystem._
 import patsyn._
+
+import scala.util.Random
 
 object WiseExamples {
 
@@ -85,19 +86,42 @@ object WiseExamples {
 
   def allProblems = IS(listInsert, heapInsert, bstSearch, rbSearch, quickSort, mergeSort, dijkstra, bellmanFord, tsp)
 
-  def runExample(seed: Int, useGUI: Boolean): Unit = {
-    val rand = new Random(seed)
-    Supernova.standardSupernova.fuzzProblem(
-      tsp,
-      RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
-      ExecutionConfig(evalSizePolicy = FixedEvalSize(100), timeLimitInMillis = 10000), rand,
-      overrideGpConfig = config => config.copy(exprCostPenaltyBase = 0.95)
-    )
+  def runWithTimeout(args: Array[String], problems: IS[ProblemConfig], hoursAllowed: Double, evalSize: Int, processNum: Int = 1, maxIteration: Int = 500, baseSeed: Int = 0): Unit = {
+    val execConfigTemplate: ExecutionConfig = ExecutionConfig(evalSizePolicy = FixedEvalSize(evalSize), timeLimitInMillis = 10 * 60 * 1000, maxNonIncreaseGen = Some(250))
+    val taskNum = problems.length
+
+    SimpleMath.processMap(args, 0 until taskNum, processNum = processNum, mainClass = this) {
+      i =>
+        val problem = problems(i)
+        var timeLeft = (3600 * hoursAllowed).toLong
+        var numIters = 0
+        while (timeLeft > 0L && numIters < maxIteration) {
+          val seed = baseSeed + numIters
+          val runnerConfig = RunnerConfig(randomSeed = seed, ioId = seed, useGUI = false, callExitAfterFinish = false)
+          try {
+            val (timeUsed, _) = TimeTools.measureTime {
+              val execConfig = execConfigTemplate.copy(maxFuzzingTimeSec = Some(timeLeft))
+              Supernova.standardSupernova.fuzzProblem(problem, runnerConfig, execConfig,
+                new Random(i))
+            }
+            timeLeft -= (timeUsed / 1000000000)
+          } catch {
+            case tE: Runner.MaxFuzzingTimeReachedException =>
+              println(s"Benchmark $i finished, time limit for this one: ${tE.timeLimitSec}")
+              timeLeft = -1
+          }
+          numIters += 1
+        }
+    }
   }
 
   def main(args: Array[String]): Unit = {
-    runExample(0, true)
-    //        val ind = FileInteraction.readMultiIndFromFile("results/textbook.quickSort3Way[performance=2320.0][ioId=0,seed=0](18-02-25-16:54:38)/bestIndividual.serialized", StandardSystem.funcMap)
-    //        visual.PatternPlot.showResourceUsageChart(quickSort3Way, ind, 1000, 50)
+    BenchmarkSet.runExample(0, bstSearch, useGUI=true, size=100)
+//    runWithTimeout(args, allProblems,
+//      hoursAllowed = 3,
+//      evalSize = 30,
+//      processNum = 9,
+//      maxIteration = 1000,
+//      baseSeed = 1000)
   }
 }
