@@ -77,9 +77,16 @@ sealed trait ResourceUsagePolicy
 object ResourceUsagePolicy{
   case class SimpleEvaluationPolicy(windowSize: Int = 1) extends ResourceUsagePolicy
 
-  case class FittingEvaluationPolicy(minPointsToUse: Int = 6,
-                                     maxPointsToUse: Int = 12,
-                                     maxIter: Int = 100) extends ResourceUsagePolicy
+  /** fit a power law and evaluate usage at size = scaleFactor * sizeOfInterest */
+  case class HybridEvaluationPolicy(minPointsToUse: Int = 8,
+                                    maxPointsToUse: Int = 14,
+                                    scaleFactor: Double = 10.0,
+                                    maxIter: Int = 100) extends ResourceUsagePolicy
+
+  /** fit a power law and returns the power as evaluation result */
+  case class PowerLawEvaluationPolicy(minPointsToUse: Int = 8,
+                                    maxPointsToUse: Int = 14,
+                                    maxIter: Int = 100) extends ResourceUsagePolicy
 }
 
 

@@ -56,13 +56,13 @@ class SimplePerformanceEvaluation(sizeOfInterest: Int, evaluationTrials: Int, va
 
 object FittingPerformanceEvaluation {
 
-  trait ModelFitter{
-    def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): ((Double => Double), Double, String)
+  trait FittingModel{
+    def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): (IS[Double], Double, String)
   }
 
-  case class PowerLawFitter(maxIter: Int, gofPenaltyBase: Double = 100.0) extends ModelFitter{
+  case class PowerLawFitter(maxIter: Int, gofPenaltyBase: Double = 100.0) extends FittingModel{
 
-    def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): (Double => Double, Double, String) = {
+    def fitModel(xyPoints: IS[(Double, Double)], xRange: (Double, Double)): (IS[Double], Double, String) = {
       import collection.JavaConverters._
       import org.apache.commons.math3.fitting.{SimpleCurveFitter, WeightedObservedPoints}
 
@@ -81,7 +81,7 @@ object FittingPerformanceEvaluation {
       }
 
       val observations = obPoints.toList
-      val Array(a1,b,c1) = ModifiedCurveFitter.create(PowerLawModel, Array(10.0, 2.0, 0.0)).withMaxIterations(maxIter).fit(observations)
+      val Array(a1,b,c1) = ModifiedCurveFitter.create(PowerLawFunction, Array(10.0, 2.0, 0.0)).withMaxIterations(maxIter).fit(observations)
       val (a,c) = (a1*scale, c1*scale)
       def f(x: Double) = a * math.pow(x, b) + c
 
@@ -99,11 +99,11 @@ object FittingPerformanceEvaluation {
         gofPenaltyBase * math.pow(gofPenaltyBase, -1.0 / (rs * rs))
       }
 
-      (f, beta, s"$a * x ^ $b + $c, beta = $beta, data = {${xs.mkString("{",",","}")},${ys.mkString("{",",","}")}}")
+      (IS(a,b,c), beta, s"$a * x ^ $b + $c, beta = $beta, data = {${xs.mkString("{",",","}")},${ys.mkString("{",",","}")}}")
     }
   }
 
-  object PowerLawModel extends ParametricUnivariateFunction{
+  object PowerLawFunction extends ParametricUnivariateFunction{
     def gradient(x: Double, abc: Double*): Array[Double] = {
       val Seq(a,b,c) = abc
       val xb = math.pow(x, b)
@@ -116,6 +116,15 @@ object FittingPerformanceEvaluation {
     }
   }
 
+  def pModel(model: IS[Double], gamma: Double, size: Int): Double = {
+    val IS(a,p,c) = model
+    p * gamma
+  }
+
+  def hybridModel(scaleFactor: Double)(model: IS[Double], gamma: Double, size: Int): Double = {
+    val IS(a,p,c) = model
+    (a * math.pow(scaleFactor * SimpleMath.square(gamma) * size, p) + c) * gamma
+  }
 }
 
 class FittingPerformanceEvaluation(sizeOfInterest: Int, val resourceUsage: (IS[EValue]) => Double,
@@ -124,7 +133,8 @@ class FittingPerformanceEvaluation(sizeOfInterest: Int, val resourceUsage: (IS[E
                                    val nonsenseFitness: Double,
                                    val minPointsToUse: Int,
                                    val maxPointsToUse: Int,
-                                   val fitter: FittingPerformanceEvaluation.ModelFitter
+                                   val fitter: FittingPerformanceEvaluation.FittingModel,
+                                   val modelToScore: (IS[Double], Double, Int) => Double
                                    ) extends PerformanceEvaluation {
 
   def usableInputs(inputStream: Stream[(MemoryUsage, IS[EValue])]): Option[IS[(Int, IS[EValue])]] = {
@@ -160,7 +170,7 @@ class FittingPerformanceEvaluation(sizeOfInterest: Int, val resourceUsage: (IS[E
         val xRange = (xyPoints.head._1, sizeOfInterest.toDouble)
         try {
           val (model, beta, info) = fitter.fitModel(xyPoints, xRange)
-          PerformanceEvalResult(xyPoints.last._2 * beta, info)
+          PerformanceEvalResult(modelToScore(model, beta, sizeOfInterest), info)
         } catch {
           case cE: ConvergenceException =>
             System.err.println{"ConvergenceException when try to fit a curve during resource usage evaluation."}

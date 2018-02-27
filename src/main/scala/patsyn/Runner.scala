@@ -208,10 +208,16 @@ object Runner {
               resourceUsage = timeLimitedResourceUsage(timeLimitInMillis),
               sizeF = sizeF, breakingMemoryUsage = memoryLimit
             )
-          case ResourceUsagePolicy.FittingEvaluationPolicy(minPointsToUse, maxPointsToUse, maxIter) =>
+          case ResourceUsagePolicy.PowerLawEvaluationPolicy(minPointsToUse, maxPointsToUse, maxIter) =>
             new FittingPerformanceEvaluation(sizeOfInterest, resourceUsage, sizeF, memoryLimit,
               nonsenseFitness = -1.0, minPointsToUse = minPointsToUse, maxPointsToUse = maxPointsToUse,
-              FittingPerformanceEvaluation.PowerLawFitter(maxIter))
+              FittingPerformanceEvaluation.PowerLawFitter(maxIter), FittingPerformanceEvaluation.pModel)
+
+          case ResourceUsagePolicy.HybridEvaluationPolicy(minPointsToUse, maxPointsToUse, scaleFactor, maxIter) =>
+            new FittingPerformanceEvaluation(sizeOfInterest, resourceUsage, sizeF, memoryLimit,
+              nonsenseFitness = -1.0, minPointsToUse = minPointsToUse, maxPointsToUse = maxPointsToUse,
+              FittingPerformanceEvaluation.PowerLawFitter(maxIter), FittingPerformanceEvaluation.hybridModel(scaleFactor))
+
         }
       }
       MultiStateRepresentation(
@@ -397,7 +403,7 @@ object Runner {
           println(s"Best Individual Pattern: ${showPattern(bestData.ind)}, ...")
           println(s"Best Individual cost penalty: ${representation.costPenalty(bestData.ind)}")
           if(runnerConfig.fitAfterEachGen){
-            val fittingRepr = mkRepresentation(evalSize, memoryLimit, ResourceUsagePolicy.FittingEvaluationPolicy())
+            val fittingRepr = mkRepresentation(evalSize, memoryLimit, ResourceUsagePolicy.HybridEvaluationPolicy())
             val fitInfo = fittingRepr.fitnessEvaluation(bestData.ind)._1.extraInfo
             println(s"Best Individual Fit: $fitInfo")
           }

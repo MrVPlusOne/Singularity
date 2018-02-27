@@ -1,8 +1,9 @@
 package patsyn
 
-import benchmarks.{GuavaExamples, JGraphTExamples}
+import benchmarks.{GuavaExamples, JGraphTExamples, SlowfuzzExamples}
 import measure.TimeTools
 import patsyn.Runner.RunnerConfig
+import patsyn.Supernova.standardSupernova
 
 import scala.util.Random
 
@@ -134,29 +135,19 @@ object Playground {
   }
 
   def main(args: Array[String]): Unit = {
-    val taskNum = 17
-    val hoursAllowed = 3.0
-    val problems: IS[ProblemConfig] = ???
-    val execConfigTemplate: ExecutionConfig = ???
+    val seed = 5
+    //    val workingDir = FileInteraction.getWorkingDir(seed)
+    val rand = new Random(seed)
+    val size = 100
+    val sizePolicy = FixedEvalSize(size)
+    val resourcePolicy = ResourceUsagePolicy.HybridEvaluationPolicy()
 
-    SimpleMath.processMap(args, (0 until taskNum), processNum = 5, mainClass = this){
-      i =>
-        val problem = problems(i)
-        var timeLeft = (3600 * hoursAllowed).toLong
-        while(timeLeft > 0L) {
-          try {
-            val (timeUsed, _) = TimeTools.measureTime {
-              val execConfig = execConfigTemplate.copy(maxFuzzingTimeSec = Some(timeLeft))
-              Supernova.standardSupernova.fuzzProblem(problem, ???, execConfig,
-                new Random(i))
-            }
-            timeLeft -= timeUsed
-          } catch {
-            case tE: Runner.MaxFuzzingTimeReachedException =>
-              println(s"Benchmark $i finished, time limit for this one: ${tE.timeLimitSec}")
-              timeLeft = -1
-          }
+//    val prob = SlowfuzzExamples.phpHashExample(size)(FileInteraction.getWorkingDir(1))
+        FuzzingTaskProvider.quickSortMiddlePivotExample.runAsProbConfig("quickSortMiddle"){ prob =>
+    standardSupernova.fuzzProblem(prob,
+      RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = true),
+      ExecutionConfig().copy(evalSizePolicy = sizePolicy, resourcePolicy = resourcePolicy),
+      rand = rand)
         }
-    }
   }
 }
