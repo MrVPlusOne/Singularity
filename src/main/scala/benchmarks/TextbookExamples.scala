@@ -215,7 +215,7 @@ object TextbookExamples {
             val (timeUsed, _) = TimeTools.measureTime {
               val execConfig = execConfigTemplate.copy(maxFuzzingTimeSec = Some(timeLeft))
               Supernova.standardSupernova.fuzzProblem(problem, runnerConfig, execConfig,
-                new Random(i))
+                new Random(seed))
             }
             timeLeft -= (timeUsed / 1000000000)
           } catch {
@@ -229,7 +229,18 @@ object TextbookExamples {
   }
 
   def main(args: Array[String]): Unit = {
-    runWithTimeout(args, allProblems, 3.0, 250)
+    runWithTimeout(args, allProblems,
+      hoursAllowed = 3.0,
+      evalSize = 250,
+      processNum = 8,
+      baseSeed = 1000
+    )
+//    BenchmarkSet.runExample(1224, nfaStr, true, 250);
+//    val rand = new Random(1436)
+//    Supernova.standardSupernova.fuzzProblem(
+//      nfaStr,
+//      RunnerConfig().copy(randomSeed = 1436, ioId = 1436, useGUI = true),
+//      ExecutionConfig(evalSizePolicy = FixedEvalSize(250)), new Random(5))
   }
 
 //  def main(args: Array[String]): Unit = {

@@ -127,7 +127,7 @@ object WiseExamples {
             val (timeUsed, _) = TimeTools.measureTime {
               val execConfig = execConfigTemplate.copy(maxFuzzingTimeSec = Some(timeLeft))
               Supernova.standardSupernova.fuzzProblem(problem, runnerConfig, execConfig,
-                new Random(i))
+                new Random(seed))
             }
             timeLeft -= (timeUsed / 1000000000)
           } catch {
