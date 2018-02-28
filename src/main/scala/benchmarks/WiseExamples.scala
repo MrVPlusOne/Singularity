@@ -26,6 +26,14 @@ object WiseExamples {
         BenchmarkSet.measureCost {
           func(ds, new Integer(i))
         }
+    },
+    saveValueWithName = (value: IS[EValue], name: String) => {
+      value match {
+        case IS(VectValue(v), IntValue(i)) =>
+          val str = (v.map { case IntValue(j) => j } :+ i).mkString("\n")
+          val textFileName = s"$name.raw.txt"
+          FileInteraction.writeToFile(textFileName)(str)
+      }
     }
   )
 
@@ -43,6 +51,14 @@ object WiseExamples {
         BenchmarkSet.measureCost {
           sort(ds)
         }
+    },
+    saveValueWithName = (value: IS[EValue], name: String) => {
+      value match {
+        case IS(VectValue(v)) =>
+          val str = v.map { case IntValue(j) => j }.mkString("\n")
+          val textFileName = s"$name.raw.txt"
+          FileInteraction.writeToFile(textFileName)(str)
+      }
     }
   )
 
@@ -71,6 +87,15 @@ object WiseExamples {
         BenchmarkSet.measureCost {
           run(g.nodeNum, adjMatrix)
         }
+    },
+    saveValueWithName = (value: IS[EValue], name: String) => {
+      value match {
+        case IS(g: GraphValue) =>
+          val adjMatrix = translateAdjMatrix(g, lowerWeight, upperWeight)
+          val str = adjMatrix.map(row => row.mkString(" ")).mkString("\n")
+          val textFileName = s"$name.raw.txt"
+          FileInteraction.writeToFile(textFileName)(str)
+      }
     }
   )
 
@@ -116,12 +141,12 @@ object WiseExamples {
   }
 
   def main(args: Array[String]): Unit = {
-    BenchmarkSet.runExample(0, bstSearch, useGUI=true, size=100)
-//    runWithTimeout(args, allProblems,
-//      hoursAllowed = 3,
-//      evalSize = 30,
-//      processNum = 9,
-//      maxIteration = 1000,
-//      baseSeed = 1000)
+//    BenchmarkSet.runExample(0, bstSearch, useGUI=true, size=100)
+    runWithTimeout(args, allProblems,
+      hoursAllowed = 3,
+      evalSize = 30,
+      processNum = 9,
+      maxIteration = 1000,
+      baseSeed = 1000)
   }
 }

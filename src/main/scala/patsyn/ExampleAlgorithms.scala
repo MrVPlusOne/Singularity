@@ -922,7 +922,7 @@ object FuzzingTaskProvider {
 
     override protected def task: RunningFuzzingTask = {
       RunningFuzzingTask(
-        sizeOfInterest = 100,
+        sizeOfInterest = 30,
         resourceUsage = {
           case IS(origin: IntValue, dest: IntValue, graphValue: GraphValue) =>
             import patbench.airplan3.edu.utexas.stac.AirplanNoServer
