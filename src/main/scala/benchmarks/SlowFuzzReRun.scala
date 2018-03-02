@@ -18,7 +18,8 @@ object SlowFuzzReRun {
     val logPath: Path = pwd / "analyzed" / "slowFuzzRerun.txt"
     var currentBestPerformance = -1000.0
 
-    FileInteraction.mkDirsAlongPath(logPath.toString())
+
+    FileInteraction.mkDirsAlongPath("analyzed")
     val execConfigTemplate: ExecutionConfig = ExecutionConfig(evalSizePolicy = FixedEvalSize(evalSize), timeLimitInMillis = 10 * 60 * 1000)
 
     SimpleMath.parallelMap(threadNum)(0 until threadNum){
