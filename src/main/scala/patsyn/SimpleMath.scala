@@ -177,6 +177,22 @@ object SimpleMath {
     }
   }
 
+  def parallelMap[A,B](threadNum: Int): Seq[A] => (A => B) => IS[B] = {
+    import scala.collection.parallel
+    import parallel._
+    val taskSupport = new ForkJoinTaskSupport(new scala.concurrent.forkjoin.ForkJoinPool(threadNum))
+    def parExecute(seq: Seq[A])(f: A => B): IS[B] = {
+      if(threadNum>1) {
+        val p = seq.par
+        p.tasksupport = taskSupport
+        p.map(f).toIndexedSeq
+      }else{
+        seq.map(f).toIndexedSeq
+      }
+    }
+    parExecute
+  }
+
   case class PCF[A](pdf: IS[(A,Double)]){
     val pcf: IS[(A, Double)] = {
       val normalizeFactor = pdf.map(_._2).sum
