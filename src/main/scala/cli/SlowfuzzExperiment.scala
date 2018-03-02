@@ -36,7 +36,7 @@ object SlowfuzzExperiment {
   }
 
   def getExecConfig(cliOption: CliOption): ExecutionConfig = {
-    val problemSize = if (cliOption.name.endsWith("sort")) cliOption.size / 4 else cliOption.size // Sorting examples work on int32 (4x byte)
+    val problemSize = if (!cliOption.name.startsWith("pcre_regex")) cliOption.size / 4 else cliOption.size // Sorting examples work on int32 (4x byte)
     ExecutionConfig(
       evalSizePolicy = FixedEvalSize(problemSize),
       maxNonIncreaseGen = None,
