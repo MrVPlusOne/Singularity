@@ -29,6 +29,24 @@ object TextbookExamples {
       }
     )
 
+  private def insertionProblem[T](name: String, ctor: Unit => T)(put: T => (Integer, Integer) => Unit) = ProblemConfig(
+    name,
+    outputTypes = IS(EVect(EInt)),
+    sizeF = {
+      case IS(VectValue(v)) =>
+        v.value.length
+    },
+    resourceUsage = {
+      case IS(VectValue(vec)) =>
+        val arr = vecToJavaIntArray(vec)
+        val alg = ctor ()
+        BenchmarkSet.measureCost {
+          for (e <- arr)
+            put(alg)(e, e)
+        }
+    }
+  )
+
   private def searchingProblem[T](name: String, ctor: Unit => T)(put: T => (Integer, Integer) => Unit, get: T => Integer => Integer) = ProblemConfig(
       name,
       outputTypes = IS(EVect(EInt), EInt),
@@ -125,9 +143,7 @@ object TextbookExamples {
   )
 
   // Sorting problems
-  def insertSort = sortingProblem("textbook.insertSort", patbench.textbook.Insertion.sort)
   def insertSortOpt = sortingProblem("textbook.insertSortOpt", patbench.textbook.InsertionX.sort)
-  def insertSortBinary = sortingProblem("textbook.insertSortBinary", patbench.textbook.BinaryInsertion.sort)
   def selectSort = sortingProblem("textbook.selectSort", patbench.textbook.Selection.sort)
   def shellSort = sortingProblem("textbook.shellSort", patbench.textbook.Shell.sort)
   def mergeSortTD = sortingProblem("textbook.mergeSortTopDown", patbench.textbook.Merge.sort)
@@ -138,6 +154,14 @@ object TextbookExamples {
   def quickSortOpt = sortingProblem("textbook.quickSortOpt", patbench.textbook.QuickX.sort)
   def quickSort3WayOpt = sortingProblem("textbook.quickSort3WayOpt", patbench.textbook.QuickBentleyMcIlroy.sort)
   def heapSort = sortingProblem("textbook.heapSort", patbench.textbook.Heap.sort)
+
+  // Insertion problems
+  def seqInsert = insertionProblem("textbook.seqInsert", _ => new patbench.textbook.SequentialSearchST[Integer, Integer])(_.put)
+  def binInsert = insertionProblem("textbook.binInsert", _ => new patbench.textbook.BinarySearchST[Integer, Integer])(_.put)
+  def bstInsert = insertionProblem("textbook.bstInsert", _ => new patbench.textbook.BST[Integer, Integer])(_.put)
+  def rbInsert = insertionProblem("textbook.rbInsert", _ => new patbench.textbook.RedBlackBST[Integer, Integer])(_.put)
+  def sepChainInsert = insertionProblem("textbook.sepChainInsert", _ => new patbench.textbook.SeparateChainingHashST[Integer, Integer])(_.put)
+  def linProbeInsert = insertionProblem("textbook.linProbeInsert", _ => new patbench.textbook.LinearProbingHashST[Integer, Integer])(_.put)
 
   // Searching problems
   def seqSearch = searchingProblem("textbook.seqSearch", _ => new patbench.textbook.SequentialSearchST[Integer, Integer])(_.put, _.get)
@@ -150,12 +174,9 @@ object TextbookExamples {
   // String problems
   def kmpStr = stringProblem("textbook.kmp", s => new patbench.textbook.KMP(s))(_.search)
   def bmStr = stringProblem("textbook.booyerMoore", s => new patbench.textbook.BoyerMoore(s))(_.search)
-  def rkStr = stringProblem("textbook.rabinKarp", s => new patbench.textbook.RabinKarp(s))(_.search)
   def nfaStr = stringProblem("textbook.nfa", s => new patbench.textbook.NFA(s))(_.recognizes)
 
   // Graph problems
-  def dfs = graphProblem("textbook.dfs", translateGraph)(g => new patbench.textbook.DepthFirstPaths(g, 0))
-  def bfs = graphProblem("textbook.bfs", translateGraph)(g => new patbench.textbook.BreadthFirstPaths(g, 0))
   def altPathBiMatch = graphProblem("textbook.altPathBiMatch", translateGraph)(g => new patbench.textbook.BipartiteMatching(g))
   def hkBiMatch = graphProblem("textbook.hopcroftKarpBiMatch", translateGraph)(g => new patbench.textbook.HopcroftKarp(g))
   def prim = graphProblem("textbook.prim", translateWeightedGraph)(g => new patbench.textbook.PrimMST(g))
@@ -165,29 +186,7 @@ object TextbookExamples {
   def bellmanFord = graphProblem("textbook.bellmanFord", translateWeightedDigraph)(g => new patbench.textbook.BellmanFordSP(g, 0))
   def fordFulkerson = graphProblem("textbook.fordFulkerson", translateFlowNetwork)(g => new patbench.textbook.FordFulkerson(g, 0, g.V() - 1))
 
-  // Miscellaneous
-  def grahamScan = ProblemConfig(
-    "textbook.grahamScan",
-    outputTypes = IS(EVect(EPair(EInt, EInt))),
-    sizeF = {
-      case IS(v) =>
-        v.memoryUsage.toInt
-    },
-    resourceUsage = {
-      case IS(VectValue(vec)) =>
-        val points = vec.map { value: EValue =>
-          val (xValue, yValue) = value.asInstanceOf[PairValue].value
-          new patbench.textbook.Point2D(xValue.asInstanceOf[IntValue].value, yValue.asInstanceOf[IntValue].value)
-        }.toArray
-        BenchmarkSet.handleRuntimeException(0L) {
-          BenchmarkSet.measureCost {
-            new patbench.textbook.GrahamScan(points)
-          }
-        }
-    }
-  )
-
-  val allProblems = IS(sepChainHash, linProbeHash, kmpStr, bmStr, rkStr, nfaStr, altPathBiMatch, hkBiMatch, prim, kruskal, boruvka, dijkstra, bellmanFord, fordFulkerson, dfs, bfs, grahamScan, quickSort3Way, quickSort3WayOpt, shellSort, mergeSortTD, mergeSortBU, mergeSortOpt, quickSort, quickSortOpt, heapSort, seqSearch, binSearch, bstSearch, rbSearch, insertSort, insertSortOpt, insertSortBinary, selectSort)
+  val allProblems = IS(sepChainHash, linProbeHash, kmpStr, bmStr, nfaStr, altPathBiMatch, hkBiMatch, prim, kruskal, boruvka, dijkstra, bellmanFord, fordFulkerson, quickSort3Way, quickSort3WayOpt, shellSort, mergeSortTD, mergeSortBU, mergeSortOpt, quickSort, quickSortOpt, heapSort, seqSearch, binSearch, bstSearch, rbSearch, insertSortOpt, selectSort, seqInsert, binInsert, bstInsert, rbInsert, sepChainInsert, linProbeInsert)
 
   def runExample(seed: Int, useGUI: Boolean): Unit = {
     val rand = new java.util.Random(seed)

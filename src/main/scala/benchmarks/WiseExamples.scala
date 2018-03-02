@@ -16,8 +16,8 @@ object WiseExamples {
     name,
     outputTypes = IS(EVect(EInt), EInt),
     sizeF = {
-      case IS(vec, _) =>
-        vec.memoryUsage.toInt
+      case IS(VectValue(vec), _) =>
+        vec.size
     },
     resourceUsage = {
       case IS(VectValue(vec), IntValue(i)) =>
@@ -41,8 +41,8 @@ object WiseExamples {
     name,
     outputTypes = IS(EVect(EInt)),
     sizeF = {
-      case IS(vec) =>
-        vec.memoryUsage.toInt
+      case IS(VectValue(vec)) =>
+        vec.size
     },
     resourceUsage = {
       case IS(VectValue(vec)) =>
@@ -92,7 +92,10 @@ object WiseExamples {
       value match {
         case IS(g: GraphValue) =>
           val adjMatrix = translateAdjMatrix(g, lowerWeight, upperWeight)
-          val str = adjMatrix.map(row => row.mkString(" ")).mkString("\n")
+          val matrix1 = for ((line, i) <- adjMatrix.zipWithIndex) yield {
+            line.take(i)++line.drop(i+1)
+          }
+          val str = matrix1.map(row =>  row.mkString(" ")).mkString("\n")
           val textFileName = s"$name.raw.txt"
           FileInteraction.writeToFile(textFileName)(str)
       }
@@ -102,9 +105,9 @@ object WiseExamples {
   def listInsert = simpleProblem("wise.listInsert", patbench.wise.SortedListInsert.build)(patbench.wise.SortedListInsert.insert)
   def heapInsert = simpleProblem("wise.heapInsert", patbench.wise.HeapInsertJDK15.build)(patbench.wise.HeapInsertJDK15.insert)
   def bstSearch = simpleProblem("wise.bstSearch", patbench.wise.BinaryTreeSearch.build)(patbench.wise.BinaryTreeSearch.search)
-  def rbSearch = simpleProblem("wise.rbSearch", patbench.wise.RedBlackTreeSearch.build)(patbench.wise.RedBlackTreeSearch.search)
-  def quickSort = sortProblem("wise.quickSortJDK15", patbench.wise.QuickSortJDK15.build)(patbench.wise.QuickSortJDK15.sort)
-  def mergeSort = sortProblem("wise.mergeSortJDK15", patbench.wise.MergeSortJDK15.build)(patbench.wise.MergeSortJDK15.sort)
+  def rbSearch = simpleProblem("wise.rbTreeSearch", patbench.wise.RedBlackTreeSearch.build)(patbench.wise.RedBlackTreeSearch.search)
+  def quickSort = sortProblem("wise.qsort", patbench.wise.QuickSortJDK15.build)(patbench.wise.QuickSortJDK15.sort)
+  def mergeSort = sortProblem("wise.mergeSort", patbench.wise.MergeSortJDK15.build)(patbench.wise.MergeSortJDK15.sort)
   def dijkstra = graphProblem("wise.dijkstra", (n, d) => patbench.wise.Dijkstra.runDijkstra(n, d, 0), 0, 1000)
   def bellmanFord = graphProblem("wise.bellmanFord", (n, d) => patbench.wise.BellmanFord.runBellmanFord(n, d, 0), -1000, 1000)
   def tsp = graphProblem("wise.tsp", patbench.wise.Tsp.runTsp, 0, 1000)
@@ -141,12 +144,11 @@ object WiseExamples {
   }
 
   def main(args: Array[String]): Unit = {
-//    BenchmarkSet.runExample(0, bstSearch, useGUI=true, size=100)
+//    BenchmarkSet.runExample(100, dijkstra, useGUI=true, size=30)
     runWithTimeout(args, allProblems,
       hoursAllowed = 3,
       evalSize = 30,
       processNum = 9,
-      maxIteration = 1000,
       baseSeed = 1000)
   }
 }
