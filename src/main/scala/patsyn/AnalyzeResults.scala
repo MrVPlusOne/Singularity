@@ -43,12 +43,14 @@ object AnalyzeResults {
     }
   }
 
-  def analyze(resultsPath: Path) = {
-    def showInfo(info: ResultInfo) = {
-      s"""[ioId=${info.ioId},performance=${info.performance}]"""
-    }
+  val problemMap = TextbookExamples.allProblems.groupBy(_.problemName)
 
-    val problemMap = TextbookExamples.allProblems.groupBy(_.problemName)
+  def showInfo(info: ResultInfo) = {
+    s"""[ioId=${info.ioId},performance=${info.performance}]"""
+  }
+
+  def analyze(resultsPath: Path) = {
+
     val sizeOfInterest = 250
 
     val tasks =
@@ -66,7 +68,7 @@ object AnalyzeResults {
       println(s"number of results: ${results.length}")
 
       val problem = problemMap(name).head
-      results.take(5).zipWithIndex.foreach{ case(info, i) =>
+      results.take(5).foreach{ info =>
 
         info.performance match{
           case PerformanceNormal(_) =>
@@ -89,8 +91,35 @@ object AnalyzeResults {
     }
   }
 
+  def analyzeOneResult(resultDir: Path, sizeOfInterest: Int) = {
+    val info = parseResultInfo(resultDir.name)
+    val problem = problemMap(info.name).head
+
+    info.performance match {
+      case PerformanceNormal(_) =>
+        val indFilePath = resultDir / "bestIndividual.serialized"
+        val ind = FileInteraction.readMultiIndFromFile(indFilePath.toString(), StandardSystem.funcMap)
+        val evaluator = {
+          import problem._
+          new FittingPerformanceEvaluation(sizeOfInterest, resourceUsage, sizeF, breakingMemoryUsage = sizeOfInterest * 500, nonsenseFitness = -1, minPointsToUse = 8, maxPointsToUse = 200,
+            fitter = PowerLawFitter(maxIter = 300), modelToScore = FittingPerformanceEvaluation.pModel)
+        }
+        val inputStream = MultiStateRepresentation.individualToPattern(ind)
+        val eval = evaluator.evaluateAPattern(inputStream)
+        println(showInfo(info) + " -> " + eval)
+        val fittingData = eval.info.split("data = ").last
+
+        val fitterFile = pwd / "mathematica" / "FitterData.txt"
+        rm(fitterFile)
+        write(fitterFile, fittingData)
+      case _ =>
+        println(showInfo(info))
+    }
+  }
 
   def main(args: Array[String]): Unit = {
-    analyze(Path.home / "Downloads" / "experiment1")
+    analyzeOneResult(Path.home / "Downloads" / "experiment1" / "textbook.hopcroftKarpBiMatch[performance=76175.0][ioId=1045,seed=1045](18-02-28-12:10:48)", sizeOfInterest = 250*8*8)
+
+//    analyze(Path.home / "Downloads" / "experiment1")
   }
 }
