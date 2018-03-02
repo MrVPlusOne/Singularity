@@ -12,7 +12,7 @@ object SlowFuzzReRun {
 
   def runTask(args: Array[String]): Unit ={
     val evalSize = 1024
-    val threadNum = 2
+    val threadNum = 10
     val hoursAllowed = 10
     val maxIteration = 100
     val logPath: Path = pwd / "analyzed" / "slowFuzzRerun.txt"
@@ -34,7 +34,7 @@ object SlowFuzzReRun {
             if(individualEvaluation.performance > currentBestPerformance){
               currentBestPerformance = individualEvaluation.performance
               FileInteraction.writeToFile(logPath.toString(), append = true){
-                s"new best performance[seed=$baseSeed]: $currentBestPerformance"
+                s"new best performance[seed=$seed]: $currentBestPerformance"
               }
             }
           }
