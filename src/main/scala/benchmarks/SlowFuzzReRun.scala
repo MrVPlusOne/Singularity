@@ -35,7 +35,7 @@ object SlowFuzzReRun {
             if(individualEvaluation.performance > currentBestPerformance){
               currentBestPerformance = individualEvaluation.performance
               FileInteraction.writeToFile(logPath.toString(), append = true){
-                s"new best performance[seed=$seed]: $currentBestPerformance"
+                s"new best performance[seed=$seed]: $currentBestPerformance\n"
               }
             }
           }
