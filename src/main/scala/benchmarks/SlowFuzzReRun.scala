@@ -18,7 +18,7 @@ object SlowFuzzReRun {
     val logPath: Path = pwd / "analyzed" / "slowFuzzRerun.txt"
     var currentBestPerformance = -1000.0
 
-
+    FileInteraction.mkDirsAlongPath(logPath.toString())
     val execConfigTemplate: ExecutionConfig = ExecutionConfig(evalSizePolicy = FixedEvalSize(evalSize), timeLimitInMillis = 10 * 60 * 1000)
 
     SimpleMath.parallelMap(threadNum)(0 until threadNum){
@@ -30,7 +30,7 @@ object SlowFuzzReRun {
         while (timeLeft > 0L && numIters < maxIteration) {
           val seed = baseSeed + numIters
           val problem: ProblemConfig = SlowfuzzExamples.appleQsortIntExample(evalSize)(FileInteraction.getWorkingDir(i))
-          def reportResult(multiStateInd: MultiStateInd, individualEvaluation: IndividualEvaluation): Unit ={
+          def reportResult(multiStateInd: MultiStateInd, individualEvaluation: IndividualEvaluation): Unit = this.synchronized {
             if(individualEvaluation.performance > currentBestPerformance){
               currentBestPerformance = individualEvaluation.performance
               FileInteraction.writeToFile(logPath.toString(), append = true){
