@@ -5,7 +5,7 @@ import java.awt.Dimension
 import java.util.concurrent.TimeoutException
 
 import measure.TimeTools
-import patsyn.EvolutionRepresentation.{IndividualData, MemoryUsage}
+import patsyn.EvolutionRepresentation.{IndividualData, IndividualEvaluation, MemoryUsage}
 import FuzzingTaskProvider.escapeStrings
 import benchmarks.SlowfuzzExamples
 
@@ -93,7 +93,8 @@ object Runner {
                           keepBestIndividuals: Boolean = false,
                           previewPatternLen: Int = 7,
                           callExitAfterFinish: Boolean = true,
-                          fitAfterEachGen: Boolean = false
+                          fitAfterEachGen: Boolean = false,
+                          reportResult: (MultiStateInd, IndividualEvaluation) => Unit = (_,_) => ()
                          ){
     def show: String = {
       s"""
@@ -426,6 +427,7 @@ object Runner {
       try{
         val performance = bestSoFar.get.evaluation.performance
         renameResultDir(s"$performance")
+        reportResult(bestSoFar.get.ind, bestSoFar.get.evaluation)
       }finally {
         if(callExitAfterFinish){
           System.exit(0)
