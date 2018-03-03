@@ -6,6 +6,7 @@ import measure.TimeTools
 import ammonite.ops._
 import benchmarks.TextbookExamples
 import patsyn.FittingPerformanceEvaluation.PowerLawFitter
+import patsyn.StandardSystem.GraphValue
 
 import scala.util.matching.Regex
 
@@ -91,6 +92,15 @@ object AnalyzeResults {
     }
   }
 
+  private val indWithDateRegex = "bestIndividual[time=(.+)].serialized".r
+  def getLatestInd(dir: Path): Path = {
+    (ls ! dir).map{ p =>
+      p.name match {
+        case indWithDateRegex(time) => (time.toLong, p)
+      }
+    }.maxBy(_._1)._2
+  }
+
   def analyzeOneResult(resultDir: Path, sizeOfInterest: Int) = {
     val info = parseResultInfo(resultDir.name)
     val problem = problemMap(info.name).head
@@ -117,8 +127,43 @@ object AnalyzeResults {
     }
   }
 
+  def analyzeOneGraphResult(resultDir: Path, sizeOfInterest: Int, graphToSize: GraphValue => Double) = {
+    val info = parseResultInfo(resultDir.name)
+    val problem = problemMap(info.name).head
+
+    info.performance match {
+      case PerformanceNormal(_) =>
+        val indFilePath = resultDir / "bestIndividual.serialized"
+        val ind = FileInteraction.readMultiIndFromFile(indFilePath.toString(), StandardSystem.funcMap)
+        val evaluator = {
+          import problem._
+          new FittingPerformanceEvaluation(sizeOfInterest, resourceUsage, sizeF, breakingMemoryUsage = sizeOfInterest * 500, nonsenseFitness = -1, minPointsToUse = 8, maxPointsToUse = 100,
+            fitter = PowerLawFitter(maxIter = 300), modelToScore = FittingPerformanceEvaluation.pModel,
+            extraSizeF = Some(xs => xs.collect{ case gv: GraphValue => graphToSize(gv)}.sum))
+        }
+        val inputStream = MultiStateRepresentation.individualToPattern(ind)
+        val eval = evaluator.evaluateAPattern(inputStream)
+        println(showInfo(info) + " -> " + eval)
+        val fittingData = eval.info.split("data = ").last
+
+        val fitterFile = pwd / "mathematica" / "FitterData.txt"
+        rm(fitterFile)
+        write(fitterFile, fittingData)
+      case _ =>
+        println(showInfo(info))
+    }
+  }
+
+
   def main(args: Array[String]): Unit = {
-    analyzeOneResult(Path.home / "Downloads" / "experiment1" / "textbook.hopcroftKarpBiMatch[performance=76175.0][ioId=1045,seed=1045](18-02-28-12:10:48)", sizeOfInterest = 250*8*8)
+    analyzeOneGraphResult(Path.home / "Downloads" / "experiment1" / "textbook.hopcroftKarpBiMatch[performance=79103.0][ioId=1043,seed=1043](18-02-28-12/01/47)".replace("/",":"),
+      sizeOfInterest = 250*8,
+      graphToSize = { gv =>
+        import math.log
+        val e = gv.edges.length
+        val v = gv.nodeNum
+        e * math.sqrt(v)
+      })
 
 //    analyze(Path.home / "Downloads" / "experiment1")
   }

@@ -134,12 +134,13 @@ class FittingPerformanceEvaluation(sizeOfInterest: Int, val resourceUsage: (IS[E
                                    val minPointsToUse: Int,
                                    val maxPointsToUse: Int,
                                    val fitter: FittingPerformanceEvaluation.FittingModel,
-                                   val modelToScore: (IS[Double], Double, Int) => Double
+                                   val modelToScore: (IS[Double], Double, Int) => Double,
+                                   extraSizeF: Option[IS[EValue] => Double] = None
                                    ) extends PerformanceEvaluation {
 
-  def usableInputs(inputStream: Stream[(MemoryUsage, IS[EValue])]): Option[IS[(Int, IS[EValue])]] = {
+  def usableInputs(inputStream: Stream[(MemoryUsage, IS[EValue])], extraSizeF: IS[EValue] => Double): Option[IS[(Double, IS[EValue])]] = {
     var lastSize = Int.MinValue
-    val xyPoints = mutable.ListBuffer[(Int, IS[EValue])]()
+    val xyPoints = mutable.ListBuffer[(Double, IS[EValue])]()
     inputStream.foreach{ case (usage, input) =>
       val inputSize = sizeF(input)
       if (inputSize <= lastSize || usage.amount > breakingMemoryUsage)
@@ -148,7 +149,7 @@ class FittingPerformanceEvaluation(sizeOfInterest: Int, val resourceUsage: (IS[E
       val shouldContinue = sizeF(input) <= sizeOfInterest
       if(!shouldContinue)
         return Some(xyPoints.toIndexedSeq)
-      xyPoints.append(inputSize -> input)
+      xyPoints.append(extraSizeF(input) -> input)
     }
     Some(xyPoints.toIndexedSeq)
   }
@@ -156,11 +157,11 @@ class FittingPerformanceEvaluation(sizeOfInterest: Int, val resourceUsage: (IS[E
 
   def evaluateAPattern(inputStream: Stream[(MemoryUsage, IS[EValue])]): PerformanceEvalResult = {
 
-    usableInputs(inputStream) match {
+    usableInputs(inputStream, extraSizeF.getOrElse(x => sizeF(x).toDouble)) match {
       case Some(pts) =>
         val points = pts.filter(p => p._1 > 0)
         if (points.length < minPointsToUse)
-          return PerformanceEvalResult(nonsenseFitness, "points.length < minPointsToUse")
+          return PerformanceEvalResult(nonsenseFitness, s"[points.length < minPointsToUse]: ${pts.take(10)}")
         val xyPoints = {
           val ps = SimpleMath.randomSelectFrom(points, maxPointsToUse, new Random(1)).map{
             case (x, input) => x.toDouble -> resourceUsage(input)
