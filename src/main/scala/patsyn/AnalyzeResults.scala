@@ -92,7 +92,7 @@ object AnalyzeResults {
     }
   }
 
-  private val indWithDateRegex = "bestIndividual[time=(.+)].serialized".r
+  private val indWithDateRegex = """bestIndividual\[time=(.+)\].serialized""".r
   def getLatestInd(dir: Path): Path = {
     (ls ! dir).map{ p =>
       p.name match {
