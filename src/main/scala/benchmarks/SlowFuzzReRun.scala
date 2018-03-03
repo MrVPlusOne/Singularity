@@ -12,7 +12,7 @@ object SlowFuzzReRun {
 
   def runTask(args: Array[String]): Unit ={
     val evalSize = 1024
-    val threadNum = 10
+    val threadNum = 4
     val hoursAllowed = 10
     val maxIteration = 100
     val logPath: Path = pwd / "analyzed" / "slowFuzzRerun.txt"
@@ -40,7 +40,7 @@ object SlowFuzzReRun {
             }
           }
 
-          val runnerConfig = RunnerConfig(randomSeed = seed, ioId = seed, useGUI = false, callExitAfterFinish = false,
+          val runnerConfig = RunnerConfig(randomSeed = seed, ioId = seed, useGUI = true, callExitAfterFinish = false,
             reportResult = reportResult
           )
           try {

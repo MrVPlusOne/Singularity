@@ -81,7 +81,7 @@ class Supernova(extendedConstRule: (PartialFunction[EType, Random => EValue] => 
       tournamentSize = rand.nextInt(9-3)+3,
       totalSizeTolerance = totalTolerance.toInt,
       singleSizeTolerance = singleTolerance.toInt,
-      exprCostPenaltyBase = 0.92 + 0.07*rand.nextDouble(),
+      exprCostPenaltyBase = 1.0 - 0.10*SimpleMath.square(rand.nextDouble()),
       mutateP = inter(0.4,0.7),
       crossoverP = 0.5,
       copyP = 0.05+0.1-inter(0.0,0.1),
