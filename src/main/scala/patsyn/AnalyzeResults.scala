@@ -92,6 +92,28 @@ object AnalyzeResults {
     }
   }
 
+  def analyzeSingularityResults(resultsPath: Path) = {
+      val infos =  (ls ! resultsPath).filter { p =>
+        p.fileType == FileType.Dir
+      }.map { p =>
+        parseResultInfo(p.name)
+      }.groupBy(_.name).mapValues { results =>
+        results.sortBy(info => performanceToDouble(info.performance)).reverse.toIndexedSeq.head
+      }.toIndexedSeq
+      val sizeExtrat = """(.+)_int_(.+)""".r
+      infos.map{ case (name, info) =>
+        name match {
+          case sizeExtrat(n, size) =>
+            val s = if(n.endsWith("sort")||n.toLowerCase()=="phphash") size.toInt *4 else size.toInt
+            (n, s, info.performance.asInstanceOf[PerformanceNormal].value)
+        }
+      }.sortBy(x => (x._1, x._2)).foreach{
+        x => println{
+          IS(x._1, x._2, x._3).mkString(", ")
+        }
+      }
+  }
+
   private val indWithDateRegex = """bestIndividual\[time=(.+)\].serialized""".r
   def getLatestInd(dir: Path): Path = {
     (ls ! dir).map{ p =>
@@ -156,15 +178,17 @@ object AnalyzeResults {
 
 
   def main(args: Array[String]): Unit = {
-    analyzeOneGraphResult(Path.home / "Downloads" / "experiment1" / "textbook.hopcroftKarpBiMatch[performance=79103.0][ioId=1043,seed=1043](18-02-28-12/01/47)".replace("/",":"),
-      sizeOfInterest = 250*8,
-      graphToSize = { gv =>
-        import math.log
-        val e = gv.edges.length
-        val v = gv.nodeNum
-        e * math.sqrt(v)
-      })
+    analyze(Path.home / "Downloads" / "experiment1")
 
-//    analyze(Path.home / "Downloads" / "experiment1")
+//    analyzeOneGraphResult(Path.home / "Downloads" / "experiment1" / "textbook.hopcroftKarpBiMatch[performance=79103.0][ioId=1043,seed=1043](18-02-28-12/01/47)".replace("/",":"),
+//      sizeOfInterest = 250*8,
+//      graphToSize = { gv =>
+//        import math.log
+//        val e = gv.edges.length
+//        val v = gv.nodeNum
+//        e * math.sqrt(v)
+//      })
+
+//    analyzeSingularityResults(Path.home / "Downloads" / "singularity_results")
   }
 }

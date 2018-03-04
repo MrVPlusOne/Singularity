@@ -93,13 +93,13 @@ object FittingPerformanceEvaluation {
           xs(i) = wp.getX
           ys(i) = wp.getY * scale
       }
+      val rs = SimpleMath.rSquared(ys, xs.map(f), weights)
       val beta: Double = {
-        val rs = SimpleMath.rSquared(ys, xs.map(f), weights)
         assert(0.0 <= rs && rs <= 1.0, s"r squared should be in [0,1], but actually in $rs")
         gofPenaltyBase * math.pow(gofPenaltyBase, -1.0 / (rs * rs))
       }
 
-      (IS(a,b,c), beta, s"$a * x ^ $b + $c, beta = $beta, data = {${xs.mkString("{",",","}")},${ys.mkString("{",",","}")}}")
+      (IS(a,b,c), beta, s"$a * x ^ $b + $c, rSquared = $rs, beta = $beta, data = {${xs.mkString("{",",","}")},${ys.mkString("{",",","}")}}")
     }
   }
 
