@@ -64,7 +64,7 @@ object AnalyzeResults {
       }.toIndexedSeq.sortBy(pair => performanceToDouble(pair._2.head.performance)).reverse
 
     println(s"${tasks.size} tasks in total.")
-    tasks.foreach{ case (name, results) =>
+    for (((name, results)) <- tasks if problemMap.contains(name)){
       println(s"--- Task: $name ---")
       println(s"number of results: ${results.length}")
 
