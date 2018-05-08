@@ -231,7 +231,10 @@ object Runner {
     FileInteraction.runWithAFileLogger(s"$recordDirPath/runLog.txt") { logger =>
       import logger._
 
+      val testRandom = true
+
       println(s"Starting task: ${problemConfig.problemName}")
+      println(s"TestRandom=$testRandom")
 
       printSection("Configuration"){
         println(s"[sizePolicy] $evalSizePolicy")
@@ -262,12 +265,15 @@ object Runner {
         representation = mkRepresentation(evalSize, memoryLimit, execConfig.resourcePolicy)
       }
 
-      val operators = IS(
+      val operators = if(testRandom)
+        IS(
+          library.initOp(6) -> 1.0
+        )
+      else IS(
         library.simpleCrossOp -> crossoverP,
         library.simpleMutateOp(newTreeMaxDepth = 3) -> mutateP,
         library.copyOp -> copyP,
-        library.constantFolding -> constFoldP,
-//        library.initOp(6) -> 1.0
+        library.constantFolding -> constFoldP
       )
 
       def showPattern(ind: MultiStateInd): String ={
