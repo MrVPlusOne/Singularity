@@ -263,10 +263,11 @@ object Runner {
       }
 
       val operators = IS(
-        library.simpleCrossOp -> crossoverP,
-        library.simpleMutateOp(newTreeMaxDepth = 3) -> mutateP,
-        library.copyOp -> copyP,
-        library.constantFolding -> constFoldP
+//        library.simpleCrossOp -> crossoverP,
+//        library.simpleMutateOp(newTreeMaxDepth = 3) -> mutateP,
+//        library.copyOp -> copyP,
+//        library.constantFolding -> constFoldP,
+        library.initOp(6) -> 1.0
       )
 
       def showPattern(ind: MultiStateInd): String ={
