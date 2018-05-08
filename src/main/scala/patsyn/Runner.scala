@@ -263,11 +263,11 @@ object Runner {
       }
 
       val operators = IS(
-//        library.simpleCrossOp -> crossoverP,
-//        library.simpleMutateOp(newTreeMaxDepth = 3) -> mutateP,
-//        library.copyOp -> copyP,
-//        library.constantFolding -> constFoldP,
-        library.initOp(6) -> 1.0
+        library.simpleCrossOp -> crossoverP,
+        library.simpleMutateOp(newTreeMaxDepth = 3) -> mutateP,
+        library.copyOp -> copyP,
+        library.constantFolding -> constFoldP,
+//        library.initOp(6) -> 1.0
       )
 
       def showPattern(ind: MultiStateInd): String ={
@@ -350,7 +350,7 @@ object Runner {
           val timeString = if (keepBestIndividuals) {
             val timeInNano = System.nanoTime() - startTime
             val timeInMillis = (timeInNano / 1e6).toInt
-            s"[time=$timeInMillis]"
+            s"[time=$timeInMillis][perf=${"%.1f".format(indData.evaluation.performance)}]"
           } else {
             ""
           }

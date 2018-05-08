@@ -156,8 +156,8 @@ object GuavaExamples {
     val rand = new Random(seed)
     standardSupernova.fuzzProblem(
       treeMultiSet_insertSequence,
-      RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI),
-      ExecutionConfig(evalSizePolicy = FixedEvalSize(400)), rand)
+      RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = useGUI, keepBestIndividuals = true),
+      ExecutionConfig(evalSizePolicy = FixedEvalSize(300), maxFuzzingTimeSec = Some(3600)), rand)
   }
 
   def testAverage(): Unit ={
@@ -184,17 +184,17 @@ object GuavaExamples {
   }
 
   def main(args: Array[String]): Unit = {
-//    SimpleMath.processMap(args,
-//      0 to 60, processNum = 14,
-//      mainClass = this){
-//      i => runExample(i, useGUI = false)
-//    }
+    SimpleMath.processMap(args,
+      0 to 30, processNum = 8,
+      mainClass = this){
+      i => runExample(i, useGUI = false)
+    }
 //    runExample(15, useGUI = true)
 
 //    testAverage()
 
-    runExample(7, useGUI = true)
-
-    fitCurveImmutableSet()
+//    runExample(7, useGUI = true)
+//
+//    fitCurveImmutableSet()
   }
 }
