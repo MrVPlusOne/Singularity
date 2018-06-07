@@ -43,16 +43,14 @@ object IOExample {
   }
 
   def getPerf(t: Int)(series: IS[(Int, Double)]): Double = {
-    val idx = series.indexWhere {
+    val idx = series.lastIndexWhere {
       case (tpoint, _) =>
-        t < tpoint
+        tpoint <= t
     }
     if (idx == -1)
       series.last._2
-    else if (idx == 0)
-      0.0
     else
-      series(idx - 1)._2
+      series(idx)._2
   }
 
   def processTopDir(inName: String, outName: String) = {

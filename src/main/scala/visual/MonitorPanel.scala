@@ -22,7 +22,7 @@ object MonitorPanel{
 
     val chart = {
       import io.Source
-      val lines = Source.fromFile("someMonitorFile.txt").getLines()
+      val lines = Source.fromFile("/Users/weijiayi/Downloads/monitorData_random.txt").getLines()
       plotFromCSVString(lines)
     }
 
