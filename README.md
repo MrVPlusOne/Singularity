@@ -13,17 +13,16 @@ Singularity is an automatic fuzzing tool for generating inputs (called patterns)
 
 The core idea behind Singulairty is based on the observation that the worst-case behavior of a given progarm is normally triggered by inputs with some specific structual patterns. For example, to trigger the maximal running time of an insertion sort algorithm, the input array must be reversely sorted. Similarly, inserting a series of elements with the right pattern into a hash-based data structure can cause hash collisions and greatly decrease its performance (see https://github.com/google/guava/issues/3015).
 
-In order to efficiently search for such inputs, Singularity emploies a Domain Specific Language (DSL) to compactly represents different input patterns and uses an optimization technique called [Genetic Programming](https://en.wikipedia.org/wiki/Genetic_programming) to synthesize input patterns generating maximial resource usage inputs. This feedback-guided workflow is shown as follows:
+In order to efficiently search for such inputs, Singularity emploies a Domain Specific Language (DSL) to compactly represents different input patterns and uses an optimization technique called [Genetic Programming](https://en.wikipedia.org/wiki/Genetic_programming) to synthesize input patterns with maximial resource usage inputs. This feedback-guided workflow is shown as follows:
 
-
-<img src="doc/images/SingularityLoop.png" width="600">
+![SingularityLoop.png](doc/images/SingularityLoop.png)
 
 
 ## Usage
 
-The recommended way is to include Singularity as a library into your Scala/Java project. Since Singularity is a blackbox fuzzing technique, it can be used for fuzzing target programs written in any language, but it would require the user to provide gluing code to translate the data structures outputed by Singularity into corresponding counterparts acceptable by the program of interest.
+The recommended way is to include Singularity as a library into your Scala/Java project. Since Singularity is a blackbox fuzzing technique, it can be used to fuzz target programs written in any language, but the user is required to provide gluing code to translate the data structures outputed by Singularity into corresponding counterparts acceptable by the target program.
 
-To include Singularity into your Scala project, add the following line into your build.sbt file.
+To include Singularity into your Scala project, add the following line into your `build.sbt` file.
 
 ```scala
 libraryDependencies += "TODO"
