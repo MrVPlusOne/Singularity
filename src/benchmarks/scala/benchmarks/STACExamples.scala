@@ -1,9 +1,9 @@
 package benchmarks
 
-import patsyn.{ExampleAlgorithms, IS}
+import singularity.{ExampleAlgorithms, IS}
 
 object STACExamples {
-  import patsyn.FuzzingTaskProvider
+  import singularity.FuzzingTaskProvider
 
 
   def allTasks(ioId: Int, workDir: String): IS[FuzzingTaskProvider] = IS(

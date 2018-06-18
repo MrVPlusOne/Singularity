@@ -3,10 +3,10 @@ package benchmarks
 import java.util.Date
 
 import ammonite.ops._
-import measure.TimeTools
-import patsyn.FittingPerformanceEvaluation.PowerLawFitter
-import patsyn.StandardSystem.GraphValue
-import patsyn._
+import singularity.measure.TimeTools
+import singularity.FittingPerformanceEvaluation.PowerLawFitter
+import singularity.StandardSystem.GraphValue
+import singularity._
 
 import scala.util.matching.Regex
 

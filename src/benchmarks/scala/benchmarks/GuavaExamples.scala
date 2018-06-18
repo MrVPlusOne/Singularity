@@ -3,9 +3,9 @@ package benchmarks
 
 import java.util.Comparator
 
-import patsyn.Runner.RunnerConfig
-import patsyn._
-import patsyn.StandardSystem._
+import singularity.Runner.RunnerConfig
+import singularity._
+import singularity.StandardSystem._
 import Supernova._
 import BenchmarkSet._
 import patbench.guava.common.collect.TreeMultiset

@@ -2,14 +2,14 @@ package benchmarks
 
 import java.io.ByteArrayOutputStream
 
-import patsyn._
+import singularity._
 import StandardSystem._
 import patbench.commons.compress.compressors.{CompressorStreamFactory => CF}
 import patbench.commons.compress.archivers.{ArchiveStreamFactory => AF}
 import BenchmarkSet._
 import measure.TimeTools
 import patbench.commons.math3.fitting.{AbstractCurveFitter, HarmonicCurveFitter, PolynomialCurveFitter, WeightedObservedPoints}
-import patsyn.Runner.RunnerConfig
+import singularity.Runner.RunnerConfig
 
 import scala.util.Random
 

@@ -1,10 +1,9 @@
 package benchmarks;
 
 import patbench.jgrapht.Graph;
-import patbench.jgrapht.Graphs;
 import patbench.jgrapht.graph.*;
-import patsyn.EValue;
-import patsyn.StandardSystem.*;
+import singularity.EValue;
+import singularity.StandardSystem.*;
 import scala.Tuple3;
 import scala.collection.Iterator;
 

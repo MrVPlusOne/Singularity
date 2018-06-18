@@ -1,8 +1,8 @@
-package patsyn
+package singularity
 
-import patsyn.GeneticOperator.ExprGen
-import patsyn.Runner.RunnerConfig
-import patsyn.StandardSystem.{EInt, EVect, IntValue, VectValue}
+import singularity.GeneticOperator.ExprGen
+import singularity.Runner.RunnerConfig
+import singularity.StandardSystem.{EInt, EVect, IntValue, VectValue}
 
 import scala.util.Random
 

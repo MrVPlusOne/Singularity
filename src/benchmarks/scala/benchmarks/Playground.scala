@@ -1,8 +1,8 @@
 package benchmarks
 
-import patsyn.Runner.RunnerConfig
-import patsyn.Supernova.standardSupernova
-import patsyn._
+import singularity.Runner.RunnerConfig
+import singularity.Supernova.standardSupernova
+import singularity._
 
 import scala.util.Random
 

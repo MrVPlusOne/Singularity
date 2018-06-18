@@ -1,8 +1,8 @@
 package benchmarks
 
 import patbench.commons.math3.fitting.{GaussianCurveFitter, HarmonicCurveFitter, PolynomialCurveFitter}
-import patsyn.Runner.RunnerConfig
-import patsyn._
+import singularity.Runner.RunnerConfig
+import singularity._
 
 import scala.util.Random
 

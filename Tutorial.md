@@ -59,7 +59,7 @@ def quickSortExample = new FuzzingTaskProvider {
   }
 ```
 function `quickSortExample` (we use `def` keyword to define functions in scala) defines how to create a new `FuzzingTaskProvider` anonymous class by implementing `task` and `sizeF` in the class body.
-`sizeF` specifies the size metric to measure how big a task input is. Since the program of interest can accept multiple arguments in general, sizeF takes an input of type `IS[EValue]`.
+`sizeF` specifies the size metric to singularity.measure how big a task input is. Since the program of interest can accept multiple arguments in general, sizeF takes an input of type `IS[EValue]`.
 
 `IS[T]` is just a convenient synonym for `IndexedSeq[T]` that is used through out this project.
 

@@ -1,6 +1,6 @@
 package cli
 
-import patsyn.RunConfig
+import singularity.RunConfig
 import scopt.OptionParser
 
 import scala.util.Random
@@ -38,8 +38,8 @@ object JarTester {
 
     val runConfig = getRunConfig(opt)
 
-    import patsyn.StandardSystem._
-    import patsyn._
+    import singularity.StandardSystem._
+    import singularity._
     import ExampleAlgorithms.vectIntToString
 
     val rand = new Random(runConfig.runnerConfig.randomSeed)

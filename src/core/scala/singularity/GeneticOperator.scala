@@ -1,6 +1,6 @@
-package patsyn
+package singularity
 
-import patsyn.GeneticOperator._
+import singularity.GeneticOperator._
 
 import scala.util.Random
 

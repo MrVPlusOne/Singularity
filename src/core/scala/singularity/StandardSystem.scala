@@ -1,4 +1,4 @@
-package patsyn
+package singularity
 
 import scala.language.implicitConversions
 

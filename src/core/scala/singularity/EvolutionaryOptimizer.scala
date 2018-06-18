@@ -1,6 +1,6 @@
-package patsyn
+package singularity
 
-import patsyn.EvolutionRepresentation.{IndividualData, IndividualEvaluation, IndividualHistory, Population}
+import singularity.EvolutionRepresentation.{IndividualData, IndividualEvaluation, IndividualHistory, Population}
 
 import scala.util.Random
 

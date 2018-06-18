@@ -1,17 +1,17 @@
 package examples
 
-import patsyn.Runner.RunnerConfig
-import patsyn.StandardSystem._
-import patsyn._
+import singularity.Runner.RunnerConfig
+import singularity.StandardSystem._
+import singularity._
 
 import scala.util.Random
 
 /** A minimal example to use Singularity */
 object QuickSort {
 
-  var counter = 0
-
   def pivotChoose(xs: IS[Int]) = xs(xs.length/2) //can also try "xs.head", "xs.tail" etc..
+
+  var counter = 0
 
   def quickSort(xs: IS[Int]): IS[Int] = {
     counter += 1

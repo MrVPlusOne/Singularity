@@ -1,4 +1,4 @@
-package patsyn;
+package singularity;
 
 import java.util.Collection;
 
@@ -8,7 +8,6 @@ import org.apache.commons.math3.fitting.WeightedObservedPoint;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresBuilder;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresProblem;
 import org.apache.commons.math3.linear.DiagonalMatrix;
-import org.apache.commons.math3.optim.ConvergenceChecker;
 
 public class ModifiedCurveFitter extends AbstractCurveFitter {
     /** Function to fit. */

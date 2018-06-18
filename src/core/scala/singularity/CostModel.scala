@@ -1,4 +1,4 @@
-package patsyn
+package singularity
 
 object CostModel {
   def exprCost(expr: Expr): Double = expr match {

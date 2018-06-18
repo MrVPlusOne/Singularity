@@ -1,10 +1,10 @@
 package benchmarks
 
 import ammonite.ops._
-import measure.TimeTools
-import patsyn.EvolutionRepresentation.IndividualEvaluation
-import patsyn.Runner.RunnerConfig
-import patsyn._
+import singularity.measure.TimeTools
+import singularity.EvolutionRepresentation.IndividualEvaluation
+import singularity.Runner.RunnerConfig
+import singularity._
 
 import scala.util.Random
 

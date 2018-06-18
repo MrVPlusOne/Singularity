@@ -3,9 +3,9 @@ package benchmarks
 import java.util.Random
 
 import benchmarks.AllTogether.ConfigGen
-import patsyn.Runner.RunnerConfig
-import patsyn.StandardSystem._
-import patsyn._
+import singularity.Runner.RunnerConfig
+import singularity.StandardSystem._
+import singularity._
 import visual.PatternPlot.showResourceUsageChart
 
 object VavrExamples {

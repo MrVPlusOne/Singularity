@@ -1,7 +1,7 @@
-package patsyn
+package singularity
 
-import patsyn.EvolutionRepresentation.MemoryUsage
-import patsyn.MultiStateInd.GlobalCoord
+import singularity.EvolutionRepresentation.MemoryUsage
+import singularity.MultiStateInd.GlobalCoord
 
 object MultiStateInd {
   type GlobalCoord = (Int, Expr.Coordinate)

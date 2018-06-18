@@ -1,7 +1,7 @@
-package patsyn
+package singularity
 
 
-import patsyn.EvolutionRepresentation._
+import singularity.EvolutionRepresentation._
 
 
 trait EvolutionRepresentation[Individual] {

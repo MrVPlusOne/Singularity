@@ -1,7 +1,7 @@
 package benchmarks
 
 import BenchmarkSet._
-import patsyn._
+import singularity._
 import StandardSystem._
 import patbench.jgrapht
 import patbench.jgrapht.alg.StoerWagnerMinimumCut
@@ -13,7 +13,7 @@ import patbench.jgrapht.alg.scoring.{ClosenessCentrality, Coreness}
 import patbench.jgrapht.alg.spanning.{BoruvkaMinimumSpanningTree, KruskalMinimumSpanningTree, PrimMinimumSpanningTree}
 import patbench.jgrapht.alg.vertexcover.{ClarksonTwoApproxVCImpl, EdgeBasedTwoApproxVCImpl, GreedyVCImpl, RecursiveExactVCImpl}
 import patbench.jgrapht.graph._
-import patsyn.Runner.RunnerConfig
+import singularity.Runner.RunnerConfig
 
 import scala.util.Random
 

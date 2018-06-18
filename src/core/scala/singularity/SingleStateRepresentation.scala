@@ -1,6 +1,6 @@
-package patsyn
+package singularity
 
-import patsyn.EvolutionRepresentation.MemoryUsage
+import singularity.EvolutionRepresentation.MemoryUsage
 
 @deprecated("using multi-state representation instead")
 case class SingleStateInd(seed: IS[Expr], iter: IS[Expr]){

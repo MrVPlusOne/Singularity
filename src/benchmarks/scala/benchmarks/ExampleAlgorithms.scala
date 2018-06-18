@@ -1,10 +1,10 @@
-package patsyn
+package singularity
 
 import java.awt.image.BufferedImage
 
 import edu.utexas.stac.Cost
-import patsyn.GeneticOperator.ExprGen
-import patsyn.StandardSystem._
+import singularity.GeneticOperator.ExprGen
+import singularity.StandardSystem._
 import FuzzingTaskProvider._
 import scala.util.Random
 

@@ -1,6 +1,6 @@
 package cli
 
-import patsyn._
+import singularity._
 import scopt.OptionParser
 import visual.PatternPlot
 import scala.util.Random

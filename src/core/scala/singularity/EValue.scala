@@ -1,4 +1,4 @@
-package patsyn
+package singularity
 
 @SerialVersionUID(1L)
 trait EValue extends Serializable{

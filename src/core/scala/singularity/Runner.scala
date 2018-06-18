@@ -1,10 +1,10 @@
-package patsyn
+package singularity
 
 
 import java.awt.Dimension
 import java.util.concurrent.TimeoutException
 import measure.TimeTools
-import patsyn.EvolutionRepresentation.{IndividualData, IndividualEvaluation, MemoryUsage}
+import singularity.EvolutionRepresentation.{IndividualData, IndividualEvaluation, MemoryUsage}
 
 import scala.util.Random
 

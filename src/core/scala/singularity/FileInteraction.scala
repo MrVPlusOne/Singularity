@@ -1,9 +1,9 @@
-package patsyn
+package singularity
 
 import java.io._
 import java.nio.file.{Files, Paths}
 
-import patsyn.EvolutionRepresentation.IndividualData
+import singularity.EvolutionRepresentation.IndividualData
 
 class FileLogger(fileName: String, printToConsole: Boolean, writer: FileWriter) {
 

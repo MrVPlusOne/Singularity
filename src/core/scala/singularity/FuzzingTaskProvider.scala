@@ -1,9 +1,9 @@
-package patsyn
+package singularity
 
 import java.awt.image.BufferedImage
 
 import StandardSystem._
-import patsyn.GeneticOperator.ExprGen
+import singularity.GeneticOperator.ExprGen
 
 import scala.util.Random
 

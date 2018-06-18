@@ -1,4 +1,4 @@
-package patsyn
+package singularity
 
 object HashFunc {
   // Hash function DJBX33A

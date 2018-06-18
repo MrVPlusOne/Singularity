@@ -1,11 +1,11 @@
-package visual
+package singularity.visual
 
 import javax.swing.JFrame
 
 import org.apache.commons.math3.fitting.PolynomialCurveFitter
-import patsyn.MultiStateRepresentation.individualToPattern
-import patsyn.StandardSystem.GraphValue
-import patsyn._
+import singularity.MultiStateRepresentation.individualToPattern
+import singularity.StandardSystem.GraphValue
+import singularity._
 
 import scala.util.Random
 

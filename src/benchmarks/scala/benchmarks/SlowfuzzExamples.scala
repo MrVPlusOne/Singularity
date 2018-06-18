@@ -2,8 +2,8 @@ package benchmarks
 
 
 import benchmarks.AllTogether.ConfigGen
-import patsyn.StandardSystem._
-import patsyn._
+import singularity.StandardSystem._
+import singularity._
 import ExampleAlgorithms._
 
 object SlowfuzzExamples {

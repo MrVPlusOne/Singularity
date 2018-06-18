@@ -1,8 +1,8 @@
 package cli
 
 import benchmarks.SlowfuzzExamples
-import patsyn.Runner.RunnerConfig
-import patsyn._
+import singularity.Runner.RunnerConfig
+import singularity._
 import scopt.OptionParser
 
 object SlowfuzzExperiment {

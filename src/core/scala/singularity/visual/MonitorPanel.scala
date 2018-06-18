@@ -1,4 +1,4 @@
-package visual
+package singularity.visual
 
 import java.awt.geom.Rectangle2D
 import java.awt.{Dimension, Graphics, Graphics2D}
@@ -9,7 +9,7 @@ import org.jfree.chart.axis.NumberAxis
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.chart.{ChartFactory, JFreeChart}
 import org.jfree.data.xy.{XYSeries, XYSeriesCollection}
-import patsyn._
+import singularity._
 
 
 object MonitorPanel{

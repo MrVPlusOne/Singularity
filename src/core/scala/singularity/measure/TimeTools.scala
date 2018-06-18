@@ -1,4 +1,4 @@
-package measure
+package singularity.measure
 
 import java.text.SimpleDateFormat
 

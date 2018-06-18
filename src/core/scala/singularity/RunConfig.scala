@@ -1,6 +1,6 @@
-package patsyn
+package singularity
 
-import patsyn.Runner.RunnerConfig
+import singularity.Runner.RunnerConfig
 
 import scala.util.Random
 

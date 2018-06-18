@@ -1,8 +1,8 @@
 package benchmarks
 
 import edu.utexas.stac.Cost
-import patsyn._
-import patsyn.Runner.RunnerConfig
+import singularity._
+import singularity.Runner.RunnerConfig
 
 import scala.util.Random
 

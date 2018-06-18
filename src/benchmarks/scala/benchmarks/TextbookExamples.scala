@@ -1,9 +1,9 @@
 package benchmarks
 
-import measure.TimeTools
-import patsyn.Runner.RunnerConfig
-import patsyn.StandardSystem._
-import patsyn._
+import singularity.measure.TimeTools
+import singularity.Runner.RunnerConfig
+import singularity.StandardSystem._
+import singularity._
 
 import scala.util.Random
 
@@ -245,6 +245,6 @@ object TextbookExamples {
 //  def main(args: Array[String]): Unit = {
 //    runExample(0, true)
 ////        val ind = FileInteraction.readMultiIndFromFile("results/textbook.quickSort3Way[performance=2320.0][ioId=0,seed=0](18-02-25-16:54:38)/bestIndividual.serialized", StandardSystem.funcMap)
-////        visual.PatternPlot.showResourceUsageChart(quickSort3Way, ind, 1000, 50)
+////        singularity.visual.PatternPlot.showResourceUsageChart(quickSort3Way, ind, 1000, 50)
 //  }
 }

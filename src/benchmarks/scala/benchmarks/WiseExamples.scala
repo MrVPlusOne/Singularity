@@ -1,9 +1,9 @@
 package benchmarks
 
-import measure.TimeTools
-import patsyn.Runner.RunnerConfig
-import patsyn.StandardSystem._
-import patsyn._
+import singularity.measure.TimeTools
+import singularity.Runner.RunnerConfig
+import singularity.StandardSystem._
+import singularity._
 
 import scala.util.Random
 

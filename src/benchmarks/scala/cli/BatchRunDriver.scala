@@ -1,7 +1,7 @@
 package cli
 
-import patsyn.Runner.RunnerConfig
-import patsyn.{ExecutionConfig, SimpleMath}
+import singularity.Runner.RunnerConfig
+import singularity.{ExecutionConfig, SimpleMath}
 import scopt.OptionParser
 
 case class BatchRunOption(benchNames: Seq[String] = Seq(),

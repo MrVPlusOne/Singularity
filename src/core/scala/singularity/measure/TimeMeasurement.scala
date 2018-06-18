@@ -1,9 +1,9 @@
-package measure
+package singularity.measure
 
 
 import java.io.ByteArrayInputStream
-import measure.TimeMeasurement.DoubleAsMillis
-import patsyn.FileInteraction
+import singularity.measure.TimeMeasurement.DoubleAsMillis
+import singularity.FileInteraction
 
 object TimeMeasurement{
   type DoubleAsMillis = Double

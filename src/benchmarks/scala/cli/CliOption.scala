@@ -1,7 +1,7 @@
 package cli
 
-import patsyn.{ExecutionConfig, GPConfig}
-import patsyn.Runner.RunnerConfig
+import singularity.{ExecutionConfig, GPConfig}
+import singularity.Runner.RunnerConfig
 
 case class CliOption(target: String = "",
                      useSledgehammer: Boolean = true,

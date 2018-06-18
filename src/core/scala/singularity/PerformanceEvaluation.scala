@@ -1,8 +1,8 @@
-package patsyn
+package singularity
 
 import org.apache.commons.math3.analysis.ParametricUnivariateFunction
 import org.apache.commons.math3.exception.ConvergenceException
-import patsyn.EvolutionRepresentation.MemoryUsage
+import singularity.EvolutionRepresentation.MemoryUsage
 
 import scala.collection.mutable
 import scala.util.Random
