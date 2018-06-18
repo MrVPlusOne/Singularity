@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat
 
 
 /**
-  * Running time related tools
+  * Time measurement utilities
   */
 object TimeTools {
   type Nanosecond = Long

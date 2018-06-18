@@ -3,16 +3,19 @@ package singularity
 
 import singularity.EvolutionRepresentation._
 
-
+/** Provides utility operations needed for applying Genetic Programming to a type of `Individual` */
 trait EvolutionRepresentation[Individual] {
   def showIndividual(ind: Individual): String
   def representationSize(ind: Individual): Double
+
+  /** returns all [[Expr]]s of an individual */
   def individualExprs(ind: Individual): Seq[Expr]
 
   def individualToPattern(ind: Individual): Stream[(MemoryUsage, IS[EValue])]
 
   def sizePenaltyFactor(ind: Individual): Double
 
+  /** returns true if an individual is considered to be too large to be useful during GP */
   def isTooLarge(ind: Individual): Boolean
 
   def evaluation: PerformanceEvaluation

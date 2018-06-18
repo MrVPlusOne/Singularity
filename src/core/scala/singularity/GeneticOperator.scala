@@ -4,10 +4,11 @@ import singularity.GeneticOperator._
 
 import scala.util.Random
 
-trait GeneticOperator[T]{
+/** Used to create new individuals during GP fuzzing processes. */
+trait GeneticOperator[Individual]{
   def arity: Int
 
-  def operate(random: Random, participates: IS[T]): T
+  def operate(random: Random, participates: IS[Individual]): Individual
 
   def name: String
 }
@@ -73,6 +74,7 @@ object GeneticOperator{
   }
 }
 
+/** Defines the DSL (i.e. which components to use) used to represent input patterns. */
 case class GPEnvironment(constMap: Map[EType, ExprGen[EConst]], functions: IS[EFunction], stateTypes: IS[EType], argConstRatio: Double = 0.35, warningOn: Boolean = true) {
 
   /** type set used to concretize abstract functions, all function argument types and
@@ -134,6 +136,7 @@ case class GPEnvironment(constMap: Map[EType, ExprGen[EConst]], functions: IS[EF
   }
 }
 
+@deprecated("using multi-state representation instead")
 case class SingleStateGOpLibrary(environment: GPEnvironment)  {
   type Individual = SingleStateInd
   type GOp = GeneticOperator[Individual]
@@ -219,6 +222,7 @@ case class SingleStateGOpLibrary(environment: GPEnvironment)  {
   }
 }
 
+/** Provides genetic operators used to create new individuals */
 case class MultiStateGOpLibrary(environment: GPEnvironment, outputTypes: IS[EType])  {
   type Individual = MultiStateInd
   type GOp = GeneticOperator[Individual]

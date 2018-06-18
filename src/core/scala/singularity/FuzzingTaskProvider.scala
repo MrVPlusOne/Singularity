@@ -7,6 +7,9 @@ import singularity.GeneticOperator.ExprGen
 
 import scala.util.Random
 
+/** Describes a fuzzing task. Only use this if you want to specify problem-specific [[GPEnvironment]].
+  * Otherwise, use [[singularity.ProblemConfig]] instead.
+  * @see [[singularity.ProblemConfig]]  */
 trait FuzzingTaskProvider {
   protected def task: RunningFuzzingTask
 

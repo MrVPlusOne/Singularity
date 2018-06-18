@@ -7,6 +7,11 @@ object MultiStateInd {
   type GlobalCoord = (Int, Expr.Coordinate)
 }
 
+/** An individual consists of multiple internal states and iterators. Corresponds to "Recurrent Computation Graph"
+  * in the Singularity paper.
+  * @param exprs all expressions in this individual. equals to ``seeds ++ iters ++ outputs``
+  * @param nStates number of internal states
+  * */
 @SerialVersionUID(0L)
 case class MultiStateInd(exprs: IS[Expr], nStates: Int){
   val seeds: IS[Expr] = exprs.take(nStates)
@@ -98,6 +103,7 @@ object MultiStateRepresentation{
   }
 }
 
+/** Provides utility operations needed for applying Genetic Programming to [[singularity.MultiStateInd]] */
 case class MultiStateRepresentation(stateTypes: IS[EType], outputTypes: IS[EType],
                                     totalSizeTolerance: Double, singleSizeTolerance: Double,
                                     exprCostPenaltyBase: Double,

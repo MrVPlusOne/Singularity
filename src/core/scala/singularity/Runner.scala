@@ -100,7 +100,17 @@ object Runner {
   }
 
 
-  def run(problemConfig: ProblemConfig, gpEnv: GPEnvironment, config: RunConfig = RunConfig.default): Unit = {
+  /** starts a fuzzing process
+    *
+    * Ways to automatically stop fuzzing:
+    * <ol>
+    *   <li> set [[AllConfigs.execConfig.maxNonIncreaseGen]] to some limit number `m`. This stops fuzzing when there
+    *   has not been any fitness improvement (on the best individual of each generation) for `m`
+    *   generations. </li>
+    *   <li> set [[AllConfigs.execConfig.maxFuzzingTimeSec]] to some time limit (in seconds). </li>
+    * </ol>
+    * */
+  def run(problemConfig: ProblemConfig, gpEnv: GPEnvironment, config: AllConfigs = AllConfigs.default): Unit = {
     import problemConfig._
     import config._
     import config.gpConfig._
@@ -323,7 +333,7 @@ object Runner {
           evalProgressCallback = { i =>
             evalProgressCallback(s"GP Evaluation progress: $i")
           },
-          bufferEvaluation = evalSizePolicy match {
+          cacheEvaluations = evalSizePolicy match {
             case _: FixedEvalSize => true
             case _: VariedEvalSize => false
           }
@@ -437,7 +447,7 @@ object Runner {
   }
 
 
-  def runExample(taskName: String, taskProvider: FuzzingTaskProvider, config: RunConfig = RunConfig.default): Unit = {
+  def runExample(taskName: String, taskProvider: FuzzingTaskProvider, config: AllConfigs = AllConfigs.default): Unit = {
     taskProvider.run{ task =>
       import task._
       import taskProvider._
@@ -448,7 +458,7 @@ object Runner {
         saveValueWithName = saveValueWithName)
 
 
-      Runner.run(problemConfig, gpEnv, RunConfig(runnerConfig, gpConfig, execConfig))
+      Runner.run(problemConfig, gpEnv, AllConfigs(runnerConfig, gpConfig, execConfig))
     }
 
   }

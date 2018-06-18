@@ -1,6 +1,6 @@
 package cli
 
-import singularity.RunConfig
+import singularity.AllConfigs
 import scopt.OptionParser
 
 import scala.util.Random
@@ -16,8 +16,8 @@ object JarTester {
   import java.io.File
   import java.net.URLClassLoader
 
-  private def getRunConfig(option: JarTesterOption): RunConfig = {
-    val defaultConfig = RunConfig.default
+  private def getRunConfig(option: JarTesterOption): AllConfigs = {
+    val defaultConfig = AllConfigs.default
     defaultConfig.copy(
       runnerConfig = defaultConfig.runnerConfig.copy(
         ioId = option.ioId,

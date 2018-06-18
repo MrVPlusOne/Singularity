@@ -114,7 +114,7 @@ class Supernova(extendedConstRule: (PartialFunction[EType, Random => EValue] => 
   def fuzzProblem(problemConfig: ProblemConfig, runnerConfig: RunnerConfig, execConfig: ExecutionConfig, rand: Random, aggressiveness: Option[Double] = None, overrideGpConfig: GPConfig => GPConfig = x => x): Unit ={
     val (env, gpConfig) = genGPParameters(problemConfig.outputTypes, rand, aggressiveness)
     val gpConfig1 = overrideGpConfig(gpConfig)
-    Runner.run(problemConfig, env, RunConfig(runnerConfig, gpConfig1, execConfig))
+    Runner.run(problemConfig, env, AllConfigs(runnerConfig, gpConfig1, execConfig))
   }
 }
 

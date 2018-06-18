@@ -9,6 +9,7 @@ import singularity._
 
 import scala.util.Random
 
+/** Restores an input pattern from serialization and plots how its performance scales with the input size. */
 object PatternPlot {
   def plotPatternPerformance(probConfig: ProblemConfig, individual: MultiStateInd,
                              sizeLimit: Int, maxPoints: Int = 10, memoryLimit: Long = Long.MaxValue,

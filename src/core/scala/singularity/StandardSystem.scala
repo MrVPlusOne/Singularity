@@ -2,6 +2,11 @@ package singularity
 
 import scala.language.implicitConversions
 
+//todo: add more docs for each component
+/**
+  * The standard component set used in the Singularity paper. Defines commonly used data structures like
+  * Integers, Vectors, Tuples, and Graphs.
+  */
 //noinspection TypeAnnotation
 object StandardSystem {
   private var _funcMap = Map[String, EFunction]()

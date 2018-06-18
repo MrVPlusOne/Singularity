@@ -1,6 +1,7 @@
 package singularity
 
-
+/** DSL expressions used to represent input patterns
+  * @see [[singularity.MultiStateInd]] */
 sealed trait Expr {
   def returnType: EType
 
@@ -17,6 +18,7 @@ sealed trait ETerminal extends Expr with SExpr {
   def argTypes: IS[EType] = IS()
 }
 
+/** Represents an internal state, used to construct updaters and transformers */
 @SerialVersionUID(0L)
 case class EArg(id: Int, returnType: EType) extends ETerminal{
   def isConst: Boolean = false
@@ -33,6 +35,7 @@ case class EConst(returnType: EType, value: EValue) extends ETerminal{
   def astSize: Int = value.memoryUsage.toInt
 }
 
+/** Represents applying an function to its argument expressions */
 @SerialVersionUID(0L)
 case class ENode(f: EConcreteFunc, args: IS[Expr]) extends Expr {
   val astSize: Int = args.map(_.astSize).sum + 1
@@ -61,6 +64,7 @@ sealed trait EFunction{
   def name: String
 }
 
+/** An DSL function. Corresponds to a Component described in the Singularity paper. */
 @SerialVersionUID(0L)
 case class EConcreteFunc(name: String, argTypes: IS[EType], returnType: EType,
                          eval: PartialFunction[IS[EValue], EValue]) extends EFunction {
@@ -73,6 +77,8 @@ case class EConcreteFunc(name: String, argTypes: IS[EType], returnType: EType,
   }
 }
 
+/** An abstract DSL function. Can be turned into a concrete function when applied to type parameters.
+  * @see [[singularity.EConcreteFunc]], [[singularity.StandardSystem]]*/
 @SerialVersionUID(0L)
 case class EAbstractFunc(name: String, tyVarNum: Int,
                          typeInstantiation: (IS[EType]) => (IS[EType], EType),
@@ -90,6 +96,7 @@ case class EAbstractFunc(name: String, tyVarNum: Int,
 
 
 object Expr {
+
   def evaluateWithCheck(expr: Expr, env: IndexedSeq[EValue]): EValue = {
 //    println(s"$expr \\||/ $env")
     def withType(ty: EType)(value: EValue) ={
@@ -152,8 +159,12 @@ object Expr {
 
 }
 
+/** S Expressions used for serialization purpose. (use a function map during saving/restoration
+  * to get rid of lambdas) */
 sealed trait SExpr
 
+/** used for serialization purpose. (use a function map during saving/restoration
+  * to get rid of lambdas) */
 case class SNode(name: String, argTypes: IS[EType], returnType: EType,
                  args: IS[SExpr]
                 ) extends SExpr

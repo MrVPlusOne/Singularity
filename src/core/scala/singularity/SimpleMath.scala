@@ -2,6 +2,7 @@ package singularity
 
 import scala.util.Random
 
+/** Useful utility functions */
 object SimpleMath {
   def wrapInRange(i: Int, range: Int): Int = {
     val m = i % range

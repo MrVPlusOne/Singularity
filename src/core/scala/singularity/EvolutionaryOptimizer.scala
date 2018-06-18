@@ -4,18 +4,33 @@ import singularity.EvolutionRepresentation.{IndividualData, IndividualEvaluation
 
 import scala.util.Random
 
+/** A generic Genetic Programming Implementation.
+  * @tparam Individual The type of the individuals being optimized. Currently only [[singularity.MultiStateInd]]
+  *                    are widely used.
+  * @see [[singularity.MultiStateInd]], [[singularity.EvolutionRepresentation]] */
 case class EvolutionaryOptimizer[Individual]() {
   type GOp = GeneticOperator[Individual]
 
-  def optimize(populationSize: Int, tournamentSize: Int, neighbourSize: Option[Int] = None,
+  /** Returns a lazy stream of Populations
+    * @param neighbourSize If set to None, uses the standard tournament method to select individuals; otherwise,
+    *                      only individuals that are close to each other can be combined using GP operators.
+    *                      Recommended to set this to None
+    *
+    * @param threadNum The number of threads used during indiviudal evaluation
+    * @param cacheEvaluations If set to true, reuse fitness evaluation of the same individual whenever possible.
+    *
+    * This class is used in [[singularity.Runner]]`.run`
+    * */
+  def optimize(populationSize: Int,
+               tournamentSize: Int,
+               neighbourSize: Option[Int] = None,
                initOperator: GOp,
                operators: IS[(GOp, Double)],
                indEval: Individual => IndividualEvaluation,
                threadNum: Int,
                random: Random,
                evalProgressCallback: Int => Unit,
-               bufferEvaluation: Boolean
-                     ): Iterator[Population[Individual]] = {
+               cacheEvaluations: Boolean): Iterator[Population[Individual]] = {
 
     require(threadNum>=1)
     neighbourSize.foreach(ns => require(ns*2+1 <= populationSize, "Neighbour size too large."))
@@ -91,7 +106,7 @@ case class EvolutionaryOptimizer[Individual]() {
       val newInds = newIndsAndHistory.map(_._1)
       val newFitnessMap = {
         parExecute(newInds.distinct) { ind =>
-          val eval = if (bufferEvaluation) {
+          val eval = if (cacheEvaluations) {
             pop.fitnessMap.getOrElse(ind, default = evaluation(ind))
           } else evaluation(ind)
           ind -> eval
