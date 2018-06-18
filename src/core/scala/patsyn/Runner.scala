@@ -7,7 +7,6 @@ import java.util.concurrent.TimeoutException
 import measure.TimeTools
 import patsyn.EvolutionRepresentation.{IndividualData, IndividualEvaluation, MemoryUsage}
 import FuzzingTaskProvider.escapeStrings
-import benchmarks.SlowfuzzExamples
 
 import scala.util.Random
 
