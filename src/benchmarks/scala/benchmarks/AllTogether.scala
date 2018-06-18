@@ -18,7 +18,6 @@ object AllTogether {
       CommonsExamples.curveFittingProblem("harmonicFit", HarmonicCurveFitter.create()),
       CommonsExamples.curveFittingProblem("gaussianFit", GaussianCurveFitter.create())
     ).map(toGen) ++
-    IS(DemanglerExamples.llvmDemanglerExample, DemanglerExamples.lldbDemanglerExample).map(toGen) ++
     GuavaExamples.all.map(toGen) ++
     (JGraphTExamples.maxFlowProblems ++ JGraphTExamples.spanningTreeProblems.map(_._1) ++
       JGraphTExamples.coloringProblems ++ JGraphTExamples.simpleCyclesProblems).map(toGen)

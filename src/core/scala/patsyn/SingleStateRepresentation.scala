@@ -2,8 +2,8 @@ package patsyn
 
 import patsyn.EvolutionRepresentation.MemoryUsage
 
+@deprecated("using multi-state representation instead")
 case class SingleStateInd(seed: IS[Expr], iter: IS[Expr]){
-  //todo: add new size measurement with penalty on repeated exprs
 
   def showAsLinearExpr: String = {
     s"{seed: ${seed.map(Expr.linearShow).mkString("< ", " | ", " >" )} ; " +
@@ -11,6 +11,7 @@ case class SingleStateInd(seed: IS[Expr], iter: IS[Expr]){
   }
 }
 
+@deprecated("using multi-state representation instead")
 case class SingleStateRepresentation(seedSizeTolerance: Int, iterSizeTolerance: Int,
                                      exprCostPenaltyBase: Double,
                                      evaluation: PerformanceEvaluation) extends EvolutionRepresentation[SingleStateInd]{

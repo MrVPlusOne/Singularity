@@ -2,7 +2,6 @@ package measure
 
 
 import java.io.ByteArrayInputStream
-
 import measure.TimeMeasurement.DoubleAsMillis
 import patsyn.FileInteraction
 

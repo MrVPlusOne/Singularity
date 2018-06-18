@@ -40,7 +40,7 @@ object JarTester {
 
     import patsyn.StandardSystem._
     import patsyn._
-    import FuzzingTaskProvider.vectIntToString
+    import ExampleAlgorithms.vectIntToString
 
     val rand = new Random(runConfig.runnerConfig.randomSeed)
 

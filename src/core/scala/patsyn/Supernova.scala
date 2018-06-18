@@ -1,6 +1,5 @@
 package patsyn
 
-import benchmarks.{TextbookExamples, SlowfuzzExamples}
 import patsyn.GeneticOperator.ExprGen
 import patsyn.Runner.RunnerConfig
 import patsyn.StandardSystem.{EInt, EVect, IntValue, VectValue}
@@ -120,23 +119,5 @@ class Supernova(extendedConstRule: (PartialFunction[EType, Random => EValue] => 
 }
 
 object Supernova{
-
   val standardSupernova = new Supernova(extendedConstRule = _ => PartialFunction.empty, IS(), IS())
-
-
-  def main(args: Array[String]): Unit = {
-    val seed = 5
-//    val workingDir = FileInteraction.getWorkingDir(seed)
-    val rand = new Random(seed)
-    val size = 100
-    val sizePolicy = FixedEvalSize(size)
-
-    val prob = SlowfuzzExamples.phpHashExample(size)(FileInteraction.getWorkingDir(1))
-//    FuzzingTaskProvider.quickSortMiddlePivotExample.runAsProbConfig("quickSortMiddle"){ prob =>
-        standardSupernova.fuzzProblem(prob,
-          RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = true),
-          ExecutionConfig().copy(evalSizePolicy = sizePolicy),
-          rand = rand)
-//    }
-  }
 }

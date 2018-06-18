@@ -75,8 +75,8 @@ object TextbookExamples {
     },
     resourceUsage = {
       case IS(VectValue(needle), VectValue(haystack)) =>
-        val needleStr = FuzzingTaskProvider.vectIntToString(needle, 8)
-        val haystackStr = FuzzingTaskProvider.vectIntToString(haystack, 8)
+        val needleStr = ExampleAlgorithms.vectIntToString(needle, 8)
+        val haystackStr = ExampleAlgorithms.vectIntToString(haystack, 8)
 
         BenchmarkSet.handleRuntimeException(0L) {
           val searcher = ctor(needleStr)

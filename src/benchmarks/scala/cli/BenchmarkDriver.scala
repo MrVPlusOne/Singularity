@@ -3,14 +3,15 @@ package cli
 import patsyn._
 import scopt.OptionParser
 import visual.PatternPlot
-
 import scala.util.Random
+import FuzzingTaskProvider._
+import ExampleAlgorithms._
+import ExampleAlgorithms.NativeSortExamples._
 
 object BenchmarkDriver {
 
   private def benchmarks(ioId: Int): Map[String, FuzzingTaskProvider] = {
-    import FuzzingTaskProvider._
-    import NativeSortExamples._
+
 
     Map[String, FuzzingTaskProvider](
 

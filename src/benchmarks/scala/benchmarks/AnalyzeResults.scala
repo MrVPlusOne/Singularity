@@ -1,12 +1,12 @@
-package patsyn
+package benchmarks
 
 import java.util.Date
 
-import measure.TimeTools
 import ammonite.ops._
-import benchmarks.TextbookExamples
+import measure.TimeTools
 import patsyn.FittingPerformanceEvaluation.PowerLawFitter
 import patsyn.StandardSystem.GraphValue
+import patsyn._
 
 import scala.util.matching.Regex
 

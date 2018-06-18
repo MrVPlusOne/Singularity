@@ -1,17 +1,17 @@
 package benchmarks
 
-import patsyn.{IS}
+import patsyn.{ExampleAlgorithms, IS}
 
 object STACExamples {
   import patsyn.FuzzingTaskProvider
 
 
   def allTasks(ioId: Int, workDir: String): IS[FuzzingTaskProvider] = IS(
-    FuzzingTaskProvider.bloggerExample(ioId),
-    FuzzingTaskProvider.graphAnalyzerExample(workDir),
-    FuzzingTaskProvider.airplan1Example(workDir),
-    FuzzingTaskProvider.airplan2Example(workDir),
-    FuzzingTaskProvider.imageExample(10, 10, workDir),
-    FuzzingTaskProvider.linearAlgebraExample(10, workDir)
+    ExampleAlgorithms.bloggerExample(ioId),
+    ExampleAlgorithms.graphAnalyzerExample(workDir),
+    ExampleAlgorithms.airplan1Example(workDir),
+    ExampleAlgorithms.airplan2Example(workDir),
+    ExampleAlgorithms.imageExample(10, 10, workDir),
+    ExampleAlgorithms.linearAlgebraExample(10, workDir)
   )
 }

@@ -4,6 +4,7 @@ package benchmarks
 import benchmarks.AllTogether.ConfigGen
 import patsyn.StandardSystem._
 import patsyn._
+import ExampleAlgorithms._
 
 object SlowfuzzExamples {
 
@@ -11,7 +12,7 @@ object SlowfuzzExamples {
 
   def nativeExample(execName: String)(inputSize: Int)(workingDir: String): ProblemConfig = {
     def vectToBytes(vect: Vector[EValue]): Array[Byte] = {
-      val ints = FuzzingTaskProvider.toIntVect(vect)
+      val ints = toIntVect(vect)
       val bBuffer = ByteBuffer.allocate(ints.length*4).order(ByteOrder.LITTLE_ENDIAN)
       ints.foreach{x =>
         bBuffer.putInt(x)
@@ -19,7 +20,7 @@ object SlowfuzzExamples {
       bBuffer.array()
     }
 
-    val native = new FuzzingTaskProvider.NativeExample(execName, workingDir)
+    val native = new NativeExample(execName, workingDir)
     ProblemConfig(
       problemName =
         if (execName.endsWith("_int"))
@@ -62,7 +63,7 @@ object SlowfuzzExamples {
   def phpHashExample = nativeExample("phphash") _
 
   def pcreExample(regexId: Int)(inputSize: Int)(workingDir: String) = {
-    val native = new FuzzingTaskProvider.NativeExample("pcre_str", workingDir)
+    val native = new NativeExample("pcre_str", workingDir)
     ProblemConfig(
       problemName = s"pcre_regex${regexId}_int_$inputSize",
       outputTypes = IS(EVect(EInt)),
@@ -71,7 +72,7 @@ object SlowfuzzExamples {
       },
       resourceUsage = {
         case IS(VectValue(v)) =>
-          val data = FuzzingTaskProvider.toIntVect(v).map(x => x.toByte).toArray
+          val data = toIntVect(v).map(x => x.toByte).toArray
           native.withWriteByteArray(data, "input", (inputFileName: String) => {
             native.runNativeGetCost(s"$inputFileName $regexId")
           })
@@ -79,7 +80,7 @@ object SlowfuzzExamples {
       saveValueWithName = (value: IS[EValue], name: String) => {
         value match {
           case IS(VectValue(v)) =>
-            val data = FuzzingTaskProvider.toIntVect(v).map(x => x.toByte).toArray
+            val data = toIntVect(v).map(x => x.toByte).toArray
             val fileName = s"$name.bin"
             FileInteraction.writeToBinaryFile(fileName)(data)
         }

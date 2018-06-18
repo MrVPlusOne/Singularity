@@ -1,7 +1,7 @@
 package benchmarks
 
 import ammonite.ops._
-import patsyn.FuzzingTaskProvider.parseCost
+import patsyn.ExampleAlgorithms.parseCost
 import patsyn.{FileInteraction, FuzzingTaskProvider, ProblemConfig}
 
 import scala.util.matching.Regex

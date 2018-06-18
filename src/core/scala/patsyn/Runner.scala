@@ -3,25 +3,14 @@ package patsyn
 
 import java.awt.Dimension
 import java.util.concurrent.TimeoutException
-
 import measure.TimeTools
 import patsyn.EvolutionRepresentation.{IndividualData, IndividualEvaluation, MemoryUsage}
-import FuzzingTaskProvider.escapeStrings
 
 import scala.util.Random
 
 object Runner {
 
   case class MaxFuzzingTimeReachedException(timeLimitSec: Long) extends Exception
-
-  def main(args: Array[String]): Unit = {
-    val ioId = if(args.isEmpty) 0 else args.head.toInt
-    val workingDir = FileInteraction.getWorkingDir(ioId)
-
-    runExample("phpHash", FuzzingTaskProvider.phpHashCollisionExample,
-      RunConfig.default.withIoIdAndSeed(ioId, ioId).copy(
-        execConfig = ExecutionConfig().copy(maxFuzzingTimeSec = Some(20))))
-  }
 
   case class MonitoringData(averageFitness: Double, bestFitness: Double, bestPerformance: Double)
 
@@ -104,6 +93,11 @@ object Runner {
     }
   }
 
+  def escapeStrings(s: String): String = {
+    import org.apache.commons.lang3.StringEscapeUtils
+
+    StringEscapeUtils.escapeJava(s)
+  }
 
 
   def run(problemConfig: ProblemConfig, gpEnv: GPEnvironment, config: RunConfig = RunConfig.default): Unit = {
@@ -230,7 +224,7 @@ object Runner {
     FileInteraction.runWithAFileLogger(s"$recordDirPath/runLog.txt") { logger =>
       import logger._
 
-      val testRandom = true
+      val testRandom = false //When turned on, no GP is used, only random fuzzing
 
       println(s"Starting task: ${problemConfig.problemName}")
       println(s"TestRandom=$testRandom")

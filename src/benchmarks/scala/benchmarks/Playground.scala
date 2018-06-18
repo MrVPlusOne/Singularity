@@ -1,9 +1,8 @@
-package patsyn
+package benchmarks
 
-import benchmarks.{GuavaExamples, JGraphTExamples, SlowfuzzExamples}
-import measure.TimeTools
 import patsyn.Runner.RunnerConfig
 import patsyn.Supernova.standardSupernova
+import patsyn._
 
 import scala.util.Random
 
@@ -73,7 +72,7 @@ object HashSample {
 object Playground {
 
   def previous(): Unit = {
-    import visual.{MonitorPanel, PatternPlot, ListPlot}
+    import visual.{ListPlot, MonitorPanel}
 
 
     var s0 = 403
@@ -101,10 +100,6 @@ object Playground {
 
     import javax.swing.JFrame
 
-    import benchmarks.GuavaExamples
-    import patsyn.MultiStateRepresentation.individualToPattern
-    import patsyn._
-
 
     val frame = new JFrame("Monitor") {
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
@@ -126,7 +121,7 @@ object Playground {
 
   def run(ioId: Int): Unit ={
     val rand = new Random(ioId)
-    FuzzingTaskProvider.phpHashCollisionExample.runAsProbConfig("PhpHash"){ config =>
+    ExampleAlgorithms.phpHashCollisionExample.runAsProbConfig("PhpHash"){ config =>
      Supernova.standardSupernova.fuzzProblem(
         config,
         RunnerConfig().copy(randomSeed = ioId, ioId = ioId, useGUI = false),
@@ -143,7 +138,7 @@ object Playground {
     val resourcePolicy = ResourceUsagePolicy.HybridEvaluationPolicy()
 
 //    val prob = SlowfuzzExamples.phpHashExample(size)(FileInteraction.getWorkingDir(1))
-        FuzzingTaskProvider.quickSortMiddlePivotExample.runAsProbConfig("quickSortMiddle"){ prob =>
+    ExampleAlgorithms.quickSortMiddlePivotExample.runAsProbConfig("quickSortMiddle"){ prob =>
     standardSupernova.fuzzProblem(prob,
       RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = true),
       ExecutionConfig().copy(evalSizePolicy = sizePolicy, resourcePolicy = resourcePolicy),

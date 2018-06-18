@@ -2,8 +2,7 @@ package visual
 
 import javax.swing.JFrame
 
-import benchmarks.{CommonsExamples, GuavaExamples, JGraphTExamples, SlowfuzzExamples}
-import patbench.commons.math3.fitting.PolynomialCurveFitter
+import org.apache.commons.math3.fitting.PolynomialCurveFitter
 import patsyn.MultiStateRepresentation.individualToPattern
 import patsyn.StandardSystem.GraphValue
 import patsyn._
@@ -83,7 +82,7 @@ object PatternPlot {
   def main(args: Array[String]): Unit = {
     import io.Source
 
-    val config = SlowfuzzExamples.phpHashExample(100)(FileInteraction.getWorkingDir(1))
+    val config: ProblemConfig = ???
     val sizeLimit = 1000
     val plotPoints = 30
     val files =
@@ -111,7 +110,7 @@ object PatternPlot {
               ev match{
                 case IS(graph: GraphValue, _, _) =>
                   println{
-                    MamFormat.showAsMamGraph(graph)
+                    graph
                   }
                 case _ => ()
               }
