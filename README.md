@@ -32,3 +32,8 @@ libraryDependencies += "TODO"
 
 
 - [A quick tutorial](Tutorial.md)
+
+
+## Notes
+
+- To obtain deterministic performance measurements, we tend to rely on program instrumentation: [This tool](https://github.com/grievejia/CostInstrument) is used to instrument programs written in Java, and [this tool](https://github.com/grievejia/CostInstrument-llvm) is used to instrument programs written in C/C++. 
