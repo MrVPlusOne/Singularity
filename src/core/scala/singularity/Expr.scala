@@ -64,7 +64,8 @@ sealed trait EFunction{
   def name: String
 }
 
-/** An DSL function. Corresponds to a Component described in the Singularity paper. */
+/** An DSL function. Corresponds to a "Component" described in the Singularity paper.
+  * @see [[singularity.StandardSystem]], [[singularity.StandardSystem.IntComponents]], etc.. */
 @SerialVersionUID(0L)
 case class EConcreteFunc(name: String, argTypes: IS[EType], returnType: EType,
                          eval: PartialFunction[IS[EValue], EValue]) extends EFunction {

@@ -26,7 +26,7 @@ object QuickSort {
   }
 
   val quickSortProblem = ProblemConfig(
-    "quickSort example",
+    problemName = "quickSort example",
     outputTypes = IS(EVect(EInt)),
     resourceUsage = {
       case IS(VectValue(vs)) =>
