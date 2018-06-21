@@ -32,7 +32,7 @@ libraryDependencies += "TODO"
 
 In this example, we will use Singularity to find the input pattern that maximizes the running time of a simple quickSort implementation. The source code can be found in [QuickSort.scala](src/benchmarks/scala/examples/QuickSort.scala).
 
-#### QuickSort Implementation
+### QuickSort Implementation
 
 First, let's write down a quickSort implementation with a simple pivot selecting strategy that always select the middle element as pivot.
 
@@ -51,9 +51,9 @@ First, let's write down a quickSort implementation with a simple pivot selecting
     quickSort(left) ++ middle ++ quickSort(right)
   }
 ```
-Note that we use a global variable `counter` here to simulate how many lines of code have been executed. In more realistic use case, you will probably consider using an automatic tool to instrument the target program's source code or even simply measure the running time. Singularity also comes with such an instrumentation tool whose usage can be found in //TODO.
+Note that we use a global variable `counter` here to simulate how many lines of code have been executed. In more realistic use case, you will probably consider measure target programs' actual running time  or using an automatic tool to instrument the target program's source code. We provides two such instrumentation tools for both Java (see [this](https://github.com/grievejia/CostInstrument)) and C++ (see [this](https://github.com/grievejia/CostInstrument-llvm)) Programs.
 
-#### ProblemConfig
+### ProblemConfig
 
 Having implemented the target program, we now need to write some gluing code to fully specify the input-feedback interface that Singularity can interact with.
 
@@ -77,13 +77,13 @@ Having implemented the target program, we now need to write some gluing code to 
  * `outputTypes` gives the argument types of the target program. Since our quickSort implementation takes a Scala indexed integer sequence (`IndexedSeq[Int]`), `outputTypes` consists of only one element, `EVect(EInt)`, which is the equivalent type defined in the standard DSL.
 (See more about DSL in [StandardSystem.scala](src/core/scala/singularity/StandardSystem.scala)).
 
- * Since we have specified the output type to be `EVect(EInt)`, during fuzzing time, Singularity will try to feed a vector of integers to the target program and need to receive the corresponding resource usage as feedback, and we specify how to get such feedback as a lambda in `resourceUsage`.
+ * `resourceUsage` specifies how to get resource usage as fuzzing feedback. Since we have specified the output type to be `EVect(EInt)`, during fuzzing time, Singularity will try to feed a vector of integers to the target program and need to receive the corresponding resource usage from the result of the lambda.
 
- * Finally, we tell Singularity how to measure the size of any particular input in `sizeF`.
+ * `sizeF` tells Singularity how to measure the size of any particular input.
 
 #### Running Singularity
 
-After defining the fuzzing problem as a `ProblemConfig`, we still need to specify several parameters related to Genetic Programming such as population size, tournament size, crossover probability, etc... Fortunately, we provide **Supernova**, a parameter sampling tool that automatically guesses (smartly) those parameters for you. All you need to do is providing a random seed and a fuzzing size:
+After defining the fuzzing problem as a `ProblemConfig`, we still need to specify a few parameters related to Genetic Programming such as population size, tournament size, crossover probability, etc... Fortunately, we provide **Supernova**, a parameter sampling tool that automatically guesses (smartly) those parameters for you. So all you need to do is providing a random seed and a fuzzing size:
 
 ```scala
   def main(args: Array[String]): Unit = {
