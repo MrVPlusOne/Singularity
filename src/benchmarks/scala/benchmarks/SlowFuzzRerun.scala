@@ -8,7 +8,7 @@ import singularity._
 
 import scala.util.Random
 
-object SlowFuzzReRun {
+object SlowFuzzRerun {
 
   def runTask(args: Array[String]): Unit ={
     val evalSize = 1024

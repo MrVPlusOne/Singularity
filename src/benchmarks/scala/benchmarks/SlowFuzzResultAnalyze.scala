@@ -9,7 +9,7 @@ import scala.util.matching.Regex
 object SlowFuzzResultAnalyze {
   case class SlowFuzzResult(name: String, size: Int, trial: Int, path: Path)
 
-  val slowFuzzResultRegex: Regex = s"""^(.+)_size(.+)_trial_(.+)""".r //todo: check what's wrong with /d
+  val slowFuzzResultRegex: Regex = s"""^(.+)_size(.+)_trial_(.+)""".r
 
   def analyze(resultsPath: Path, logPath: Path): Unit = {
     val results = (ls ! resultsPath).map(f => (f, f.name)).collect {

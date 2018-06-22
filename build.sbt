@@ -1,3 +1,6 @@
+import sbt.Keys.test
+import sbtassembly.AssemblyPlugin.autoImport.assemblyJarName
+
 organization in ThisBuild := "io.github.MrVPlusOne"
 scalaVersion in ThisBuild := "2.12.3"
 
@@ -29,7 +32,9 @@ lazy val benchmarks = {
     version := "0.6",
     scalaSource in Compile :=  baseDirectory.value / "scala",
     javaSource in Compile :=  baseDirectory.value / "java",
-      unmanagedBase := baseDirectory.value / "lib",
+    unmanagedBase := baseDirectory.value / "lib",
+    mainClass in assembly := Some("benchmarks.TextbookExamples"),
+    test in assembly := {},
     libraryDependencies ++= {
       Seq(
         "com.google.guava" % "guava" % "23.6-jre",
@@ -40,7 +45,3 @@ lazy val benchmarks = {
     }
   )
 }
-
-//mainClass in assembly := Some("cli.BenchmarkDriver")
-//test in assembly := {}
-//assemblyJarName in assembly := "PatternSynthBenchmarkDriver.jar"

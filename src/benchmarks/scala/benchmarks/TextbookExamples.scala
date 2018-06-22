@@ -23,7 +23,7 @@ object TextbookExamples {
         case IS(VectValue(vec)) =>
           val arr = vecToJavaIntArray(vec)
           BenchmarkSet.measureCost {
-            // Array is invariant in Scala so an explicit cast is needed here to  pass Array[Integer] to Array[Comparable].
+            // Array is invariant in Scala so an explicit cast is needed here to pass Array[Integer] to Array[Comparable].
             func(arr.asInstanceOf[Array[Comparable[_]]])
           }
       }
@@ -231,20 +231,8 @@ object TextbookExamples {
     runWithTimeout(args, allProblems,
       hoursAllowed = 3.0,
       evalSize = 250,
-      processNum = 8,
-      baseSeed = 1000
+      processNum = 8
     )
-//    BenchmarkSet.runExample(1224, nfaStr, true, 250);
-//    val rand = new Random(1436)
-//    Supernova.standardSupernova.fuzzProblem(
-//      nfaStr,
-//      RunnerConfig().copy(randomSeed = 1436, ioId = 1436, useGUI = true),
-//      ExecutionConfig(evalSizePolicy = FixedEvalSize(250)), new Random(5))
   }
 
-//  def main(args: Array[String]): Unit = {
-//    runExample(0, true)
-////        val ind = FileInteraction.readMultiIndFromFile("results/textbook.quickSort3Way[performance=2320.0][ioId=0,seed=0](18-02-25-16:54:38)/bestIndividual.serialized", StandardSystem.funcMap)
-////        singularity.visual.PatternPlot.showResourceUsageChart(quickSort3Way, ind, 1000, 50)
-//  }
 }

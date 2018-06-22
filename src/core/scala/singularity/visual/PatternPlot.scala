@@ -11,10 +11,10 @@ import scala.util.Random
 
 /** Restores an input pattern from serialization and plots how its performance scales with the input size. */
 object PatternPlot {
-  def plotPatternPerformance(probConfig: ProblemConfig, individual: MultiStateInd,
-                             sizeLimit: Int, maxPoints: Int = 10, memoryLimit: Long = Long.MaxValue,
-                             patternCreationFeedback: (Int, IS[EValue]) => Unit,
-                             seed: Int = 0): Stream[(Double, Double)] = {
+  def extrapolateAPattern(probConfig: ProblemConfig, individual: MultiStateInd,
+                          sizeLimit: Int, maxPoints: Int = 10, memoryLimit: Long = Long.MaxValue,
+                          patternCreationFeedback: (Int, IS[EValue]) => Unit,
+                          seed: Int = 0): Stream[(Double, Double)] = {
     import EvolutionRepresentation.MemoryUsage
 
     var lastSize = Int.MinValue
@@ -65,7 +65,7 @@ object PatternPlot {
       }
       setVisible(true)
     }
-    val xys = plotPatternPerformance(probConfig, ind, sizeLimit, maxPoints
+    val xys = extrapolateAPattern(probConfig, ind, sizeLimit, maxPoints
       = plotPoints, memoryLimit, patternCreationFeedback = patternCreationFeedback)
 
     var data = IndexedSeq[(Double, Double)]()
@@ -75,9 +75,8 @@ object PatternPlot {
       frame.setContentPane(new MonitorPanel(Some(chart), margin = 10, plotSize = (600,450)))
       frame.pack()
     }
-    println(data)
-
     println("Evaluation finished.")
+    println(data)
   }
 
   def main(args: Array[String]): Unit = {
