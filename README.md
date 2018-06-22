@@ -17,13 +17,13 @@ In order to efficiently search for such inputs, Singularity employs a Domain Spe
 
 ![SingularityLoop.png](doc/images/SingularityLoop.png)
 
- * [Usage](#Usage)
- * [QuickSort Example](#QuickSort Example)
-    * [QuickSort Implementation and Instrumentation](#QuickSort-Implementation-and-Instrumentation)
-    * [ProblemConfig](#ProblemConfig)
-    * [Running Singularity](#Running-Singularity)
-    * [Understanding the Results](#Understanding-the-Results)
-    * [Saving and Reading Patterns](#Saving-and-Reading-Patterns)
+ * [Usage](#esage)
+ * [QuickSort Example](#euickSort-example)
+    * [QuickSort Implementation and Instrumentation](#quickSort-implementation-and-instrumentation)
+    * [ProblemConfig](#problemconfig)
+    * [Running Singularity](#running-singularity)
+    * [Understanding the Results](#understanding-the-results)
+    * [Saving and Reading Patterns](#saving-and-reading-patterns)
 
 ## Usage
 
