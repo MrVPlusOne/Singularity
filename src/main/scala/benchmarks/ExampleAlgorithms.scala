@@ -1,7 +1,7 @@
 package singularity
 
 import java.awt.image.BufferedImage
-
+import benchmarks.HashFunc
 import edu.utexas.stac.Cost
 import singularity.GeneticOperator.ExprGen
 import singularity.StandardSystem._
