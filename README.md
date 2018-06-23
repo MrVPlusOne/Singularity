@@ -1,15 +1,22 @@
 # Singularity
 
-#### Pattern-based blackbox fuzzing framework for determining worst-case algorithmic complexities.
-
-
-## Overview
-
 **The closer your program gets to a singularity, the slower it runs.**
 
 <p align="right"><strong> -- general theory of relativity </strong></p>
 
 Singularity is an automatic fuzzing tool for generating inputs (called patterns) that demonstrates the maximal resource usage behavior of a given program.
+
+ * [Overview](#overview)
+ * [Usage](#usage)
+ * [Tutorial](#tutorial)
+    * [QuickSort Implementation and Instrumentation](#quickSort-implementation-and-instrumentation)
+    * [ProblemConfig](#problemconfig)
+    * [Running Singularity](#running-singularity)
+    * [Understanding the Results](#understanding-the-results)
+    * [Saving and Reading Patterns](#saving-and-reading-patterns)
+ * [Running Textbook Algorithm Examples](#running-textbook-algorithm-examples)   
+
+## Overview
 
 The core idea behind Singularity is based on the observation that the **asymptotic worst-case behavior** of a given program is always triggered by inputs with some specific structural patterns. For example, to trigger the maximal running time of an insertion sort algorithm, the input array must be reversely sorted. Similarly, inserting a series of elements with the right pattern into a hash-based data structure can cause hash collisions and greatly decrease its performance (see [this github issue](https://github.com/google/guava/issues/3015)).
 
@@ -17,27 +24,17 @@ In order to efficiently search for such inputs, Singularity employs a Domain Spe
 
 ![SingularityLoop.png](doc/images/SingularityLoop.png)
 
- * [Usage](#esage)
- * [QuickSort Example](#euickSort-example)
-    * [QuickSort Implementation and Instrumentation](#quickSort-implementation-and-instrumentation)
-    * [ProblemConfig](#problemconfig)
-    * [Running Singularity](#running-singularity)
-    * [Understanding the Results](#understanding-the-results)
-    * [Saving and Reading Patterns](#saving-and-reading-patterns)
 
 ## Usage
 
 The recommended way is to include Singularity as a library into your Scala/Java project. Since Singularity is a blackbox fuzzing technique, it can be used to fuzz target programs written in any language, but the user is required to provide gluing code to translate the data structures outputted by Singularity into corresponding counterparts acceptable by the target program.
 
-To follow the tutorial, either clone the github project or start a new Scala Project and include Singularity into your `build.sbt` file using:
+To use the source code, clone or download the github project and run [sbt](https://www.scala-sbt.org) at the project root to install all dependencies.
 
-```scala
-libraryDependencies += "TODO"
-```
 
-## QuickSort Example
+## Tutorial
 
-In this example, we will use Singularity to find the input pattern that maximizes the running time of a simple quickSort implementation. The source code can be found in [QuickSort.scala](src/benchmarks/scala/examples/QuickSort.scala).
+In this example, we will use Singularity to find the input pattern that maximizes the running time of a simple **quickSort** implementation. The source code can be found in [QuickSort.scala](src/benchmarks/scala/examples/QuickSort.scala).
 
 ### QuickSort Implementation and Instrumentation
 
@@ -197,3 +194,14 @@ object PatternRestoration {
 The runningTime-inputSize relation is, as expected, a parabola.
 
 <img src="doc/images/Extrapolation.png" width="500" style="display: block; margin-left: auto; margin-right: auto;">
+
+## Running Textbook Algorithm Examples
+To run the set of Textbook algorithm examples described in the Singularity Paper, in the project root directory, type
+```
+sbt assembly
+```
+This will package everything into `src/benchmarks/target/scala-2.12/singularity-benchmarks-assembly-0.6.jar`, then type
+```
+java -cp src/benchmarks/target/scala-2.12/singularity-benchmarks-assembly-0.6.jar benchmarks.TextbookExamples
+```
+This will start the 17 textbook algorithm examples described in section 7.1 of the Singularity paper. By default, 8 processes will fuzz in parallel. You can change this number by setting `processNum` in `TextbookExamples.main()`. As described before, all results are written into `results-running` and `results`.
