@@ -246,31 +246,4 @@ object SimpleMath {
     1 - resSquared / variance
   }
 
-//  /** use exponentially weighted moving variance to calculate rSquared
-//    * @param alpha: change rate */
-//  def eRSquared(ys: IS[Double], predictions: IS[Double], weights: IS[Double], alpha: Double): Double = {
-//    val n = ys.length
-//    val residuals = (0 until n).map(i => predictions(i) - ys(i))
-//    var mean = 0.0
-//    var vSum = 0.0
-//    for(i <- 0 until n){
-//      val delta = residuals(i) - mean
-//      mean += alpha * weights(i) * delta
-//      vSum += square(delta) * weights(i)
-//    }
-//
-//    val staticMean = (0 until n).map(i => ys(i) * weights(i)).sum/n
-//    val variance = (0 until n).map(i => square(ys(i) - staticMean) * weights(i)).sum
-//    1 - vSum / variance
-//  }
-
-  def main(args: Array[String]): Unit = {
-    parallelMapOrdered(0 until 100, 6){ i =>
-//      Thread.sleep(100)
-      println(i)
-    }
-//    processMap(args, 0 until 100, 3, mainClass = this){
-//      i => println(s"*** $i ***")
-//    }
-  }
 }

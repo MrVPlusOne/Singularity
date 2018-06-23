@@ -181,9 +181,9 @@ object VavrExamples {
       ExecutionConfig(evalSizePolicy = FixedEvalSize(200)), rand)
   }
 
-  def main(args: Array[String]): Unit = {
-    runExample(0, true)
+//  def main(args: Array[String]): Unit = {
+//    runExample(0, true)
 //    val ind = FileInteraction.readMultiIndFromFile("/home/grieve/scratch/results/vavr.linkedhashset.union[performance=1048047.0][ioId=125,seed=125](17-12-15-11:26:57)/bestIndividual.serialized", StandardSystem.funcMap)
 //    showResourceUsageChart(linkedHashSetUnion, ind, 10000, 50)
-  }
+//  }
 }

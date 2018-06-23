@@ -78,46 +78,4 @@ object PatternPlot {
     println("Evaluation finished.")
     println(data)
   }
-
-  def main(args: Array[String]): Unit = {
-    import io.Source
-
-    val config: ProblemConfig = ???
-    val sizeLimit = 1000
-    val plotPoints = 30
-    val files =
-      """
-        |/Users/weijiayi/Programming/PatternSyn/results-running/phphash_int_100[ioId=4,seed=4](18-02-20-14:23:19)/bestIndividual.serialized
-      """.stripMargin.split("\n").map(_.trim).filter(_.nonEmpty)
-
-
-    for(fileLine <- files) {
-//      val lastName = "timeoutIndividual.serialized"
-      val lastName = "bestIndividual.serialized"
-      val file = if(fileLine.endsWith(".serialized")) fileLine else fileLine + "/" + lastName
-      val ind = FileInteraction.readMultiIndFromFile(file, StandardSystem.funcMap)
-      println("Individual: ")
-      println(ind)
-
-
-//      FuzzingTaskProvider.phpHashCollisionExample.runAsProbConfig("phpHash16") { config =>
-        showResourceUsageChart(config, ind, sizeLimit,
-          plotPoints = plotPoints, plotName = file, exitOnClose = false,
-          memoryLimit = sizeLimit * ind.nStates * 4,
-          patternCreationFeedback = (i, ev) => {
-            if (i % 1 == 0) {
-              println(s"input created: $i")
-              ev match{
-                case IS(graph: GraphValue, _, _) =>
-                  println{
-                    graph
-                  }
-                case _ => ()
-              }
-            }
-          }
-        )
-//      }
-    }
-  }
 }

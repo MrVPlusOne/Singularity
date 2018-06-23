@@ -4,7 +4,7 @@ import sbtassembly.AssemblyPlugin.autoImport.assemblyJarName
 organization in ThisBuild := "io.github.MrVPlusOne"
 scalaVersion in ThisBuild := "2.12.3"
 
-name := "singularity-core"
+name := "singularity"
 version := "0.6"
 
 libraryDependencies ++= {
@@ -27,4 +27,4 @@ libraryDependencies ++= {
 }
 
 unmanagedBase := file("lib")
-mainClass in assembly := Some("benchmarks.TextbookExamples")
+mainClass in assembly := Some("singularity.benchmarks.TextbookExamples")

@@ -129,20 +129,20 @@ object Playground {
     }
   }
 
-  def main(args: Array[String]): Unit = {
-    val seed = 5
-    //    val workingDir = FileInteraction.getWorkingDir(seed)
-    val rand = new Random(seed)
-    val size = 100
-    val sizePolicy = FixedEvalSize(size)
-    val resourcePolicy = ResourceUsagePolicy.HybridEvaluationPolicy()
-
-//    val prob = SlowfuzzExamples.phpHashExample(size)(FileInteraction.getWorkingDir(1))
-    ExampleAlgorithms.quickSortMiddlePivotExample.runAsProbConfig("quickSortMiddle"){ prob =>
-    standardSupernova.fuzzProblem(prob,
-      RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = true),
-      ExecutionConfig().copy(evalSizePolicy = sizePolicy, resourcePolicy = resourcePolicy),
-      rand = rand)
-        }
-  }
+//  def main(args: Array[String]): Unit = {
+//    val seed = 5
+//    //    val workingDir = FileInteraction.getWorkingDir(seed)
+//    val rand = new Random(seed)
+//    val size = 100
+//    val sizePolicy = FixedEvalSize(size)
+//    val resourcePolicy = ResourceUsagePolicy.HybridEvaluationPolicy()
+//
+////    val prob = SlowfuzzExamples.phpHashExample(size)(FileInteraction.getWorkingDir(1))
+//    ExampleAlgorithms.quickSortMiddlePivotExample.runAsProbConfig("quickSortMiddle"){ prob =>
+//    standardSupernova.fuzzProblem(prob,
+//      RunnerConfig().copy(randomSeed = seed, ioId = seed, useGUI = true),
+//      ExecutionConfig().copy(evalSizePolicy = sizePolicy, resourcePolicy = resourcePolicy),
+//      rand = rand)
+//        }
+//  }
 }

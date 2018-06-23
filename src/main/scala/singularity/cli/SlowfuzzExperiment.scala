@@ -61,10 +61,10 @@ object SlowfuzzExperiment {
     println(s"*** Task $cliOption finished ***")
   }
 
-  def main(args: Array[String]): Unit = {
-    val parser = optParser()
-    parser.parse(args, CliOption(name = "unknown")).foreach(runExperiment)
-  }
+//  def main(args: Array[String]): Unit = {
+//    val parser = optParser()
+//    parser.parse(args, CliOption(name = "unknown")).foreach(runExperiment)
+//  }
 
   def optParser(): OptionParser[CliOption] = {
     new scopt.OptionParser[CliOption]("slowfuzz_exp_driver") {

@@ -321,23 +321,5 @@ object JGraphTExamples {
   val greedy2VC = vertexCoverProblem("GreedyTwoApproxVCImpl", ()=> new GreedyVCImpl())
   val recursiveExactVC = vertexCoverProblem("RecursiveExactVCImpl", ()=> new RecursiveExactVCImpl())
 
-  def main(args: Array[String]): Unit = {
 
-//    val problems = coloringProblems ++ spanningTreeProblems
-//
-//    val numPerExample = 40
-//    val shift = 100
-//    SimpleMath.processMap(args,
-//      0 until problems.length*numPerExample, processNum = 14,
-//      mainClass = this){
-//      i =>
-//        val size = 200
-//        runExample(i+shift, problems(i/numPerExample), useGUI = false, size = size)
-//    }
-
-
-    runExample(2, clarkson2VC, useGUI = true, size = 200)
-
-    //    testAverage()
-  }
 }

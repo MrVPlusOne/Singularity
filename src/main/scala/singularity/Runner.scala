@@ -75,6 +75,16 @@ object Runner {
     )
   }
 
+  /**
+    *
+    * @param ioId When multiple fuzzing tasks are running in parallel, make sure they have different ioIds to prevent
+    *             from I/O conflicts.
+    * @param useGUI Some platform might not support GUI interfaces, in that case, set this to false to avoid exceptions
+    * @param keepBestIndividuals When set to true, every time a better individual is found, instead of overwriting
+    *                            the current best one, both old ones and the new one is saved (with different names).
+    * @param callExitAfterFinish set this to true if the target program keeps running after it has been called
+    * @param reportResult this callback gets called with the best individual of each generation
+    */
   case class RunnerConfig(ioId: Int = 0,
                           randomSeed: Int = 0,
                           useGUI: Boolean = true,

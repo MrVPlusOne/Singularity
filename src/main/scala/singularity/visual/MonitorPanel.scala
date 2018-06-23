@@ -13,22 +13,22 @@ import singularity._
 
 
 object MonitorPanel{
-  def main(args: Array[String]): Unit = {
-    val frame = new JFrame("Monitor") {
-      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-
-      setVisible(true)
-    }
-
-    val chart = {
-      import io.Source
-      val lines = Source.fromFile("/Users/weijiayi/Downloads/monitorData_random.txt").getLines()
-      plotFromCSVString(lines)
-    }
-
-    frame.setContentPane(new MonitorPanel(Some(chart), margin = 10, plotSize = (600,450)))
-    frame.pack()
-  }
+//  def main(args: Array[String]): Unit = {
+//    val frame = new JFrame("Monitor") {
+//      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+//
+//      setVisible(true)
+//    }
+//
+//    val chart = {
+//      import io.Source
+//      val lines = Source.fromFile("/Users/weijiayi/Downloads/monitorData_random.txt").getLines()
+//      plotFromCSVString(lines)
+//    }
+//
+//    frame.setContentPane(new MonitorPanel(Some(chart), margin = 10, plotSize = (600,450)))
+//    frame.pack()a
+//  }
 
   def plotFromCSVString(lines: Iterator[String]): JFreeChart = {
     import ListPlot.makeXY

@@ -236,8 +236,8 @@ object MicroBenchmarks {
 
   def allProblems: IS[ProblemConfig] = IS(insertionSort, bubbleSort, quickSortPivotFirst, quickSortPivotMiddle, treeSort, shellSortShell, shellSortFrankLazarus, shellSortHibbard, stringSearch, giftWrap, bellmanFord, kruskal)
 
-  def main(args: Array[String]): Unit = {
-    BenchmarkSet.runExample(2, bellmanFord, useGUI = true, size = 100)
+//  def main(args: Array[String]): Unit = {
+//    BenchmarkSet.runExample(2, bellmanFord, useGUI = true, size = 100)
 
 //    val numPerExample = 40
 //    val shift = 100
@@ -247,5 +247,5 @@ object MicroBenchmarks {
 //          i =>
 //            BenchmarkSet.runExample(i+shift, allProblems(i/numPerExample), useGUI = false, size = 100)
 //        }
-  }
+//  }
 }

@@ -209,7 +209,7 @@ object TextbookExamples {
         var numIters = 0
         while (timeLeft > 0L && numIters < maxIteration) {
           val seed = baseSeed + numIters
-          val runnerConfig = RunnerConfig(randomSeed = seed, ioId = seed, useGUI = false, callExitAfterFinish = false)
+          val runnerConfig = RunnerConfig(randomSeed = seed, ioId = seed, useGUI = true, callExitAfterFinish = false)
           try {
             val (timeUsed, _) = TimeTools.measureTime {
               val execConfig = execConfigTemplate.copy(maxFuzzingTimeSec = Some(timeLeft))

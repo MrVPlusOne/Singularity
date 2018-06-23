@@ -118,14 +118,6 @@ object FileInteraction{
     MultiStateInd(sExprs.map(e => SExpr.mkExpr(e, funcMap)), numOfStates)
   }
 
-  def main(args: Array[String]): Unit = {
-    import StandardSystem._
-    val t = EVect(EInt)
-    val path = "testSave.serialized"
-    saveObjectToFile(path)(t)
-    val t1 = readObjectFromFile[EType](path)
-    println(t == t1)
-  }
 }
 
 

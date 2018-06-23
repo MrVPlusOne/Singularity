@@ -71,9 +71,9 @@ object TimeMeasureExamples {
     })
   }
 
-  def main(args: Array[String]): Unit = {
-    println{
-      phpHashExample.measure(Seq("a","b","c","d","e","f","g","h"), 1000)
-    }
-  }
+//  def main(args: Array[String]): Unit = {
+//    println{
+//      phpHashExample.measure(Seq("a","b","c","d","e","f","g","h"), 1000)
+//    }
+//  }
 }
