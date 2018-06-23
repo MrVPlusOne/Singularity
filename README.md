@@ -34,7 +34,7 @@ To use the source code, clone or download the github project and run [sbt](https
 
 ## Tutorial
 
-In this example, we will use Singularity to find the input pattern that maximizes the running time of a simple **quickSort** implementation. The source code can be found in [QuickSort.scala](src/benchmarks/scala/examples/QuickSort.scala).
+In this example, we will use Singularity to find the input pattern that maximizes the running time of a simple **quickSort** implementation. The source code can be found in [QuickSort.scala](src/main/scala/singularity/examples/QuickSort.scala).
 
 ### QuickSort Implementation and Instrumentation
 
@@ -61,7 +61,7 @@ Cost.reset()
 runTargetProgram()
 Cost.read()
 ```
-To get resource usage. (see also [BenchmarkSet.measureCost](src/benchmarks/scala/benchmarks/BenchmarkSet.scala)). For the C++ instrumentation, the user will need to parse the cost from command line output.
+To get resource usage. (see also [BenchmarkSet.measureCost](src/main/scala/singularity/benchmarks/BenchmarkSet.scala)). For the C++ instrumentation, the user will need to parse the cost from command line output.
 
 ### ProblemConfig
 
@@ -85,7 +85,7 @@ Having implemented the target program, we now need to write some gluing code to 
 ```
 
  * `outputTypes` gives the argument types of the target program. Since our quickSort implementation takes a Scala indexed integer sequence (`IndexedSeq[Int]`), `outputTypes` consists of only one element, `EVect(EInt)`, which is the equivalent type defined in the standard DSL.
-(See more about DSL in [StandardSystem.scala](src/core/scala/singularity/StandardSystem.scala)).
+(See more about DSL in [StandardSystem.scala](src/main/scala/singularity/StandardSystem.scala)).
 
  * `resourceUsage` specifies how to get resource usage as fuzzing feedback. Since we have specified the output type to be `EVect(EInt)`, during fuzzing time, Singularity will try to feed a vector of integers to the target program and need to receive the corresponding resource usage from the result of the lambda.
 
