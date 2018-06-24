@@ -14,7 +14,8 @@ Singularity is an automatic fuzzing tool for generating inputs (called patterns)
     * [Running Singularity](#running-singularity)
     * [Understanding the Results](#understanding-the-results)
     * [Saving and Reading Patterns](#saving-and-reading-patterns)
- * [Running Textbook Algorithm Examples](#running-textbook-algorithm-examples)   
+ * [Running Textbook Algorithm Examples](#running-textbook-algorithm-examples)
+ * [Graph DSL](#graph-dsl)
 
 ### Overview
 
@@ -213,3 +214,6 @@ This will package everything into `src/benchmarks/target/scala-2.12/singularity-
 java -cp src/benchmarks/target/scala-2.12/singularity-benchmarks-assembly-0.6.jar benchmarks.TextbookExamples
 ```
 to start the 17 textbook algorithm examples described in section 7.1 of the Singularity paper. The additional packaging step is required in order to spawn multiple processes. By default, 8 subprocesses will run in parallel. You can change this number by setting `processNum` in `TextbookExamples.main()`. As described before, all results will be written into `results-running` and `results`.
+
+## Graph DSL
+You can learn more about how Singularity deals with Graphs [here](doc/GraphComponents.md).
