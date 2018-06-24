@@ -134,7 +134,7 @@ The best pattern in the first generation:
 [S4: EVect(EInt)]{ seed: [23,234] ; iter: shift(prepend(118, append(S4, 227)), S0) }
 ```
 
-Which is a pattern (i.e. a Recurrent Computation Graph introduced in the paper) with 5 internal states. Each state consists of a `seed`-`iter` pair: `seed` defines how to initialize the state, and `iter` defines how to update it.
+Which is a pattern (i.e. a *Recurrent Computation Graph*) with 5 internal states. Each state consists of a `seed`-`iter` pair: `seed` defines how to initialize the state, and `iter` defines how to update it.
 
 The above pattern generates inputs like this:
 
@@ -212,4 +212,4 @@ This will package everything into `src/benchmarks/target/scala-2.12/singularity-
 ```
 java -cp src/benchmarks/target/scala-2.12/singularity-benchmarks-assembly-0.6.jar benchmarks.TextbookExamples
 ```
-This will start the 17 textbook algorithm examples described in section 7.1 of the Singularity paper. By default, 8 subprocesses will run in parallel. You can change this number by setting `processNum` in `TextbookExamples.main()`. As described before, all results will be written into `results-running` and `results`.
+to start the 17 textbook algorithm examples described in section 7.1 of the Singularity paper. The additional packaging step is required in order to spawn multiple processes. By default, 8 subprocesses will run in parallel. You can change this number by setting `processNum` in `TextbookExamples.main()`. As described before, all results will be written into `results-running` and `results`.
