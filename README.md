@@ -125,16 +125,18 @@ As you can see from the Screenshot, Singularity easily found the pattern with ma
 The best pattern in the first generation:
 
 ```
-[O0: EVect(EInt)] -> #3  //A single output that outputs S3
-*  //below are 4 internal states
+[O0: EVect(EInt)] -> S3  //A single output that outputs S3
+*  //below are 5 internal states
 [S0: EInt]{ seed: 224 ; iter: shiftBL(plus(bitAnd(9, 205), 215)) }
-[S1: EInt]{ seed: 242 ; iter: #0 }
+[S1: EInt]{ seed: 242 ; iter: S0 }
 [S2: EVect(EInt)]{ seed: [245,35] ; iter: [] }
-[S3: EVect(EInt)]{ seed: [] ; iter: #4 }
-[S4: EVect(EInt)]{ seed: [23,234] ; iter: shift(prepend(118, append(#4, 227)), #0) }
+[S3: EVect(EInt)]{ seed: [] ; iter: S4 }
+[S4: EVect(EInt)]{ seed: [23,234] ; iter: shift(prepend(118, append(S4, 227)), S0) }
 ```
 
-Which generates inputs like this:
+Which is a pattern (i.e. a Recurrent Computation Graph introduced in the paper) with 5 internal states. Each state consists of a `seed`-`iter` pair: `seed` defines how to initialize the state, and `iter` defines how to update it.
+
+The above pattern generates inputs like this:
 
 ```
 [23,234],
@@ -153,7 +155,7 @@ But as the fuzzing continues, we see gradual and consistent fitness improvement.
 *
 [S0: EInt]{ seed: 0 ; iter: 0 }                 (unused state)
 [S1: EInt]{ seed: 1 ; iter: S1 }
-[S2: EVect(EInt)]{ seed: [] ; iter: #2 }        (unused state)
+[S2: EVect(EInt)]{ seed: [] ; iter: S2 }        (unused state)
 [S3: EVect(EInt)]{ seed: [] ; iter: prepend(0, shift(S4, inc(S1))) }
 [S4: EVect(EInt)]{ seed: [] ; iter: append(S3, S1) }
 ```
