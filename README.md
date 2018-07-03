@@ -32,6 +32,7 @@ The recommended way is to include Singularity as a library into your Scala/Java 
 
 To use the source code, clone or download the github project and run [sbt](https://www.scala-sbt.org) at the project root to install all dependencies.
 
+See also the [installation steps](INSTALL.md).
 
 ## Tutorial
 
