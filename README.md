@@ -209,11 +209,11 @@ To run the set of Textbook algorithm examples described in the Singularity Paper
 ```
 sbt assembly
 ```
-This will package everything into `src/benchmarks/target/scala-2.12/singularity-benchmarks-assembly-0.6.jar`, then type
+This will package everything into `target/scala-2.12/singularity-assembly-0.6.jar`, then type
 ```
-java -cp src/benchmarks/target/scala-2.12/singularity-benchmarks-assembly-0.6.jar benchmarks.TextbookExamples
+java -cp target/scala-2.12/singularity-assembly-0.6.jar singularity.benchmarks.TextbookExamples
 ```
-to start the 17 textbook algorithm examples described in section 7.1 of the Singularity paper. The additional packaging step is required in order to spawn multiple processes. By default, 8 subprocesses will run in parallel. You can change this number by setting `processNum` in `TextbookExamples.main()`. As described before, all results will be written into `results-running` and `results`.
+to start the 17 textbook algorithm examples described in section 7.1 of the Singularity paper. The additional packaging step is required in order to spawn multiple processes. By default, a process poop of size 8 will be used. You can change this number by setting `processNum` in `TextbookExamples.main()`. As described before, all results will be written into `results-running` and `results`.
 
 ## Graph DSL
 You can learn more about how Singularity deals with Graphs [here](doc/GraphComponents.md).
