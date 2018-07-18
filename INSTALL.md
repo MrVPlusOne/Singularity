@@ -17,3 +17,5 @@ Installation steps:
    java -cp target/scala-2.12/singularity-assembly-0.6.jar singularity.benchmarks.TextbookExamples
    ```
    to start the 17 textbook algorithm examples described in section 7.1 of the Singularity paper. The additional packaging step is required in order to spawn multiple processes. By default, 8 subprocesses will run in parallel. You can change this number by setting `processNum` in `TextbookExamples.main()`. As described [in the tutorial](README.md/#saving-and-reading-patterns), all results will be written into `results-running` and `results`.
+   
+   In general, use `java -cp <path to the jar> <main class name>` to run other main classes that use a process pool. (only using `sbt run` will result in a classpath exception)
