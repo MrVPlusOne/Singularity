@@ -222,6 +222,6 @@ You can learn more about how Singularity deals with Graphs [here](doc/GraphCompo
 
 ## Paper
 
-Please cite this work as _Jiayi Wei, Jia Chen, Yu Feng, Kostas Ferles, and Isil Dillig. 2018. Singu- larity: Pattern Fuzzing for Worst Case Complexity. In Proceedings of the 26th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE ’18), November 4– 9, 2018, Lake Buena Vista, FL, USA._
+Please cite this work as _Jiayi Wei, Jia Chen, Yu Feng, Kostas Ferles, and Isil Dillig. 2018. Singularity: Pattern Fuzzing for Worst Case Complexity. In Proceedings of the 26th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE ’18), November 4– 9, 2018, Lake Buena Vista, FL, USA._
 
 Our Paper is available [here](https://github.com/MrVPlusOne/Singularity/raw/develop/doc/PatternFuzzing.pdf).
