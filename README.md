@@ -16,6 +16,7 @@ Singularity is an automatic fuzzing tool for generating inputs (called patterns)
     * [Saving and Reading Patterns](#saving-and-reading-patterns)
  * [Running Textbook Algorithm Examples](#running-textbook-algorithm-examples)
  * [Graph DSL](#graph-dsl)
+ * [Paper](#paper)
 
 ### Overview
 
@@ -218,3 +219,9 @@ to start the 17 textbook algorithm examples described in section 7.1 of the Sing
 
 ## Graph DSL
 You can learn more about how Singularity deals with Graphs [here](doc/GraphComponents.md).
+
+## Paper
+
+Please cite this work as _Jiayi Wei, Jia Chen, Yu Feng, Kostas Ferles, and Isil Dillig. 2018. Singu- larity: Pattern Fuzzing for Worst Case Complexity. In Proceedings of the 26th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE ’18), November 4– 9, 2018, Lake Buena Vista, FL, USA._
+
+Our Paper is available [here](https://github.com/MrVPlusOne/Singularity/raw/develop/doc/PatternFuzzing.pdf).
