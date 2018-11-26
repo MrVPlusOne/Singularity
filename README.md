@@ -17,6 +17,7 @@ Singularity is an automatic fuzzing tool for generating inputs (called patterns)
  * [Running Textbook Algorithm Examples](#running-textbook-algorithm-examples)
  * [Graph DSL](#graph-dsl)
  * [Paper](#paper)
+ * [Talk] (#talk)
 
 ### Overview
 
@@ -73,10 +74,10 @@ Having implemented the target program, we now need to write some gluing code to 
 ```scala
   val quickSortProblem = ProblemConfig(
     problemName = "quickSort example",
-    outputTypes = IndexedSeq(EVect(EInt)),
+    outputTypes = IndexedSeq(EVect(EInt)),  // we want singularity to output a vector of integers
     resourceUsage = {
-      case IndexedSeq(VectValue(vs)) =>
-        val xs = vs.map(_.asInstanceOf[IntValue].value) //convert VectValue to IndexedSeq[Int]
+      case IndexedSeq(VectValue(vs)) =>  // VectValue[Vector[IntValue]], corresponding to EVect(EInt)
+        val xs = vs.map(_.asInstanceOf[IntValue].value)  // convert VectValue to IndexedSeq[Int]
         counter = 0
         quickSort(xs)
         counter
@@ -87,7 +88,7 @@ Having implemented the target program, we now need to write some gluing code to 
   )
 ```
 
- * `outputTypes` gives the argument types of the target program. Since our quickSort implementation takes a Scala indexed integer sequence (`IndexedSeq[Int]`), `outputTypes` consists of only one element, `EVect(EInt)`, which is the equivalent type defined in the standard DSL.
+ * `outputTypes` gives the argument types of the target program. Since our quickSort implementation takes a Scala indexed integer sequence (`IndexedSeq[Int]`), `outputTypes` consists of only one element, `EVect(EInt)`, which is the corresponding DSL type for `IndexedSeq[Int]`.
 (See more about DSL in [StandardSystem.scala](src/main/scala/singularity/StandardSystem.scala)).
 
  * `resourceUsage` specifies how to get resource usage as fuzzing feedback. Since we have specified the output type to be `EVect(EInt)`, during fuzzing time, Singularity will try to feed a vector of integers to the target program and need to receive the corresponding resource usage from the result of the lambda.
@@ -225,3 +226,7 @@ You can learn more about how Singularity deals with Graphs [here](doc/GraphCompo
 Please cite this work as _Jiayi Wei, Jia Chen, Yu Feng, Kostas Ferles, and Isil Dillig. 2018. Singularity: Pattern Fuzzing for Worst Case Complexity. In Proceedings of the 26th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE ’18), November 4– 9, 2018, Lake Buena Vista, FL, USA._
 
 Our Paper is available [here](https://github.com/MrVPlusOne/Singularity/raw/develop/doc/PatternFuzzing.pdf).
+
+## Talk
+
+Our FSE talk is available [here](https://www.youtube.com/watch?v=SpYzBfAUHEc&t=387s).
