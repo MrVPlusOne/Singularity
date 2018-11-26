@@ -17,7 +17,7 @@ Singularity is an automatic fuzzing tool for generating inputs (called patterns)
  * [Running Textbook Algorithm Examples](#running-textbook-algorithm-examples)
  * [Graph DSL](#graph-dsl)
  * [Paper](#paper)
- * [Talk] (#talk)
+ * [Talk](#talk)
 
 ### Overview
 
