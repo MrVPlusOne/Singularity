@@ -449,7 +449,7 @@ object StandardSystem {
         case IS(eT) => IS(EGraph(eT), EGraph(eT)) -> EGraph(eT)
       }, eval = {
         case IS(g1: GraphValue, g2: GraphValue) =>
-          GraphValue(g1.nodeNum + g2.nodeNum, g2.shiftIndex(g1.nodeNum).edges)
+          GraphValue(g1.nodeNum + g2.nodeNum, g1.edges + g2.shiftIndex(g1.nodeNum).edges)
       })
 
     val updateEdgeValue = mkAbstract("updateEdge", tyVarNum = 1,
